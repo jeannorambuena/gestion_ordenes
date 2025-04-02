@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Asignaciones{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Lista de Asignaciones Funcionarios-Colegios</h2>
+    <a href="{{ url_for('funcionarios_colegios.nuevo_funcionario_colegio') }}" class="btn btn-success mb-3">Agregar Nueva Asignación</a>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Funcionario</th>
+                <th>Colegio</th>
+                <th>Horas Disponibles</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asignacion in asignaciones %}
+            <tr>
+                <td>{{ asignacion.funcionario.nombre }} {{ asignacion.funcionario.apellido }}</td>
+                <td>{{ asignacion.colegio.nombre_colegio }}</td>
+                <td>{{ asignacion.horas_disponibles }}</td>
+                <td>
+                    <!-- Botón para Editar -->
+                    <a href="{{ url_for('funcionarios_colegios.editar_funcionario_colegio', id=asignacion.id) }}"
+                       class="btn btn-warning btn-sm">
+                        Editar
+                    </a>
+                    <small class="text-muted">
+                        (Enlace generado: {{ url_for('funcionarios_colegios.editar_funcionario_colegio', id=asignacion.id) }})
+                    </small>
+
+                    <!-- Botón para Eliminar -->
+                    <form action="{{ url_for('funcionarios_colegios.eliminar_funcionario_colegio', id=asignacion.id) }}" 
+                          method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('¿Estás seguro de eliminar esta asignación?')">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

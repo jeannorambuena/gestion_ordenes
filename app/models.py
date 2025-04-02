@@ -1,0 +1,224 @@
+from sqlalchemy.orm import validates, relationship, backref, foreign
+from sqlalchemy import Column, String, Integer, Date, Boolean, Text, Enum, ForeignKey, Float
+from datetime import datetime
+from app import db
+
+# Modelo: Alcaldia
+
+
+class Alcaldia(db.Model):
+    __tablename__ = 'alcaldia'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nombre_alcalde = Column(String(100), nullable=False)
+    cedula_identidad = Column(String(12), unique=True, nullable=False)
+    email = Column(String(100), nullable=True)
+    telefono = Column(String(20), nullable=True)
+    fecha_inicio = Column(Date, nullable=False)
+    fecha_termino = Column(Date, nullable=True)
+    cargo = Column(Enum('Alcalde', 'Alcaldesa', 'Alcalde(S)', 'Alcaldesa(S)',
+                   name='cargo_enum'), nullable=False, default='Alcalde')
+
+# Modelo: Cargos
+
+
+class Cargo(db.Model):
+    __tablename__ = 'cargos'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nombre_cargo = Column(String(100), nullable=False)
+    descripcion = Column(String(255), nullable=True)
+
+# Modelo: Colegios
+
+
+class Colegios(db.Model):
+    __tablename__ = 'colegios'
+
+    rbd = Column(String(20), primary_key=True)
+    nombre_colegio = Column(String(100), nullable=False)
+    direccion = Column(String(255), nullable=False)
+    telefono = Column(String(20), nullable=True)
+    director = Column(String(100), nullable=True)
+    email = Column(String(100), nullable=True)
+    tipo_ensenanza = Column(
+        Enum('BASICA', 'MEDIA', name='tipo_ensenanza'), nullable=False)
+    latitud = Column(Float, nullable=True)
+    longitud = Column(Float, nullable=True)
+
+# Modelo: Funcionarios
+
+
+class Funcionarios(db.Model):
+    __tablename__ = 'funcionarios'
+
+    rut_cuerpo = Column(String(8), primary_key=True)
+    rut_dv = Column(String(1), nullable=False)
+    nombre = Column(String(100), nullable=False)
+    apellido = Column(String(100), nullable=False)
+    direccion = Column(String(255), nullable=True)
+    telefono = Column(String(15), nullable=True)
+    titulo = Column(String(100), nullable=True)
+    id_cargo = Column(Integer, ForeignKey('cargos.id'), nullable=True)
+
+    # Relación con el modelo Cargo
+    cargo = relationship('Cargo', backref='funcionarios', lazy='joined')
+
+    # Comentando relación con FuncionarioColegios
+    # colegios_relacion = relationship(
+    #     'FuncionarioColegios',
+    #     backref='funcionario',
+    #     lazy=True
+    # )
+
+# Modelo: Ordenes de Trabajo
+
+
+class OrdenesTrabajo(db.Model):
+    __tablename__ = 'ordenes_trabajo'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    numero_orden = Column(Integer, nullable=False)
+    anio = Column(Integer, nullable=False, default=datetime.now().year)
+    fecha_inicio = Column(Date, nullable=False)
+    fecha_termino = Column(Date, nullable=True)
+    es_indefinido = Column(Boolean, default=False)
+    observaciones = Column(Text, nullable=True)
+    horas_disponibles = Column(Integer, nullable=False, default=0)
+    colegio_rbd = Column(String(20), ForeignKey('colegios.rbd'), nullable=True)
+    tipo_contrato_id = Column(Integer, ForeignKey(
+        'tipo_contrato.id'), nullable=True)
+    financiamiento_id = Column(Integer, ForeignKey(
+        'financiamiento.id'), nullable=True)
+    rut_cuerpo = Column(String(8), nullable=False)
+    rut_dv = Column(String(1), nullable=False)
+    alcalde_id = Column(Integer, ForeignKey('alcaldia.id'), nullable=False)
+    jefatura_daem_id = Column(Integer, ForeignKey(
+        'jefatura_daem.id'), nullable=False)
+
+    # Relaciones
+    funcionario = relationship(
+        'Funcionarios',
+        primaryjoin="and_(foreign(OrdenesTrabajo.rut_cuerpo) == Funcionarios.rut_cuerpo, "
+        "foreign(OrdenesTrabajo.rut_dv) == Funcionarios.rut_dv)",
+        backref='ordenes_trabajo'
+    )
+    tipo_contrato = relationship('TipoContrato', backref='ordenes_trabajo')
+    financiamiento = relationship('Financiamiento', backref='ordenes_trabajo')
+    colegio = relationship('Colegios', backref='ordenes_trabajo')
+    alcalde = relationship('Alcaldia', backref='ordenes_trabajo')
+    jefatura_daem = relationship('JefaturaDAEM', backref='ordenes_trabajo')
+
+    # Comentando relación inversa con FuncionarioColegios
+    # funcionarios_colegios_relacion = relationship(
+    #     'FuncionarioColegios',
+    #     backref='orden_trabajo',
+    #     lazy='joined'
+    # )
+
+# Comentando clase FuncionarioColegios
+# class FuncionarioColegios(db.Model):
+#     __tablename__ = 'funcionarios_colegios'
+
+#     id = Column(Integer, primary_key=True, autoincrement=True)
+#     funcionario_id = Column(String(8), ForeignKey(
+#         'funcionarios.rut_cuerpo'), nullable=False)
+#     colegio_rbd = Column(String(20), ForeignKey(
+#         'colegios.rbd'), nullable=False)
+#     horas_disponibles = Column(Integer, nullable=False)
+#     orden_id = Column(Integer, ForeignKey('ordenes_trabajo.id'), nullable=True)
+
+#     # Relación con OrdenesTrabajo
+#     ordenes_relacion = relationship(
+#         'OrdenesTrabajo',
+#         backref='funcionarios_colegios',
+#         lazy='joined'
+#     )
+
+#     # Relación con Colegios
+#     colegio = relationship(
+#         'Colegios',
+#         backref='funcionarios_colegios',
+#         lazy='joined'
+#     )
+
+#     # Relación con Funcionarios
+#     funcionario_relacion = relationship(
+#         'Funcionarios',
+#         backref='asignaciones_colegios',
+#         foreign_keys='FuncionarioColegios.funcionario_id',
+#         lazy='joined'
+#     )
+
+# Modelo: Financiamiento
+
+
+class Financiamiento(db.Model):
+    __tablename__ = 'financiamiento'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nombre_financiamiento = Column(String(100), nullable=False)
+
+# Modelo: Tipo de Contrato
+
+
+class TipoContrato(db.Model):
+    __tablename__ = 'tipo_contrato'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nombre = Column(String(100), nullable=False)
+    observacion = Column(Text, nullable=True)
+
+# Modelo: Historial de Cambios
+
+
+class HistorialCambios(db.Model):
+    __tablename__ = 'historial_cambios'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    tabla_afectada = Column(String(100), nullable=False)
+    registro_id = Column(Integer, nullable=False)
+    usuario_id = Column(Integer, nullable=False)
+    tipo_cambio = Column(String(50), nullable=False)
+    detalle_cambio = Column(Text, nullable=True)
+    fecha_cambio = Column(Date, default=datetime.utcnow, nullable=False)
+
+# Modelo: Usuario
+
+
+class Usuario(db.Model):
+    __tablename__ = 'usuarios'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nombre_usuario = Column(String(50), unique=True, nullable=False)
+    contrasena = Column(String(255), nullable=False)
+    rol = Column(String(50), nullable=False)
+
+# Modelo: Roles
+
+
+class Rol(db.Model):
+    __tablename__ = 'roles'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nombre_rol = Column(String(50), unique=True, nullable=False)
+    descripcion = Column(Text, nullable=True)
+
+# Modelo: JefaturaDAEM
+
+
+class JefaturaDAEM(db.Model):
+    __tablename__ = 'jefatura_daem'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=True)
+    telefono = db.Column(db.String(20), nullable=True)
+    fecha_inicio = db.Column(db.Date, nullable=False)
+    fecha_termino = db.Column(db.Date, nullable=True)
+    cargo_jefatura = db.Column(db.String(50), nullable=False)
+    rut_cuerpo = db.Column(db.String(8), nullable=False)
+    rut_dv = db.Column(db.String(1), nullable=False)
+
+    def __repr__(self):
+        return f'<JefaturaDAEM {self.nombre} - {self.cargo_jefatura}>'

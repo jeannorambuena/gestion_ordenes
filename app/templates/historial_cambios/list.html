@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="page-title">Historial de Cambios</h1>
+            <a href="{{ url_for('historial_bp.nuevo_historial') }}" class="btn btn-primary">Nuevo Registro</a>
+        </div>
+        
+        {% if historial %}
+            <table class="table table-hover table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Tabla Afectada</th>
+                        <th>Registro ID</th>
+                        <th>Usuario ID</th>
+                        <th>Tipo de Cambio</th>
+                        <th>Detalle</th>
+                        <th>Fecha de Cambio</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cambio in historial %}
+                    <tr>
+                        <td>{{ cambio.tabla_afectada }}</td>
+                        <td>{{ cambio.registro_id }}</td>
+                        <td>{{ cambio.usuario_id }}</td>
+                        <td>{{ cambio.tipo_cambio }}</td>
+                        <td>{{ cambio.detalle_cambio }}</td>
+                        <td>{{ cambio.fecha_cambio.strftime('%d/%m/%Y %H:%M') }}</td>
+                        <td>
+                            <a href="{{ url_for('historial_bp.editar_historial_cambio', id=cambio.id) }}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                            <form action="{{ url_for('historial_bp.eliminar_historial_cambio', id=cambio.id) }}" method="POST" class="d-inline-block">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Estás seguro de que quieres eliminar este cambio?');">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="alert alert-info text-center">
+                No hay registros en el historial de cambios.
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

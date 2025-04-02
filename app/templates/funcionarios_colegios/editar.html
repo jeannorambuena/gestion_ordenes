@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Asignación de Funcionario a Colegio{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-lg p-4 mb-5 bg-white rounded" style="max-width: 600px; margin: auto;">
+        <h2 class="text-center mb-4">Editar Asignación de Funcionario a Colegio</h2>
+        <form method="POST" action="">
+            <div class="mb-3">
+                <label for="rut_cuerpo" class="form-label">Funcionario</label>
+                {{ form.rut_cuerpo(class="form-select") }}
+                <small class="text-muted">Funcionario actual: {{ asignacion.funcionario_id }}</small>
+            </div>
+            <div class="mb-3">
+                <label for="colegio_rbd" class="form-label">Colegio</label>
+                {{ form.colegio_rbd(class="form-select") }}
+                <small class="text-muted">Colegio actual: {{ asignacion.colegio_rbd }}</small>
+            </div>
+            <div class="mb-3">
+                <label for="horas_disponibles" class="form-label">Horas Disponibles</label>
+                {{ form.horas_disponibles(class="form-control") }}
+            </div>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

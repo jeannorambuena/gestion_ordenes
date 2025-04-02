@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Alcaldías{% endblock %}
+
+{% block content %}
+<div class="container mt-0"> <!-- Reducido el margen superior -->
+    <h2 class="text-center mb-3">Lista de Alcaldías</h2> <!-- Reducido el espacio debajo del título -->
+
+    <!-- Botón para agregar una nueva alcaldía -->
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ url_for('alcaldia.nueva_alcaldia') }}" class="btn btn-success">Agregar Nueva Alcaldía</a>
+    </div>
+
+    {% if alcaldias %}
+    <!-- Tabla con bordes, colores y clases de Bootstrap -->
+    <div class="table-responsive shadow-lg p-3 mb-5 bg-white rounded">
+        <table class="table table-bordered table-hover">
+            <thead class="bg-success text-white"> <!-- Fondo verde y texto blanco para la cabecera -->
+                <tr class="text-center">
+                    <th>Nombre del Alcalde</th>
+                    <th>Cédula de Identidad</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Fecha de Inicio</th>
+                    <th>Fecha de Término</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alcaldia in alcaldias %}
+                <tr>
+                    <td>{{ alcaldia.nombre_alcalde }}</td>
+                    <td class="text-center">{{ alcaldia.cedula_identidad }}</td>
+                    <td>{{ alcaldia.email }}</td>
+                    <td class="text-center">{{ alcaldia.telefono }}</td>
+                    <td class="text-center">{{ alcaldia.fecha_inicio }}</td>
+                    <td class="text-center">{{ alcaldia.fecha_termino }}</td>
+                    <td class="d-flex justify-content-center">
+                        <!-- Botón para editar alcaldía -->
+                        <a href="{{ url_for('alcaldia.editar_alcaldia', id=alcaldia.id) }}" class="btn btn-warning btn-sm me-2">Editar</a>
+                        <!-- Formulario para eliminar alcaldía -->
+                        <form action="{{ url_for('alcaldia.eliminar_alcaldia', id=alcaldia.id) }}" method="POST">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta alcaldía?')">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <!-- Mensaje cuando no hay alcaldías registradas -->
+    <div class="alert alert-info text-center" role="alert">
+        No hay alcaldías registradas.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,342 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="font-weight-light my-3">Nueva Orden de Trabajo</h3>
+                </div>
+                <div class="card-body">
+                    <form id="formulario-orden" method="POST" action="{{ url_for('ordenes_bp.nueva_orden') }}" novalidate>
+                        {{ form.hidden_tag() }}
+
+                        <!-- Número de Orden (No Modificable) -->
+                        <div class="form-group mb-3">
+                            <label for="numero_orden" class="form-label">Número de Orden</label>
+                            <input type="text" id="numero_orden" name="numero_orden" class="form-control" value="{{ numero_orden }}" readonly>
+                        </div>
+
+                        <!-- RUT -->
+                        <div class="row mb-3">
+                            <div class="col-md-5">
+                                <input type="text" id="rut_cuerpo" name="rut_cuerpo" class="form-control rounded" placeholder="RUT (cuerpo)">
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" id="rut_dv" name="rut_dv" class="form-control rounded" placeholder="DV">
+                            </div>
+                            <div class="col-md-5">
+                                <button type="button" id="buscar-funcionario-btn" class="btn btn-primary shadow-lg w-100 px-4">
+                                    <i class="fas fa-search"></i> Buscar Funcionario
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="rut-error" class="text-danger"></div>
+
+                        <!-- Nombre y Apellido -->
+                        <div class="form-group mb-3">
+                            <label for="nombre_funcionario" class="form-label">Nombre</label>
+                            <input type="text" id="nombre_funcionario" name="nombre_funcionario" class="form-control rounded" readonly>
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="apellido_funcionario" class="form-label">Apellido</label>
+                            <input type="text" id="apellido_funcionario" name="apellido_funcionario" class="form-control rounded" readonly>
+                        </div>
+
+                        <!-- Colegio -->
+                        <div class="form-group mb-3">
+                            <label for="colegio_rbd" class="form-label">Colegio</label>
+                            {{ form.colegio_rbd(class="form-select rounded", id="colegio_rbd") }}
+                        </div>
+
+                        <!-- Tipo de Contrato -->
+                        <div class="form-group mb-3">
+                            <label for="tipo_contrato" class="form-label">Tipo de Contrato</label>
+                            {{ form.tipo_contrato(class="form-select rounded", id="tipo_contrato") }}
+                        </div>
+
+                        <!-- Financiamiento -->
+                        <div class="form-group mb-3">
+                            <label for="financiamiento_id" class="form-label">Financiamiento</label>
+                            {{ form.financiamiento(class="form-select rounded", id="financiamiento_id") }}
+                        </div>
+
+                        <!-- Fechas -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                                    {{ form.fecha_inicio(class="form-control rounded", id="fecha_inicio") }}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label for="fecha_termino" class="form-label">Fecha de Término</label>
+                                    {{ form.fecha_termino(class="form-control rounded", id="fecha_termino") }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Checkbox "Es Indefinido" -->
+                        <div class="form-check mb-3">
+                            {{ form.es_indefinido(class="form-check-input", id="es_indefinido") }}
+                            <label class="form-check-label">Es Indefinido</label>
+                        </div>
+
+                                                <!-- Horas Disponibles -->
+                        <div class="form-group mb-3">
+                            <label for="horas_disponibles" class="form-label">Horas Disponibles</label>
+                            {{ form.horas_disponibles(class="form-control rounded", id="horas_disponibles") }}
+                            <div id="mensaje-horas"></div>
+
+                            <!-- Botón Ver Detalle de Órdenes Activas -->
+                            <button type="button" id="ver-ordenes-activas-btn" class="btn btn-outline-info mt-2 w-100">
+                                Ver Detalle de Órdenes Activas
+                            </button>
+                        </div>
+
+                        <!-- Advertencia si el funcionario tiene más de dos órdenes en el año -->
+                        <div id="advertencia-tercera-orden" class="alert alert-warning" style="display: none;">
+                            <p>⚠️ Este funcionario ya tiene más de dos órdenes en el año. Esto podría tener implicaciones legales.</p>
+                            <input type="checkbox" id="aceptar-implicaciones" name="aceptar_implicaciones" required>
+                            <label for="aceptar-implicaciones">Confirmo que entiendo las implicaciones legales de esta tercera orden.</label>
+                        </div>
+                        <!-- Alcalde o Alcaldesa -->
+                        <div class="form-group mb-3">
+                            <label for="alcalde_id" class="form-label">Alcalde o Alcaldesa</label>
+                            {{ form.alcalde_id(class="form-select rounded", id="alcalde_id") }}
+                        </div>
+                        <!-- Jefe(a) DAEM -->
+                        <div class="form-group mb-3">
+                            <label for="jefatura_daem_id" class="form-label">Jefe(a) DAEM</label>
+                            {{ form.jefatura_daem_id(class="form-select rounded", id="jefatura_daem_id") }}
+                        </div>
+                        <!-- Observaciones -->
+                        <div class="form-group mb-3">
+                            <label for="observaciones" class="form-label">Observaciones</label>
+                            {{ form.observaciones(class="form-control rounded", id="observaciones", rows="3") }}
+                        </div>
+
+                        <!-- Botón Guardar -->
+                        <button type="submit" id="guardar-btn" class="btn btn-success w-100 shadow">Guardar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modales -->
+<!-- Modal de Órdenes Activas Mejorado -->
+<div class="modal fade" id="modalOrdenesActivas" tabindex="-1" aria-labelledby="modalOrdenesActivasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered"> <!-- Ampliado a modal extra grande -->
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Órdenes de Trabajo Activas - Funcionario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <!-- Datos del Funcionario -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>RUT:</strong> <span id="modal-rut"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Nombre:</strong> <span id="modal-nombre"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Apellido:</strong> <span id="modal-apellido"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Horas Disponibles:</strong> <span id="modal-horas-disponibles"></span>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Órdenes Activas -->
+                    <p class="fw-bold">Órdenes activas del funcionario:</p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>N° Orden</th>
+                                    <th>Colegio</th>
+                                    <th>Horas</th>
+                                    <th>Financiamiento</th>
+                                    <th>Inicio</th>
+                                    <th>Término</th>
+                                </tr>
+                            </thead>
+                            <tbody id="detalle-ordenes"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cerrar-modal" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" id="continuar-modal" class="btn btn-primary">Continuar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+ <!-- Modal Advertencia Horas Disponibles -->
+<div class="modal fade" id="modalHorasExcedidas" tabindex="-1" aria-labelledby="modalHorasExcedidasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Advertencia: Exceso de Horas</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>El funcionario ya tiene asignadas <strong id="horas-actuales"></strong> horas. No puede superar las 44 horas permitidas.</p>
+                <p>Detalles de asignaciones actuales:</p>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>N° Orden</th>
+                            <th>Colegio</th>
+                            <th>Horas</th>
+                            <th>Financiamiento</th>
+                            <th>Inicio</th>
+                            <th>Término</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detalle-horas"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="continuar-horas">Continuar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal de RUT Inválido -->
+<div class="modal fade" id="modalRutInvalido" tabindex="-1" aria-labelledby="modalRutInvalidoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">RUT Inválido</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">El RUT ingresado no es válido. Por favor, intente nuevamente.</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal de Funcionario Encontrado -->
+<div class="modal fade" id="modalFuncionarioEncontrado" tabindex="-1" aria-labelledby="modalFuncionarioEncontradoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">Funcionario Encontrado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                El funcionario está registrado. ¿Desea continuar con la creación de la orden?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cerrar-funcionario-encontrado">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="continuar-funcionario">Continuar</button> <!-- Eliminamos data-bs-dismiss="modal" -->
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal de Funcionario No Encontrado -->
+<div class="modal fade" id="modalFuncionarioNoEncontrado" tabindex="-1" aria-labelledby="modalFuncionarioNoEncontradoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">Funcionario No Encontrado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" id="cerrar-funcionario-no-encontrado"></button>
+            </div>
+            <div class="modal-body">
+                El RUT ingresado es válido, pero el funcionario no está registrado. ¿Desea agregarlo?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelar-funcionario-no-encontrado">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="redirigir-nuevo">Agregar Funcionario</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal de Búsqueda de Funcionarios Mejorado -->
+<div class="modal fade" id="modalBuscarFuncionario" tabindex="-1" aria-labelledby="modalBuscarFuncionarioLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title">Buscar Funcionario</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="buscar-funcionario-input" class="form-control mb-3" placeholder="Ingrese RUT, Nombre o Apellido...">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>RUT</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultado-busqueda"></tbody>
+                </table>
+                <p id="mensaje-no-encontrado" class="text-danger text-center mt-2" style="display: none;">
+                    ❌ No se encontraron coincidencias.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="usar-funcionario-btn" class="btn btn-success" disabled>✅ Usar Funcionario Seleccionado</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal: Sin Horas Disponibles -->
+<div class="modal fade" id="modalSinHoras" tabindex="-1" aria-labelledby="modalSinHorasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalSinHorasLabel">⚠️ Sin Horas Disponibles</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>Este funcionario ya tiene asignadas <strong id="horas-asignadas-modal">44</strong> horas, por lo tanto no puedes crear una nueva orden.</p>
+                <hr>
+                <p class="fw-bold">Órdenes activas del funcionario:</p>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover text-center">
+                        <thead class="table-light">
+                            <tr>
+                                <th>N° Orden</th>
+                                <th>Colegio</th>
+                                <th>Horas</th>
+                                <th>Financiamiento</th>
+                                <th>Inicio</th>
+                                <th>Término</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detalle-horas-modal">
+                            <!-- Las filas se llenarán dinámicamente con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Importación de scripts -->
+<script src="{{ url_for('static', filename='js/jquery/jquery-3.7.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+
+{% endblock %}

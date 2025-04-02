@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Crear Nuevo Rol{% endblock %}
+
+{% block content %}
+<div class="container mt-5 d-flex justify-content-center">
+    <div class="card shadow-lg p-4 mb-5 bg-white rounded" style="max-width: 600px;">
+        <h2 class="text-center mb-4">Crear Nuevo Rol</h2>
+        
+        <form action="" method="POST">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+                <label for="nombre_rol" class="form-label">Nombre del Rol</label>
+                {{ form.nombre_rol(class="form-control") }}
+            </div>
+            <div class="mb-3">
+                <label for="descripcion" class="form-label">Descripción</label>
+                {{ form.descripcion(class="form-control") }}
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-primary me-2">Crear</button>
+                <a href="{{ url_for('roles.listar_roles') }}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

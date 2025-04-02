@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Roles{% endblock %}
+
+{% block content %}
+<div class="container mt-5 d-flex justify-content-center">
+    <div class="card shadow-lg p-4 mb-5 bg-white rounded" style="max-width: 800px;">
+        <h2 class="text-center mb-4">Lista de Roles</h2>
+        <a href="{{ url_for('roles.nuevo_rol') }}" class="btn btn-success mb-3">Agregar Nuevo Rol</a>
+        
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="bg-primary text-white">
+                    <tr class="text-center">
+                        <th>Nombre del Rol</th>
+                        <th>Descripción</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for rol in roles %}
+                    <tr class="text-center">
+                        <td>{{ rol.nombre_rol }}</td>
+                        <td>{{ rol.descripcion }}</td>
+                        <td>
+                            <a href="{{ url_for('roles.editar_rol', id=rol.id) }}" class="btn btn-warning btn-sm me-2">Editar</a>
+                            <form action="{{ url_for('roles.eliminar_rol', id=rol.id) }}" method="POST" style="display:inline;">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este rol?')">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

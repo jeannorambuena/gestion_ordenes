@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Funcionarios{% endblock %}
+
+{% block content %}
+<div class="container mt-0"> <!-- Margen superior reducido -->
+    <h2 class="text-center mb-3">Lista de Funcionarios</h2> <!-- Título centrado con margen reducido -->
+
+    <!-- Botón para agregar un nuevo funcionario -->
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ url_for('funcionarios_bp.nuevo_funcionario') }}" class="btn btn-success">Agregar Nuevo Funcionario</a>
+    </div>
+
+    {% if funcionarios %}
+    <!-- Tabla con bordes, colores y clases de Bootstrap -->
+    <div class="table-responsive shadow-lg p-3 mb-5 bg-white rounded">
+        <table class="table table-bordered table-hover">
+            <thead class="bg-primary text-white"> <!-- Fondo azul y texto blanco para la cabecera -->
+                <tr class="text-center">
+                    <th>RUT</th> <!-- Cambiado de Cédula a RUT -->
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Teléfono</th>
+                    <th>Cargo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for funcionario in funcionarios %}
+                <tr>
+                    <!-- Mostrar rut_cuerpo y rut_dv juntos -->
+                    <td class="text-center">{{ funcionario.rut_cuerpo }}-{{ funcionario.rut_dv }}</td> 
+                    <td>{{ funcionario.nombre }}</td>
+                    <td>{{ funcionario.apellido }}</td>
+                    <td class="text-center">{{ funcionario.telefono }}</td>
+                    <td>{{ funcionario.cargo.nombre_cargo }}</td>
+                    <td class="d-flex justify-content-center">
+                        <!-- Botón para editar funcionario -->
+                        <a href="{{ url_for('funcionarios_bp.editar_funcionario', rut_cuerpo=funcionario.rut_cuerpo, rut_dv=funcionario.rut_dv) }}" class="btn btn-warning btn-sm me-2">Editar</a>
+                        <!-- Formulario para eliminar funcionario -->
+                        <form action="{{ url_for('funcionarios_bp.eliminar_funcionario', rut_cuerpo=funcionario.rut_cuerpo, rut_dv=funcionario.rut_dv) }}" method="POST">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar a este funcionario?')">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <!-- Mensaje cuando no hay funcionarios registrados -->
+    <div class="alert alert-info text-center" role="alert">
+        No hay funcionarios registrados.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>Editar Tipo de Contrato</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.nombre.label(class="form-label") }}
+            {{ form.nombre(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.observacion.label(class="form-label") }}
+            {{ form.observacion(class="form-control") }}
+        </div>
+        <button type="submit" class="btn btn-primary">Actualizar</button>
+        <a href="{{ url_for('tipo_contrato.listar_tipo_contrato') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

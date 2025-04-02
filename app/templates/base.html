@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestión de Órdenes{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    
+    <!-- Cargar Bootstrap CSS, Font Awesome y estilos personalizados -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    <!-- Navbar con menú off-canvas -->
+    <nav class="navbar navbar-light bg-light d-flex justify-content-between">
+        <div class="container-fluid d-flex justify-content-between">
+            <!-- Botón del menú emergente -->
+            <button class="navbar-toggler me-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Encabezado central con ícono -->
+            <a href="{{ url_for('main.home') }}" class="d-flex align-items-center justify-content-center text-decoration-none mx-auto" style="position: absolute; left: 50%; transform: translateX(-50%);">
+                <i class="fas fa-cogs fa-3x text-primary me-2"></i>
+                <h1 class="fw-bold text-primary mb-0">Gestión de Órdenes</h1>
+            </a>
+
+            <!-- Ícono de Home en la esquina superior derecha -->
+            <a class="navbar-brand ms-2" href="{{ url_for('main.home') }}">
+                <i class="fas fa-home fa-2x text-primary"></i>
+            </a>
+        </div>
+
+        <!-- Menú emergente -->
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title">Menú</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+            </div>
+            <div class="offcanvas-body">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('ordenes_bp.listar_ordenes') }}">
+                            <i class="fas fa-clipboard-list me-2"></i> Órdenes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('funcionarios_bp.listar_funcionarios') }}">
+                            <i class="fas fa-user me-2"></i> Funcionarios
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('cargo.listar_cargos') }}">
+                            <i class="fas fa-briefcase me-2"></i> Cargos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('colegio.listar_colegios') }}">
+                            <i class="fas fa-school me-2"></i> Colegios
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('tipo_contrato.listar_tipo_contrato') }}">
+                            <i class="fas fa-file-signature me-2"></i> Tipos de Contrato
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('alcaldia.listar_alcaldia') }}">
+                            <i class="fas fa-landmark me-2"></i> Alcaldía
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('jefatura_daem.listar_jefatura_daem') }}">
+                            <i class="fas fa-user-cog me-2"></i> Jefatura DAEM
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('financiamiento.listar_financiamientos') }}">
+                            <i class="fas fa-hand-holding-usd me-2"></i> Financiamiento
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="#">
+                            <i class="fas fa-chart-bar me-2"></i> Informes
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="#">
+                            <i class="fas fa-users-cog me-2"></i> Gestión de Usuarios
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="container mt-5">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Cargar jQuery y Bootstrap JS -->
+    <script src="{{ url_for('static', filename='js/jquery/jquery-3.7.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap/bootstrap.bundle.min.js') }}"></script>
+</body>
+</html>

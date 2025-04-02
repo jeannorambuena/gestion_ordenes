@@ -1,0 +1,190 @@
+/* Estilos generales */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Arial', sans-serif;
+}
+
+/* Ajustes de navbar */
+.navbar {
+    padding: 1rem;
+    background-color: #ffffff; /* Fondo blanco para un aspecto moderno */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    color: #333 !important;
+}
+
+/* Estilo del off-canvas */
+.offcanvas {
+    width: 250px;
+    background-color: #f7f7f7; /* Fondo claro */
+    color: #333;
+    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1); /* Sombra al menú */
+}
+
+.offcanvas-header {
+    border-bottom: 1px solid #ddd;
+}
+
+.offcanvas-body {
+    padding-left: 1rem;
+}
+
+.offcanvas-body .nav-link {
+    color: #333;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+}
+
+.offcanvas-body .nav-link:hover {
+    color: #007bff; /* Color moderno azul al pasar el cursor */
+    background-color: #e2e6ea; /* Fondo gris claro en hover */
+    padding-left: 10px;
+    border-radius: 5px;
+}
+
+/* Efecto hover con borde colorido */
+.offcanvas-body .hover-color {
+    border-left: 5px solid transparent;
+    transition: 0.3s;
+}
+
+.offcanvas-body .hover-color:hover {
+    border-left: 5px solid #007bff; /* Color azul en hover */
+    color: #007bff;
+}
+
+/* Botones */
+.btn-outline-light {
+    color: #333;
+    border-color: #007bff;
+}
+
+.btn-outline-light:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Estilo para las tarjetas */
+.card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 123, 255, 0.3);
+}
+
+.row .col-md-6 {
+    margin-bottom: 20px;
+}
+
+.container .row .col-md-6 .card-body {
+    flex-grow: 1;
+}
+
+/* Botones */
+.btn-lg {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+    width: 100%;
+    border-radius: 25px;
+}
+
+.btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.btn-warning {
+    color: #fff;
+    background-color: #ffc107;
+    border-color: #ffc107;
+}
+
+.btn-warning:hover {
+    color: #fff;
+    background-color: #e0a800;
+    border-color: #d39e00;
+}
+
+/* Formularios */
+.form-control {
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Títulos */
+h5.card-title, .form-title {
+    font-size: 1.3rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+p.card-text {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+/* Tablas */
+.table {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+    text-align: center;
+    padding: 10px;
+}
+
+.table-striped tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.table-bordered {
+    border: 1px solid #ddd;
+}
+
+/* Botones para acciones */
+.btn-sm {
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.btn-primary, .btn-warning {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover, .btn-warning:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Efectos para tablas */
+.table-hover tbody tr:hover {
+    background-color: #eaf4ff;
+}

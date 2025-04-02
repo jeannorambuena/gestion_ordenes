@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Financiamiento{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Lista de Financiamientos</h2>
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ url_for('financiamiento.nuevo_financiamiento') }}" class="btn btn-success">Agregar Nuevo Financiamiento</a>
+    </div>
+    
+    {% if financiamientos %}
+    <div class="table-responsive shadow-lg p-3 mb-5 bg-white rounded">
+        <table class="table table-bordered table-hover">
+            <thead class="bg-success text-white">
+                <tr class="text-center">
+                    <th>ID</th>
+                    <th>Nombre del Financiamiento</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for financiamiento in financiamientos %}
+                <tr class="text-center">
+                    <td>{{ financiamiento.id }}</td>
+                    <td>{{ financiamiento.nombre_financiamiento }}</td>
+                    <td class="d-flex justify-content-center">
+                        <!-- Botón para editar financiamiento -->
+                        <a href="{{ url_for('financiamiento.editar_financiamiento', id=financiamiento.id) }}" class="btn btn-warning btn-sm me-2">Editar</a>
+                        
+                        <!-- Formulario para eliminar financiamiento -->
+                        <form action="{{ url_for('financiamiento.eliminar_financiamiento', id=financiamiento.id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este financiamiento?');">
+                            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center">No hay financiamientos registrados.</div>
+    {% endif %}
+</div>
+{% endblock %}

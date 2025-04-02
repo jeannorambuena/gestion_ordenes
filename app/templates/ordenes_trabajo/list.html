@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header text-center bg-primary text-white rounded-top">
+                    <h3 class="font-weight-light my-3">Lista de Órdenes de Trabajo</h3>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover text-center mb-0 shadow-sm rounded">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th># Orden</th>
+                                    <th>Funcionario</th>
+                                    <th>RUT</th>
+                                    <th>Colegio</th>
+                                    <th>Fecha Inicio</th>
+                                    <th>Fecha Término</th>
+                                    <th>Tipo de Contrato</th>
+                                    <th>Financiamiento</th>
+                                    <th>Horas Disponibles</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for orden in ordenes %}
+                                <tr>
+                                    <td>{{ orden.numero_orden or 'N/A' }}</td>
+                                    <td>{{ orden.funcionario.nombre }} {{ orden.funcionario.apellido }}</td>
+                                    <td>{{ orden.rut_cuerpo }}-{{ orden.rut_dv }}</td>
+                                    <td>{{ orden.colegio.nombre_colegio if orden.colegio else 'No asignado' }}</td>
+                                    <td>{{ orden.fecha_inicio.strftime('%d-%m-%Y') }}</td>
+                                    <td>
+                                        {{ 'Indefinido' if orden.es_indefinido else (orden.fecha_termino.strftime('%d-%m-%Y') if orden.fecha_termino else 'Indefinido') }}
+                                    </td>
+                                    <td>{{ orden.tipo_contrato.nombre if orden.tipo_contrato else 'No asignado' }}</td>
+                                    <td>{{ orden.financiamiento.nombre_financiamiento if orden.financiamiento else 'No asignado' }}</td>
+                                    <td>{{ orden.horas_disponibles if orden.horas_disponibles is not none else 'Sin horas disponibles' }}</td>
+                                    <td>
+                                        <a href="{{ url_for('ordenes_bp.editar_orden', id=orden.id) }}" class="btn btn-warning btn-sm shadow">Editar</a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="10" class="text-center text-muted">No hay órdenes de trabajo disponibles.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer text-center bg-light rounded-bottom">
+                    <a href="{{ url_for('ordenes_bp.nueva_orden') }}" class="btn btn-primary btn-lg shadow-sm">
+                        <i class="fas fa-plus-circle"></i> Crear Nueva Orden
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

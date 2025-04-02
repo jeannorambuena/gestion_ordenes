@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Colegio{% endblock %}
+
+{% block content %}
+<div class="container mt-5 d-flex justify-content-center">
+    <!-- Formulario más estrecho y centrado -->
+    <div class="col-md-6 shadow-lg p-4 mb-5 bg-white rounded">
+        <h2 class="text-center mb-4">Editar Colegio</h2>
+        <form action="{{ url_for('colegio.editar_colegio', rbd=colegio.rbd) }}" method="POST">
+            {{ form.hidden_tag() }}
+
+            <!-- Nombre del Colegio -->
+            <div class="mb-3">
+                <label for="nombre_colegio" class="form-label">Nombre del Colegio</label>
+                {{ form.nombre_colegio(class="form-control") }}
+            </div>
+
+            <!-- Dirección -->
+            <div class="mb-3">
+                <label for="direccion" class="form-label">Dirección</label>
+                {{ form.direccion(class="form-control") }}
+            </div>
+
+            <!-- Teléfono -->
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono</label>
+                {{ form.telefono(class="form-control") }}
+            </div>
+
+            <!-- Director -->
+            <div class="mb-3">
+                <label for="director" class="form-label">Director</label>
+                {{ form.director(class="form-control") }}
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                {{ form.email(class="form-control") }}
+            </div>
+
+            <!-- Tipo de Enseñanza -->
+            <div class="mb-3">
+                <label for="tipo_ensenanza" class="form-label">Tipo de Enseñanza</label>
+                {{ form.tipo_ensenanza(class="form-select") }}
+            </div>
+
+            <!-- Latitud -->
+            <div class="mb-3">
+                <label for="latitud" class="form-label">Latitud</label>
+                {{ form.latitud(class="form-control", step="any") }} <!-- Permite decimales -->
+            </div>
+
+            <!-- Longitud -->
+            <div class="mb-3">
+                <label for="longitud" class="form-label">Longitud</label>
+                {{ form.longitud(class="form-control", step="any") }} <!-- Permite decimales -->
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary me-2">Guardar Cambios</button>
+                <a href="{{ url_for('colegio.listar_colegios') }}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

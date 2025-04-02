@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Agregar Nueva Jefatura DAEM{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-3">Agregar Nueva Jefatura DAEM</h2>
+
+    <form action="{{ url_for('jefatura_daem.nueva_jefatura_daem') }}" method="POST" class="mx-auto p-4 shadow-lg bg-white rounded" style="max-width: 600px;">
+        {{ form.hidden_tag() }}
+
+        <!-- Cuerpo del RUT y Dígito Verificador en una sola fila -->
+        <div class="mb-3 row">
+            <div class="col-md-8">
+                <label for="rut_cuerpo" class="form-label">Cuerpo del RUT</label>
+                {{ form.rut_cuerpo(class="form-control", placeholder="Ingrese el cuerpo del RUT", id="rut_cuerpo") }}
+            </div>
+            <div class="col-md-4">
+                <label for="rut_dv" class="form-label">Dígito Verificador</label>
+                {{ form.rut_dv(class="form-control", placeholder="DV", id="rut_dv") }}
+            </div>
+        </div>
+
+        <!-- Nombre -->
+        <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            {{ form.nombre(class="form-control", placeholder="Ingrese el nombre") }}
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            {{ form.email(class="form-control", placeholder="Ingrese el email") }}
+        </div>
+
+        <!-- Teléfono con prefijo +56 -->
+        <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <div class="input-group">
+                <span class="input-group-text">+56</span>
+                {{ form.telefono(class="form-control", placeholder="9 dígitos del teléfono") }}
+            </div>
+        </div>
+
+        <!-- Cargo desplegable -->
+        <div class="mb-3">
+            <label for="cargo_jefatura" class="form-label">Cargo</label>
+            {{ form.cargo_jefatura(class="form-select") }}
+        </div>
+
+        <!-- Fecha de Inicio -->
+        <div class="mb-3">
+            <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+            {{ form.fecha_inicio(class="form-control", type="date") }}
+        </div>
+
+        <!-- Fecha de Término -->
+        <div class="mb-3">
+            <label for="fecha_termino" class="form-label">Fecha de Término</label>
+            {{ form.fecha_termino(class="form-control", type="date") }}
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+            <a href="{{ url_for('jefatura_daem.listar_jefatura_daem') }}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

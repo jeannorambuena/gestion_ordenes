@@ -1,0 +1,41 @@
+<!-- app/templates/funcionarios_colegios/funcionarios_colegios.html -->
+{% extends 'base.html' %}
+
+{% block title %}Asignaciones de Funcionario a Colegio{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Asignaciones de Funcionario a Colegio</h2>
+    <a href="{{ url_for('funcionarios_colegios.nuevo_funcionario_colegio') }}" class="btn btn-primary mb-3">Asignar Horas a Nuevo Funcionario</a>
+
+    {% if asignaciones %}
+    <table class="table table-striped table-bordered shadow-sm">
+        <thead class="bg-success text-white">
+            <tr>
+                <th>Funcionario</th>
+                <th>Colegio</th>
+                <th>Horas Asignadas</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asignacion in asignaciones %}
+            <tr>
+                <td>{{ asignacion.funcionario.nombre }} {{ asignacion.funcionario.apellido }}</td>
+                <td>{{ asignacion.colegio.nombre_colegio }}</td>
+                <td>{{ asignacion.horas_disponibles }}</td>
+                <td>
+                    <a href="{{ url_for('funcionarios_colegios.editar_funcionario_colegio', id=asignacion.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                    <form action="{{ url_for('funcionarios_colegios.eliminar_funcionario_colegio', id=asignacion.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta asignación?')">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No hay asignaciones registradas.</p>
+    {% endif %}
+</div>
+{% endblock %}

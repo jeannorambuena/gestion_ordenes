@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-lg">
+                <div class="card-header text-center">
+                    <h3 class="font-weight-light my-4">Editar Orden de Trabajo</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+
+                        <!-- Campo Número de Orden (Solo lectura) -->
+                        <div class="form-group">
+                            <label for="numero_orden">Número de Orden</label>
+                            <input type="text" class="form-control" id="numero_orden" 
+                                   value="{{ orden.numero_orden }}" readonly>
+                        </div>
+
+                        <!-- Selección de Colegio -->
+                        <div class="form-group">
+                            <label for="colegio_rbd">Colegio</label>
+                            {{ form.colegio_rbd(class="form-control") }}
+                        </div>
+
+                        <!-- Selección de Tipo de Contrato -->
+                        <div class="form-group">
+                            <label for="tipo_contrato">Tipo de Contrato</label>
+                            {{ form.tipo_contrato(class="form-control") }}
+                        </div>
+
+                        <!-- Fechas de Inicio y Término -->
+                        <div class="form-group">
+                            <label for="fecha_inicio">Fecha de Inicio</label>
+                            {{ form.fecha_inicio(class="form-control", 
+                                value=form.fecha_inicio.data.strftime('%Y-%m-%d') if form.fecha_inicio.data else '', 
+                                placeholder="dd-mm-yyyy") }}
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fecha_termino">Fecha de Término</label>
+                            {{ form.fecha_termino(class="form-control", 
+                                value=form.fecha_termino.data.strftime('%Y-%m-%d') if form.fecha_termino.data else '', 
+                                placeholder="dd-mm-yyyy") }}
+                        </div>
+
+                        <!-- Contrato Indefinido -->
+                        <div class="form-group form-check">
+                            {{ form.es_indefinido(class="form-check-input") }}
+                            <label class="form-check-label" for="es_indefinido">Es Indefinido</label>
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="form-group">
+                            <label for="observaciones">Observaciones</label>
+                            {{ form.observaciones(class="form-control", rows=3) }}
+                        </div>
+
+                        <!-- Horas Disponibles -->
+                        <div class="form-group">
+                            <label for="horas_disponibles">Horas Disponibles</label>
+                            {{ form.horas_disponibles(class="form-control") }}
+                        </div>
+
+                        <!-- Botón Guardar Cambios -->
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary btn-block">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

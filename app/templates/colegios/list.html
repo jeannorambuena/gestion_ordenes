@@ -1,0 +1,66 @@
+<!-- app/templates/colegios/list.html -->
+{% extends 'base.html' %}
+
+{% block title %}Lista de Colegios{% endblock %}
+
+{% block content %}
+<div class="container mt-0"> <!-- Reducido el margen superior -->
+    <h2 class="text-center mb-3">Lista de Colegios</h2> <!-- Reducido el espacio debajo del título -->
+    
+    <!-- Botón para agregar un nuevo colegio -->
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ url_for('colegio.nuevo_colegio') }}" class="btn btn-success">Agregar Nuevo Colegio</a>
+    </div>
+
+    {% if colegios %}
+    <!-- Tabla con bordes, colores y clases de Bootstrap -->
+    <div class="table-responsive shadow-lg p-3 mb-5 bg-white rounded">
+        <table class="table table-bordered table-hover">
+            <thead class="bg-success text-white"> <!-- Fondo verde y texto blanco para la cabecera -->
+                <tr class="text-center">
+                    <th>RBD</th>
+                    <th>Nombre del Colegio</th>
+                    <th>Dirección</th>
+                    <th>Teléfono</th>
+                    <th>Director</th>
+                    <th>Tipo de Enseñanza</th>
+                    <th>Ubicación</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for colegio in colegios %}
+                <tr>
+                    <td class="text-center">{{ colegio.rbd }}</td>
+                    <td>{{ colegio.nombre_colegio }}</td>
+                    <td>{{ colegio.direccion }}</td>
+                    <td class="text-center">{{ colegio.telefono }}</td>
+                    <td>{{ colegio.director }}</td>
+                    <td class="text-center">{{ colegio.tipo_ensenanza }}</td>
+                    <td class="text-center">
+                        <!-- Enlace para ver ubicación en Google Maps -->
+                        <a href="https://www.google.com/maps?q={{ colegio.latitud }},{{ colegio.longitud }}" target="_blank" class="btn btn-info btn-sm">
+                            Ver Mapa
+                        </a>
+                    </td>
+                    <td class="d-flex justify-content-center">
+                        <!-- Botón para editar colegio -->
+                        <a href="{{ url_for('colegio.editar_colegio', rbd=colegio.rbd) }}" class="btn btn-warning btn-sm me-2">Editar</a>
+                        <!-- Formulario para eliminar colegio -->
+                        <form action="{{ url_for('colegio.eliminar_colegio', rbd=colegio.rbd) }}" method="POST">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este colegio?')">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <!-- Mensaje cuando no hay colegios registrados -->
+    <div class="alert alert-info text-center" role="alert">
+        No hay colegios registrados.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

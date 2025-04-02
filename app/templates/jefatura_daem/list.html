@@ -1,0 +1,65 @@
+<!-- app/templates/jefatura_daem/list.html -->
+{% extends 'base.html' %}
+
+{% block title %}Lista de Jefaturas DAEM{% endblock %}
+
+{% block content %}
+<div class="container mt-5"> <!-- Ajuste de margen superior -->
+    <h2 class="text-center mb-3">Lista de Jefaturas DAEM</h2>
+
+    <!-- Botón para agregar una nueva jefatura -->
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ url_for('jefatura_daem.nueva_jefatura_daem') }}" class="btn btn-success">Agregar Nueva Jefatura</a>
+    </div>
+
+    {% if jefaturas %}
+    <!-- Tabla con datos de jefaturas DAEM -->
+    <div class="table-responsive shadow-lg p-3 mb-5 bg-white rounded">
+        <table class="table table-bordered table-hover">
+            <thead class="bg-success text-white">
+                <tr class="text-center">
+                    <th>Nombre</th>
+                    <th>RUT</th>
+                    <th>Cargo</th>
+                    <th>Fecha de Inicio</th>
+                    <th>Fecha de Término</th>
+                    <th>Email</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for jefatura in jefaturas %}
+                <tr>
+                    <td>{{ jefatura.nombre }}</td>
+                    <td>{{ jefatura.rut_cuerpo }}-{{ jefatura.rut_dv }}</td>
+                    <td>{{ jefatura.cargo_jefatura }}</td>
+                    <td class="text-center">{{ jefatura.fecha_inicio.strftime('%d-%m-%Y') }}</td>
+                    <td class="text-center">
+                        {% if jefatura.fecha_termino %}
+                            {{ jefatura.fecha_termino.strftime('%d-%m-%Y') }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>{{ jefatura.email }}</td>
+                    <td class="d-flex justify-content-center">
+                        <!-- Botón para editar jefatura -->
+                        <a href="{{ url_for('jefatura_daem.editar_jefatura_daem', id=jefatura.id) }}" class="btn btn-warning btn-sm me-2">Editar</a>
+                        <!-- Formulario para eliminar jefatura -->
+                        <form action="{{ url_for('jefatura_daem.eliminar_jefatura_daem', id=jefatura.id) }}" method="POST">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta jefatura?')">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <!-- Mensaje cuando no hay jefaturas -->
+    <div class="alert alert-info text-center" role="alert">
+        No hay jefaturas registradas.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
