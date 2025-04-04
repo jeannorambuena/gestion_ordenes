@@ -562,29 +562,37 @@ def listar_alcaldia():
 
 
 @alcaldia_bp.route('/nuevo', methods=['GET', 'POST'])
-def nueva_alcaldia():  # Cambiado de 'nuevo_alcalde' a 'nueva_alcaldia'
+def nueva_alcaldia():
     form = AlcaldiaForm()
+
+    # DEPURACIÓN: imprimir estado del formulario
+    print("¿Formulario enviado y válido?", form.validate_on_submit())
+    print("Errores en rut_cuerpo:", form.rut_cuerpo.errors)
+    print("Errores en rut_dv:", form.rut_dv.errors)
+
     if form.validate_on_submit():
-        nueva_alcaldia = Alcaldia(  # Cambiado 'nuevo_alcalde' a 'nueva_alcaldia'
+        nueva_alcaldia = Alcaldia(
             nombre_alcalde=form.nombre_alcalde.data,
-            cedula_identidad=form.cedula_identidad.data,
+            cedula_identidad=f"{form.rut_cuerpo.data}-{form.rut_dv.data}",
             email=form.email.data,
             telefono=form.telefono.data,
             fecha_inicio=form.fecha_inicio.data,
-            fecha_termino=form.fecha_termino.data
+            fecha_termino=form.fecha_termino.data,
+            cargo=form.cargo.data
         )
+
         try:
-            db.session.add(nueva_alcaldia)  # Cambiado el nombre de la variable
+            db.session.add(nueva_alcaldia)
             db.session.commit()
             flash('Alcaldía agregada con éxito', 'success')
             return redirect(url_for('alcaldia.listar_alcaldia'))
         except Exception as e:
             db.session.rollback()
-            flash(f'Ocurrió un error al agregar la alcaldía: {
-                  str(e)}', 'danger')
+            print("ERROR EN BD:", e)
+            flash(
+                f'Ocurrió un error al agregar la alcaldía: {str(e)}', 'danger')
 
     return render_template('alcaldia/nuevo.html', form=form)
-
 # Ruta para editar un registro existente de alcaldía
 
 
@@ -1036,6 +1044,7 @@ def nueva_orden():
     form = OrdenTrabajoForm()
     anio_actual = datetime.now().year
 
+    # Obtener último número de orden del año actual
     ultimo_numero = db.session.query(db.func.max(OrdenesTrabajo.numero_orden))\
         .filter(OrdenesTrabajo.anio == anio_actual).scalar()
 
@@ -1047,6 +1056,7 @@ def nueva_orden():
         rut_dv = form.rut_dv.data
         horas_solicitadas = form.horas_disponibles.data or 0
 
+        # Verificar si supera las 44 horas permitidas
         ordenes_activas = OrdenesTrabajo.query.filter(
             OrdenesTrabajo.rut_cuerpo == rut_cuerpo,
             OrdenesTrabajo.rut_dv == rut_dv,
@@ -1076,6 +1086,10 @@ def nueva_orden():
                 tipo_contrato_id=form.tipo_contrato.data,
                 financiamiento_id=form.financiamiento.data
             )
+
+            # ✅ Agregar campos que estaban faltando
+            nueva_orden.alcalde_id = form.alcalde_id.data
+            nueva_orden.jefatura_daem_id = form.jefatura_daem_id.data
 
             db.session.add(nueva_orden)
             db.session.commit()

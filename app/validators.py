@@ -1,9 +1,13 @@
 import re
 
+
 def validar_rut(rut_cuerpo, rut_dv):
     """
     Valida que el RUT chileno sea correcto, incluyendo el dígito verificador.
     """
+    print(
+        # 👈 Depuración
+        f"[VALIDADOR] Validando RUT -> cuerpo: {rut_cuerpo}, dv: {rut_dv}")
     # Validar que el cuerpo del RUT y el dígito verificador no estén vacíos
     if not rut_cuerpo or not rut_dv:
         return False, "RUT y dígito verificador son obligatorios."
@@ -18,12 +22,13 @@ def validar_rut(rut_cuerpo, rut_dv):
 
     # Calcular el dígito verificador esperado
     dv_calculado = calcular_dv(rut_cuerpo)
-    
+
     # Validar el dígito verificador ingresado contra el calculado
     if dv_calculado != rut_dv.upper():
         return False, f"RUT inválido. El dígito verificador debería ser {dv_calculado}."
 
     return True, "RUT válido."
+
 
 def calcular_dv(rut):
     """

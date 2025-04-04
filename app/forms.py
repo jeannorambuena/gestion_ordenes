@@ -1,4 +1,7 @@
 # Importaciones necesarias para formularios, modelos, validadores y base de datos
+from app.validators import validar_rut
+from wtforms.validators import DataRequired, Length, Email, ValidationError
+from wtforms import StringField, DateField, SelectField, SubmitField
 from app.validators import validar_rut  # 👈 Importante
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -226,10 +229,10 @@ class ColegioForm(FlaskForm):
 
 class AlcaldiaForm(FlaskForm):
     nombre_alcalde = StringField('Nombre del Alcalde', validators=[
-                                 DataRequired(), Length(max=100)])
+        DataRequired(), Length(max=100)])
     rut_cuerpo = StringField('Cuerpo del RUT', validators=[DataRequired()])
     rut_dv = StringField('Dígito Verificador', validators=[
-                         DataRequired(), Length(min=1, max=1)])
+        DataRequired(), Length(min=1, max=1)])
     email = StringField('Email', validators=[Length(max=100), Email()])
     telefono = StringField('Teléfono', validators=[Length(max=20)])
     fecha_inicio = DateField(
@@ -243,18 +246,12 @@ class AlcaldiaForm(FlaskForm):
     ], validators=[DataRequired()])
     submit = SubmitField('Guardar')
 
-    def validate(self, extra_validators=None):
-        # Primero ejecutamos validaciones estándar
-        if not super().validate(extra_validators):
-            return False
-
+    def validate_rut_cuerpo(self, field):
+        print(">>> Entró a validate_rut_cuerpo()")  # Depuración
         rut_valido, mensaje = validar_rut(
             self.rut_cuerpo.data, self.rut_dv.data)
         if not rut_valido:
-            self.rut_cuerpo.errors.append(mensaje)
-            return False
-
-        return True
+            raise ValidationError(mensaje)
 
 
 # -------------------------------------------------------------

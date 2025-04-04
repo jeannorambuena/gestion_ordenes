@@ -6,65 +6,162 @@
 <div class="container mt-5">
     <h2 class="text-center mb-3">Agregar Nueva Alcaldía</h2>
 
-    <form action="{{ url_for('alcaldia.nueva_alcaldia') }}" method="POST" class="mx-auto p-4 shadow-lg bg-white rounded" style="max-width: 600px;">
+    <form action="{{ url_for('alcaldia.nueva_alcaldia') }}" method="POST"
+          class="mx-auto p-4 shadow-lg bg-white rounded {% if form.rut_cuerpo.errors or form.rut_dv.errors %}animate__animated animate__shakeX{% endif %}"
+          style="max-width: 600px;" id="form-alcaldia">
+
         {{ form.hidden_tag() }}
+
+        <!-- Cuerpo del RUT y Dígito Verificador -->
+        <div class="mb-3 row">
+            <div class="col-md-8">
+                <label for="rut_cuerpo" class="form-label">Cuerpo del RUT</label>
+                {{ form.rut_cuerpo(class="form-control", placeholder="Ej: 12345678", id="rut_cuerpo") }}
+                {% for error in form.rut_cuerpo.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <div class="col-md-4">
+                <label for="rut_dv" class="form-label">Dígito Verificador</label>
+                {{ form.rut_dv(class="form-control", placeholder="K o número", id="rut_dv") }}
+                {% for error in form.rut_dv.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+        </div>
 
         <!-- Nombre del Alcalde -->
         <div class="mb-3">
             <label for="nombre_alcalde" class="form-label">Nombre del Alcalde</label>
             {{ form.nombre_alcalde(class="form-control", placeholder="Ingrese el nombre completo") }}
-        </div>
-
-        <!-- Cédula de Identidad dividida en RUT y DV -->
-        <div class="mb-3 row">
-            <div class="col-md-8">
-                <label for="rut_cuerpo" class="form-label">Cuerpo del RUT</label>
-                <input type="text" name="cedula_identidad" id="rut_cuerpo" class="form-control" placeholder="Ej: 12345678">
-            </div>
-            <div class="col-md-4">
-                <label for="rut_dv" class="form-label">Dígito Verificador</label>
-                <input type="text" name="rut_dv" id="rut_dv" class="form-control" placeholder="K o número">
-            </div>
+            {% for error in form.nombre_alcalde.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
         </div>
 
         <!-- Email -->
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
             {{ form.email(class="form-control", placeholder="correo@ejemplo.cl") }}
+            {% for error in form.email.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
         </div>
 
-        <!-- Teléfono con prefijo +56 -->
+        <!-- Teléfono -->
         <div class="mb-3">
             <label for="telefono" class="form-label">Teléfono</label>
             <div class="input-group">
                 <span class="input-group-text">+56</span>
                 {{ form.telefono(class="form-control", placeholder="9 dígitos del teléfono") }}
             </div>
+            {% for error in form.telefono.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
         </div>
 
-        <!-- Cargo desplegable -->
+        <!-- Cargo -->
         <div class="mb-3">
             <label for="cargo" class="form-label">Cargo</label>
             {{ form.cargo(class="form-select") }}
+            {% for error in form.cargo.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
         </div>
 
         <!-- Fecha de Inicio -->
         <div class="mb-3">
             <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
             {{ form.fecha_inicio(class="form-control", type="date") }}
+            {% for error in form.fecha_inicio.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
         </div>
 
         <!-- Fecha de Término -->
         <div class="mb-3">
             <label for="fecha_termino" class="form-label">Fecha de Término</label>
             {{ form.fecha_termino(class="form-control", type="date") }}
+            {% for error in form.fecha_termino.errors %}
+                <div class="text-danger">{{ error }}</div>
+            {% endfor %}
         </div>
 
-        <!-- Botones de acción -->
+        <!-- Botones -->
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-primary">Crear Alcaldía</button>
             <a href="{{ url_for('alcaldia.listar_alcaldia') }}" class="btn btn-secondary">Cancelar</a>
         </div>
     </form>
 </div>
+
+<!-- Modal de error si hay problemas con el RUT -->
+<div class="modal fade" id="rutErrorModal" tabindex="-1" aria-labelledby="rutErrorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="rutErrorModalLabel">Error en RUT</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                Por favor, revisa el RUT ingresado. Verifica el cuerpo y el dígito verificador.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script de validación inmediata del RUT -->
+<script>
+    function validarRUT(rut, dv) {
+        rut = rut.replace(/\D/g, '');
+        if (!rut || rut.length < 7) return false;
+    
+        let suma = 0, factor = 2;
+        for (let i = rut.length - 1; i >= 0; i--) {
+            suma += parseInt(rut.charAt(i)) * factor;
+            factor = factor === 7 ? 2 : factor + 1;
+        }
+    
+        let dvEsperado = 11 - (suma % 11);
+        dvEsperado = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
+        return dv.toUpperCase() === dvEsperado;
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        const rutCuerpo = document.getElementById("rut_cuerpo");
+        const rutDV = document.getElementById("rut_dv");
+        const form = document.getElementById("form-alcaldia");
+    
+        rutDV.addEventListener("input", () => {
+            const rut = rutCuerpo.value.trim();
+            const dv = rutDV.value.trim();
+    
+            if (dv.length === 1 && rut.length >= 7) {
+                if (!validarRUT(rut, dv)) {
+                    form.classList.remove("animate__shakeX");
+                    void form.offsetWidth;
+                    form.classList.add("animate__animated", "animate__shakeX");
+    
+                    const modal = new bootstrap.Modal(document.getElementById("rutErrorModal"));
+                    modal.show();
+    
+                    rutCuerpo.focus();
+                }
+            }
+        });
+    
+        // ✅ Este bloque va fuera del addEventListener anterior
+        const modalElement = document.getElementById('rutErrorModal');
+        modalElement.addEventListener('hidden.bs.modal', () => {
+            rutCuerpo.value = '';
+            rutDV.value = '';
+            rutCuerpo.focus();
+        });
+
+    });
+    </script>
+        
 {% endblock %}
