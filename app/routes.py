@@ -1,37 +1,36 @@
 # 📌 Importaciones de Flask y Extensiones
-from app.forms import OrdenTrabajoForm
-from app.models import OrdenesTrabajo, Funcionarios, Colegios, TipoContrato
-from app import db
-from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import joinedload
-from datetime import datetime
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask import (
-    Blueprint, render_template, request, redirect, url_for, flash, jsonify
+    Blueprint, render_template, request, redirect,
+    url_for, flash, jsonify
 )
+
+# 📌 Herramientas de base de datos y SQLAlchemy
 from app import db  # Base de datos
 from sqlalchemy.exc import IntegrityError  # Manejo de errores de base de datos
 from sqlalchemy.orm import joinedload  # Carga de relaciones
-from sqlalchemy import text  # Ejecutar consultas SQL crudas
-from datetime import datetime  # Manejo de fechas
-from wtforms import ValidationError  # Manejo de errores de validación
+from sqlalchemy import text  # Consultas SQL crudas
 
-# 📌 Importaciones de validadores y utilidades
+# 📌 Manejo de fechas y validaciones
+from datetime import datetime
+from wtforms import ValidationError
+
+# 📌 Validadores y funciones auxiliares
 from app.validators import validar_rut  # Validador de RUT
 from app.busqueda_funcionario import buscar_funcionarios  # Búsqueda de funcionarios
 
-# 📌 Importación de modelos agrupados
+# 📌 Modelos
 from app.models import (
-    OrdenesTrabajo, Colegios, TipoContrato, Funcionarios, Financiamiento,
-    Cargo, Alcaldia, JefaturaDAEM
+    OrdenesTrabajo, Colegios, TipoContrato, Funcionarios,
+    Financiamiento, Cargo, Alcaldia, JefaturaDAEM
 )
 
-# 📌 Importación de formularios agrupados
+# 📌 Formularios
 from app.forms import (
-    OrdenTrabajoForm, FuncionarioForm, CargoForm, RolForm, ColegioForm,
-    FinanciamientoForm, JefaturaDAEMForm, UsuarioForm, AlcaldiaForm,
-    DeleteForm, TipoContratoForm
+    OrdenTrabajoForm, FuncionarioForm, CargoForm, RolForm,
+    ColegioForm, FinanciamientoForm, JefaturaDAEMForm,
+    UsuarioForm, AlcaldiaForm, DeleteForm, TipoContratoForm
 )
+
 
 # Configuración del Blueprint
 ordenes_bp = Blueprint('ordenes_bp', __name__, template_folder='templates')
@@ -1134,6 +1133,40 @@ def editar_orden(id):
             flash("Error al actualizar la orden.", "danger")
 
     return render_template('ordenes_trabajo/editar.html', form=form, orden=orden)
+
+# ✅ Generación de PDF para orden de trabajo
+
+
+@ordenes_bp.route('/imprimir/<int:id>', methods=['GET'])
+def imprimir_orden(id):
+    orden = OrdenesTrabajo.query.get_or_404(id)
+    return render_template('ordenes_trabajo/pdf.html', orden=orden, fecha_actual=datetime.now())
+
+# ✅ Generación de PDF real desde HTML usando WeasyPrint
+
+
+@ordenes_bp.route('/imprimir_pdf/<int:id>', methods=['GET'])
+def generar_pdf_orden(id):
+    from weasyprint import HTML
+    from flask import make_response
+    from io import BytesIO
+
+    orden = OrdenesTrabajo.query.get_or_404(id)
+
+    # Renderizar el HTML con los datos de la orden
+    rendered_html = render_template(
+        'ordenes_trabajo/pdf.html', orden=orden, fecha_actual=datetime.now())
+
+    # Convertir HTML a PDF
+    pdf_file = BytesIO()
+    HTML(string=rendered_html, base_url=request.base_url).write_pdf(target=pdf_file)
+    pdf_file.seek(0)
+
+    # Preparar la respuesta para descargar el PDF
+    response = make_response(pdf_file.read())
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'inline; filename=orden_{orden.numero_orden}_{orden.anio}.pdf'
+    return response
 
 
 tipo_contrato_bp = Blueprint(
