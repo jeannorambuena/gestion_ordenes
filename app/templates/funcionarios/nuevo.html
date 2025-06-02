@@ -25,12 +25,12 @@
 
                 <div class="mb-3">
                     <label for="nombre" class="form-label">Nombre</label>
-                    {{ form.nombre(class="form-control", placeholder="Ingrese el nombre") }}
+                    {{ form.nombre(class="form-control", placeholder="Ingrese el nombre", id="nombre_funcionario") }}
                 </div>
 
                 <div class="mb-3">
                     <label for="apellido" class="form-label">Apellido</label>
-                    {{ form.apellido(class="form-control", placeholder="Ingrese el apellido") }}
+                    {{ form.apellido(class="form-control", placeholder="Ingrese el apellido", id="apellido_funcionario") }}
                 </div>
 
                 <div class="mb-3">
@@ -61,6 +61,64 @@
                     <a href="{{ url_for('funcionarios_bp.listar_funcionarios') }}" class="btn btn-danger">Cancelar</a>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- ====== Modales de feedback de validación de RUT ====== -->
+
+<!-- Modal: RUT Inválido -->
+<div class="modal fade" id="modalRutInvalido" tabindex="-1" aria-labelledby="modalRutInvalidoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalRutInvalidoLabel">RUT Inválido</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                El RUT ingresado no es válido. Por favor, intente nuevamente.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Funcionario Encontrado -->
+<div class="modal fade" id="modalFuncionarioEncontrado" tabindex="-1" aria-labelledby="modalFuncionarioEncontradoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalFuncionarioEncontradoLabel">Funcionario Encontrado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                El funcionario ya está registrado. ¿Desea continuar con la edición de sus datos?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cerrar-funcionario-encontrado" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="continuar-funcionario">Continuar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Funcionario No Encontrado -->
+<div class="modal fade" id="modalFuncionarioNoEncontrado" tabindex="-1" aria-labelledby="modalFuncionarioNoEncontradoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="modalFuncionarioNoEncontradoLabel">Funcionario No Encontrado</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                El RUT ingresado es válido, pero no está registrado como funcionario.<br>
+                Puede completar los datos y proceder con el registro.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cerrar-funcionario-no-encontrado" data-bs-dismiss="modal">Cerrar</button>
+            </div>
         </div>
     </div>
 </div>

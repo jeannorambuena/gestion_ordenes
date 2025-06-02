@@ -5,9 +5,14 @@ $(document).ready(function () {
     window.horasDisponiblesBackend = 0;
     window.detalleOrdenesActivas = [];
 
+    // =================== VALIDACIÓN DE RUT UNIVERSAL ====================
     $('#rut_dv').on('input', async function () {
         const rutCuerpo = $('#rut_cuerpo').val().trim();
         const rutDv = $('#rut_dv').val().trim().toUpperCase();
+
+        // Limpia mensajes previos
+        $('#rut_cuerpo_error').text('');
+        $('#rut_dv_error').text('');
 
         if (!rutCuerpo || !rutDv) return;
 
@@ -21,28 +26,50 @@ $(document).ready(function () {
             const data = await response.json();
             console.log("📥 Respuesta del backend:", data);
 
+            // --- 1. RUT INVÁLIDO ---
             if (!data.valid) {
-                new bootstrap.Modal(document.getElementById("modalRutInvalido")).show();
+                const modalRutInvalido = document.getElementById("modalRutInvalido");
+                if (modalRutInvalido) {
+                    new bootstrap.Modal(modalRutInvalido).show();
+                } else {
+                    $('#rut_cuerpo_error').text(data.message || 'RUT inválido');
+                    $('#rut_dv_error').text('');
+                }
                 return;
             }
 
+            // --- 2. RUT EXISTE (Funcionario encontrado) ---
             if (data.existe) {
+                const modalFuncionarioEncontrado = document.getElementById("modalFuncionarioEncontrado");
                 window.datosFuncionario = { rut_cuerpo: rutCuerpo, rut_dv: rutDv, nombre: data.nombre, apellido: data.apellido };
-                $('#nombre_funcionario').val(data.nombre);
-                $('#apellido_funcionario').val(data.apellido);
-            
-                // Llamamos a la función de validación y dejamos que ella decida si mostrar el modal o no
-                validarHorasFuncionario(rutCuerpo, rutDv);
-            
-                return; // ⛔ Importante: salimos aquí y no mostramos nada más
+
+                if ($('#nombre_funcionario').length) $('#nombre_funcionario').val(data.nombre);
+                if ($('#apellido_funcionario').length) $('#apellido_funcionario').val(data.apellido);
+
+                if (modalFuncionarioEncontrado) {
+                    validarHorasFuncionario(rutCuerpo, rutDv);
+                } else {
+                    $('#rut_cuerpo_error').text('El funcionario ya está registrado.');
+                    $('#rut_dv_error').text('');
+                }
+                return;
             }
-            
+
+            // --- 3. RUT NO EXISTE (Funcionario no encontrado) ---
+            const modalFuncionarioNoEncontrado = document.getElementById("modalFuncionarioNoEncontrado");
+            if (modalFuncionarioNoEncontrado) {
+                new bootstrap.Modal(modalFuncionarioNoEncontrado).show();
+            } else {
+                $('#rut_cuerpo_error').text('');
+                $('#rut_dv_error').text('');
+            }
 
         } catch (error) {
             console.error("❌ Error en la petición fetch:", error);
         }
     });
 
+    // =================== FLUJO DE HORAS (solo para órdenes) ===================
     function validarHorasFuncionario(rutCuerpo, rutDv) {
         $.ajax({
             url: '/ordenes_trabajo/validar_horas_funcionario',
@@ -50,55 +77,99 @@ $(document).ready(function () {
             data: { rut_cuerpo: rutCuerpo, rut_dv: rutDv },
             success: function (data) {
                 console.log("🧮 Validación de horas:", data);
-    
+
                 $('#horas_disponibles').val(data.horas_disponibles);
                 window.horasDisponiblesBackend = data.horas_disponibles;
                 window.detalleOrdenesActivas = data.ordenes_activas || [];
-    
+
                 if (data.horas_disponibles <= 0) {
-                    $('#horas_disponibles').val(0);  // Mostrar 0 en el campo
-    
-                    // Actualizar tabla con órdenes activas
+                    $('#horas_disponibles').val(0);
+
                     const tbody = $('#detalle-horas-modal');
-                    tbody.empty();
-    
-                    if (data.ordenes_activas.length === 0) {
-                        tbody.append('<tr><td colspan="6">No hay órdenes activas.</td></tr>');
-                    } else {
-                        data.ordenes_activas.forEach(ord => {
-                            tbody.append(`
-                                <tr>
-                                    <td>${ord.numero_orden}</td>
-                                    <td>${ord.colegio}</td>
-                                    <td>${ord.horas}</td>
-                                    <td>${ord.financiamiento}</td>
-                                    <td>${ord.fecha_inicio}</td>
-                                    <td>${ord.fecha_termino}</td>
-                                </tr>`);
-                        });
+                    if (tbody.length) {
+                        tbody.empty();
+                        if (data.ordenes_activas.length === 0) {
+                            tbody.append('<tr><td colspan="6">No hay órdenes activas.</td></tr>');
+                        } else {
+                            data.ordenes_activas.forEach(ord => {
+                                tbody.append(`
+                                    <tr>
+                                        <td>${ord.numero_orden}</td>
+                                        <td>${ord.colegio}</td>
+                                        <td>${ord.horas}</td>
+                                        <td>${ord.financiamiento}</td>
+                                        <td>${ord.fecha_inicio}</td>
+                                        <td>${ord.fecha_termino}</td>
+                                    </tr>`);
+                            });
+                        }
+                        $('#horas-asignadas-modal').text(data.horas_totales);
+                        const modalSinHoras = document.getElementById("modalSinHoras");
+                        if (modalSinHoras) {
+                            new bootstrap.Modal(modalSinHoras).show();
+                        }
                     }
-    
-                    $('#horas-asignadas-modal').text(data.horas_totales);
-    
-                    // Mostrar solo este modal
-                    const modal = new bootstrap.Modal(document.getElementById("modalSinHoras"));
-                    modal.show();
-    
-                    // 🚫 No continuar con más lógica
                     return;
                 }
-    
-                // ✅ Si tiene horas disponibles, mostramos el modal de "Funcionario encontrado"
-                new bootstrap.Modal(document.getElementById("modalFuncionarioEncontrado")).show();
+
+                // Modal de "Funcionario encontrado"
+                const modalFuncionarioEncontrado = document.getElementById("modalFuncionarioEncontrado");
+                if (modalFuncionarioEncontrado) {
+                    new bootstrap.Modal(modalFuncionarioEncontrado).show();
+                }
             },
             error: function () {
                 console.error("❌ Error al validar las horas del funcionario");
             }
         });
     }
-    
 
-    $('#ver-ordenes-activas-btn').on('click', function () {        const detalle = window.detalleOrdenesActivas;
+    // =================== EVENTOS DE MODALES ===================
+
+    // Modal RUT inválido: cerrar limpia y enfoca
+    $('#modalRutInvalido').on('hidden.bs.modal', function () {
+        $('#rut_cuerpo').val('').focus();
+        $('#rut_dv').val('');
+        $('#rut_cuerpo_error').text('');
+        $('#rut_dv_error').text('');
+    });
+
+    // Modal Funcionario Encontrado: cerrar limpia y enfoca
+    $('#cerrar-funcionario-encontrado').on('click', function () {
+        limpiarCampos();
+        cerrarModal('modalFuncionarioEncontrado');
+        setTimeout(() => { $('#rut_cuerpo').focus(); }, 300);
+    });
+
+    // Modal Funcionario Encontrado: continuar enfoca siguiente campo (colegio)
+    $('#continuar-funcionario').on('click', function () {
+        $('#rut_cuerpo').val(window.datosFuncionario.rut_cuerpo);
+        $('#rut_dv').val(window.datosFuncionario.rut_dv);
+        $('#nombre_funcionario').val(window.datosFuncionario.nombre);
+        $('#apellido_funcionario').val(window.datosFuncionario.apellido);
+        cerrarModal('modalFuncionarioEncontrado');
+        setTimeout(() => { $('#colegio_rbd').focus(); }, 300);
+    });
+
+    // Modal Funcionario No Encontrado: siempre foco en nombre (NO limpia campos)
+    $('#cerrar-funcionario-no-encontrado, #cancelar-funcionario-no-encontrado').on('click', function () {
+        cerrarModal('modalFuncionarioNoEncontrado');
+        setTimeout(() => { $('#nombre_funcionario').focus(); }, 300);
+    });
+
+    $('#modalFuncionarioNoEncontrado').on('hidden.bs.modal', function () {
+        setTimeout(() => { $('#nombre_funcionario').focus(); }, 300);
+    });
+
+    // Cuando se cierre el modal "Sin Horas", se limpian los campos y se devuelve el foco al RUT
+    $('#modalSinHoras').on('hidden.bs.modal', function () {
+        limpiarCampos();
+        setTimeout(() => { $('#rut_cuerpo').focus(); }, 300);
+    });
+
+    // =================== RESTO DE FUNCIONALIDADES ===================
+    $('#ver-ordenes-activas-btn').on('click', function () {
+        const detalle = window.detalleOrdenesActivas;
         const rut = $('#rut_cuerpo').val() + '-' + $('#rut_dv').val();
         const nombre = $('#nombre_funcionario').val();
         const apellido = $('#apellido_funcionario').val();
@@ -150,62 +221,11 @@ $(document).ready(function () {
         }
     });
 
-    $('#modalRutInvalido').on('hidden.bs.modal', function () {
-        $('#rut_cuerpo').val('').focus();
-        $('#rut_dv').val('');
-    });
-
-    $('#cerrar-funcionario-no-encontrado, #cancelar-funcionario-no-encontrado').on('click', function () {
-        $('#rut_cuerpo').val('').focus();
-        $('#rut_dv').val('');
-    });
-
     $('#redirigir-nuevo').on('click', function () {
         window.location.href = "/funcionarios/nuevo";
     });
 
-    $('#cerrar-funcionario-encontrado').on('click', function () {
-        limpiarCampos();
-        cerrarModal('modalFuncionarioEncontrado');
-        setTimeout(() => { $('#rut_cuerpo').focus(); }, 300);
-    });
-
-    $('#continuar-funcionario').on('click', function () {
-        $('#rut_cuerpo').val(window.datosFuncionario.rut_cuerpo);
-        $('#rut_dv').val(window.datosFuncionario.rut_dv);
-        $('#nombre_funcionario').val(window.datosFuncionario.nombre);
-        $('#apellido_funcionario').val(window.datosFuncionario.apellido);
-        cerrarModal('modalFuncionarioEncontrado');
-        setTimeout(() => { $('#colegio_rbd').focus(); }, 300);
-    });
-
-    function cerrarModal(modalId) {
-        const modalElement = document.getElementById(modalId);
-        if (!modalElement) return;
-
-        let modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (!modalInstance) modalInstance = new bootstrap.Modal(modalElement);
-        modalInstance.hide();
-
-        setTimeout(() => {
-            $('.modal-backdrop').remove();
-            $('body').removeClass('modal-open').css('overflow', 'auto');
-            modalElement.classList.remove("show");
-            modalElement.style.display = "none";
-            modalElement.setAttribute("aria-hidden", "true");
-        }, 500);
-    }
-
-    function limpiarCampos() {
-        $('#rut_cuerpo, #rut_dv, #nombre_funcionario, #apellido_funcionario, #colegio_rbd, #tipo_contrato, #financiamiento_id, #fecha_inicio, #fecha_termino, #horas_disponibles, #observaciones').val('');
-        $('#mensaje-horas').html('');
-        $('#guardar-btn').prop('disabled', false);
-    }
-
-    $('#modalFuncionarioNoEncontrado').on('hidden.bs.modal', function () {
-        limpiarCampos();
-    });
-
+    // Buscar funcionario
     $('#buscar-funcionario-btn').on('click', function () {
         const modalElement = document.getElementById("modalBuscarFuncionario");
         if (!modalElement) return;
@@ -289,10 +309,29 @@ $(document).ready(function () {
         cerrarModal('modalBuscarFuncionario');
         setTimeout(() => { $('#colegio_rbd').focus(); }, 300);
     });
-    // Cuando se cierre el modal "Sin Horas", se limpian los campos y se devuelve el foco al RUT
-$('#modalSinHoras').on('hidden.bs.modal', function () {
-    limpiarCampos();
-    setTimeout(() => { $('#rut_cuerpo').focus(); }, 300);
-});
+
+    // =================== UTILIDADES GENERALES ===================
+    function cerrarModal(modalId) {
+        const modalElement = document.getElementById(modalId);
+        if (!modalElement) return;
+
+        let modalInstance = bootstrap.Modal.getInstance(modalElement);
+        if (!modalInstance) modalInstance = new bootstrap.Modal(modalElement);
+        modalInstance.hide();
+
+        setTimeout(() => {
+            $('.modal-backdrop').remove();
+            $('body').removeClass('modal-open').css('overflow', 'auto');
+            modalElement.classList.remove("show");
+            modalElement.style.display = "none";
+            modalElement.setAttribute("aria-hidden", "true");
+        }, 500);
+    }
+
+    function limpiarCampos() {
+        $('#rut_cuerpo, #rut_dv, #nombre_funcionario, #apellido_funcionario, #colegio_rbd, #tipo_contrato, #financiamiento_id, #fecha_inicio, #fecha_termino, #horas_disponibles, #observaciones').val('');
+        $('#mensaje-horas').html('');
+        $('#guardar-btn').prop('disabled', false);
+    }
 
 });

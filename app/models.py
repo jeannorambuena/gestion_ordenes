@@ -1,3 +1,5 @@
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import validates, relationship, backref, foreign
 from sqlalchemy import Column, String, Integer, Date, Boolean, Text, Enum, ForeignKey, Float
 from datetime import datetime
@@ -186,13 +188,24 @@ class HistorialCambios(db.Model):
 # Modelo: Usuario
 
 
-class Usuario(db.Model):
+class Usuario(UserMixin, db.Model):
     __tablename__ = 'usuarios'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     nombre_usuario = Column(String(50), unique=True, nullable=False)
     contrasena = Column(String(255), nullable=False)
     rol = Column(String(50), nullable=False)
+
+    # Flask-Login requirements (estos los provee UserMixin pero puedes personalizar)
+    def get_id(self):
+        return str(self.id)
+
+    # Métodos para manejo de contraseña segura:
+    def set_password(self, password):
+        self.contrasena = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.contrasena, password)
 
 # Modelo: Roles
 

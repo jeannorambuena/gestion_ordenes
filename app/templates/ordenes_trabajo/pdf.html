@@ -10,65 +10,136 @@
             font-size: 14px;
             margin: 40px;
         }
-
         .titulo {
             text-align: center;
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 20px;
         }
-
+        .cabecera-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .cabecera-label {
+            width: 85px;
+            vertical-align: top;
+            text-align: left;
+            padding-right: 0px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 15px;
+            letter-spacing: 0.03em;
+        }
+        .cabecera-sep {
+            width: 10px;
+            text-align: left;
+            vertical-align: top;
+            font-weight: bold;
+        }
+        .cabecera-dato {
+            vertical-align: top;
+            text-align: left;
+            font-size: 14px;
+            padding-bottom: 0.2em;
+        }
+        .cabecera-nombre {
+            font-weight: bold;
+            font-size: 15px;
+            letter-spacing: 0.01em;
+        }
+        .cabecera-cargo {
+            font-size: 13px;
+            font-style: italic;
+            color: #555;
+        }
+        .fecha-actual {
+            text-align: right;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
         .text-justify {
             text-align: justify;
         }
-
         .firmas {
             margin-top: 60px;
             display: flex;
             justify-content: space-between;
         }
-
         .firma {
             text-align: center;
             width: 45%;
             border-top: 1px solid #000;
             padding-top: 5px;
         }
-
         .tomo-conocimiento {
             margin-top: 60px;
             text-align: center;
         }
-
         .tomo-conocimiento .nombre {
             margin-top: 20px;
             font-weight: bold;
         }
-
         .fecha-firma {
             margin-top: 10px;
         }
     </style>
 </head>
 <body>
-
     <div class="titulo">
         ILUSTRE MUNICIPALIDAD DE TENO<br>
         ORDEN DE TRABAJO N° {{ orden.numero_orden }} – {{ orden.anio }}
     </div>
 
-    <p><strong>DE:</strong> JEFATURA(S) DEPTO DE ADMINISTRACIÓN DE EDUCACIÓN MUNICIPAL</p>
-    <p><strong>A:</strong> SR(A) DIRECTOR(A) {{ orden.colegio.nombre_colegio if orden.colegio else 'COLEGIO NO ASIGNADO' }}</p>
-    <p><strong>Fecha:</strong> {{ orden.fecha_inicio.strftime('%d-%m-%Y') }}</p>
+    <!-- Fecha de creación alineada a la derecha -->
+    <div class="fecha-actual">
+        Fecha de emisión: {{ fecha_actual.strftime('%d-%m-%Y') }}
+    </div>
+
+    <!-- Cabecera profesional perfectamente alineada -->
+    <table class="cabecera-table">
+        <tr>
+            <td class="cabecera-label">DE</td>
+            <td class="cabecera-sep">:</td>
+            <td class="cabecera-dato">
+                <span class="cabecera-nombre">{{ orden.jefatura_daem.nombre|upper if orden.jefatura_daem else 'NOMBRE NO DISPONIBLE' }}</span><br>
+                <span class="cabecera-cargo">{{ orden.jefatura_daem.cargo_jefatura|capitalize if orden.jefatura_daem else 'Cargo no disponible' }}</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="cabecera-label">A</td>
+            <td class="cabecera-sep">:</td>
+            <td class="cabecera-dato">
+                <span class="cabecera-nombre">{{ orden.colegio.director|upper if orden.colegio and orden.colegio.director else 'DIRECTOR NO ASIGNADO' }}</span><br>
+                <span class="cabecera-cargo">Director(a)</span>
+            </td>
+        </tr>
+        <tr>
+            <td class="cabecera-label">COLEGIO</td>
+            <td class="cabecera-sep">:</td>
+            <td class="cabecera-dato">
+                <span class="cabecera-nombre">{{ orden.colegio.nombre_colegio|upper if orden.colegio else 'NO ASIGNADO' }}</span>
+            </td>
+        </tr>
+    </table>
 
     <p class="text-justify">
-        Por intermedio de la presente orden de trabajo informo que Don(ña): 
-        <strong>{{ orden.funcionario.nombre }} {{ orden.funcionario.apellido }}</strong>, 
-        Cédula de identidad N° <strong>{{ orden.rut_cuerpo }}-{{ orden.rut_dv }}</strong>, 
-        ha sido designado(a) en su Unidad Educativa para servir en el cargo de 
-        <strong>{{ orden.tipo_contrato.nombre if orden.tipo_contrato else 'SIN CONTRATO' }}</strong> con un total de 
-        <strong>{{ orden.horas_disponibles }}</strong> horas cronológicas en enseñanza 
-        <strong>{{ 'básica' if orden.tipo_contrato and 'básica' in orden.tipo_contrato.nombre|lower else 'media' }}</strong>.
+        Por intermedio de la presente orden de trabajo informo que Don(ña):
+        <strong>{{ orden.funcionario.nombre }} {{ orden.funcionario.apellido }}</strong>,
+        cédula de identidad N° <strong>{{ orden.rut_cuerpo }}-{{ orden.rut_dv }}</strong>,
+        ha sido designado(a) en su Unidad Educativa <strong>{{ orden.colegio.nombre_colegio if orden.colegio else '' }}</strong>
+        para servir en el cargo de <strong>
+            {{ orden.funcionario.cargo.nombre_cargo if orden.funcionario.cargo else 'SIN CARGO' }}</strong>
+        mediante el tipo de contratación:
+        <strong>{{ orden.tipo_contrato.nombre if orden.tipo_contrato else 'SIN CONTRATO' }}</strong>,
+        por un total de <strong>{{ orden.horas_disponibles }}</strong> horas cronológicas en enseñanza
+        <strong>
+            {% if orden.colegio and orden.colegio.tipo_ensenanza %}
+                {{ orden.colegio.tipo_ensenanza|lower|capitalize }}
+            {% else %}
+                (tipo no asignado)
+            {% endif %}
+        </strong>.
     </p>
 
     {% if orden.observaciones %}
@@ -76,7 +147,7 @@
     {% endif %}
 
     <p><strong>Desde:</strong> {{ orden.fecha_inicio.strftime('%d-%m-%Y') }}</p>
-    <p><strong>Hasta:</strong> 
+    <p><strong>Hasta:</strong>
         {% if orden.es_indefinido or not orden.fecha_termino %}
             INDEFINIDO
         {% else %}
@@ -85,22 +156,21 @@
     </p>
 
     <p class="text-justify">
-        Consecuentemente con lo anterior, ruego a usted asignar las funciones respectivas al interesado 
+        Consecuentemente con lo anterior, ruego a usted asignar las funciones respectivas al interesado
         e informar a este departamento de educación la fecha exacta de la asunción de funciones.
     </p>
-
     <p class="text-justify">
         Sin otro particular, saluda atentamente a usted,
     </p>
 
     <div class="firmas">
         <div class="firma">
-            {{ orden.jefatura_daem.nombre if orden.jefatura_daem else 'NOMBRE NO DISPONIBLE' }}<br>
-            JEFE(S) DAEM
+            {{ orden.jefatura_daem.nombre|upper if orden.jefatura_daem else 'NOMBRE NO DISPONIBLE' }}<br>
+            {{ orden.jefatura_daem.cargo_jefatura|capitalize if orden.jefatura_daem else 'Cargo no disponible' }}
         </div>
         <div class="firma">
-            {{ orden.alcalde.nombre_alcalde if orden.alcalde else 'ALCALDE NO ASIGNADO' }}<br>
-            {{ orden.alcalde.cargo.upper() if orden.alcalde and orden.alcalde.cargo else 'CARGO NO DISPONIBLE' }}
+            {{ orden.alcalde.nombre_alcalde|upper if orden.alcalde else 'ALCALDE NO ASIGNADO' }}<br>
+            {{ orden.alcalde.cargo|upper if orden.alcalde and orden.alcalde.cargo else 'CARGO NO DISPONIBLE' }}
         </div>
     </div>
 
