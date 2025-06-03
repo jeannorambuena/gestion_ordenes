@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 02-04-2025 a las 21:46:50
+-- Tiempo de generación: 02-06-2025 a las 20:46:56
 -- Versión del servidor: 8.3.0
 -- Versión de PHP: 8.2.18
 
@@ -39,14 +39,14 @@ CREATE TABLE IF NOT EXISTS `alcaldia` (
   `cargo` enum('Alcalde','Alcaldesa','Alcalde(S)','Alcaldesa(S)') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Alcalde',
   PRIMARY KEY (`id`),
   UNIQUE KEY `cedula_identidad` (`cedula_identidad`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `alcaldia`
 --
 
 INSERT INTO `alcaldia` (`id`, `nombre_alcalde`, `cedula_identidad`, `email`, `telefono`, `fecha_inicio`, `fecha_termino`, `cargo`) VALUES
-(5, 'Jean', '14326078-k', 'jeannorambuena@gmail.com', '+56997718963', '2025-03-01', '2029-03-31', 'Alcalde');
+(7, 'Wildo R. Farías González', '11186445-4', 'alcalde@teno.cl', '974592791', '2024-12-06', '2028-10-27', 'Alcalde');
 
 -- --------------------------------------------------------
 
@@ -60,14 +60,17 @@ CREATE TABLE IF NOT EXISTS `cargos` (
   `nombre_cargo` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   `descripcion` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `cargos`
 --
 
 INSERT INTO `cargos` (`id`, `nombre_cargo`, `descripcion`) VALUES
-(1, 'Profesor', 'Encargado de impartir clases a los estudiantes.');
+(1, 'Profesor', 'Encargado de impartir clases a los estudiantes.'),
+(7, 'Fonoaudiólogo', 'Profesional de la Salud'),
+(5, 'Asistente de Aula', 'Asistente de Aula '),
+(6, 'Director', 'Director de Comalle');
 
 -- --------------------------------------------------------
 
@@ -161,8 +164,11 @@ CREATE TABLE IF NOT EXISTS `funcionarios` (
 --
 
 INSERT INTO `funcionarios` (`nombre`, `apellido`, `direccion`, `telefono`, `titulo`, `id_cargo`, `rut_cuerpo`, `rut_dv`) VALUES
+('Maria Elena', 'Leyton Diaz', 'Isla Victoria 1914', '999999999', 'Profesora de Educacion Básica', 1, '7309224', '8'),
 ('Mariela Isabel', 'Farias Leyton', 'msaldfkslk', '997744887', 'educadora', 1, '15130287', '4'),
-('Jean Paul', 'Norambuena Chávez', 'Ruta j55', '997718963', 'Ingeniero', 1, '14326078', 'k');
+('Jean Paul', 'Norambuena Chávez', 'Ruta j55', '997718963', 'Ingeniero', 1, '14326078', 'k'),
+('Alfredo', 'Norambuena Cerda', 'Liquidambar 2045', '993241494', 'Profesor de Enseñanza Básica', 1, '6906337', '3'),
+('Anastasia del Pilar', 'Norambuena Muñoz', 'Amsterdam 111', '999999999', 'Profesora de Educacion Fisica', 1, '22346622', '2');
 
 -- --------------------------------------------------------
 
@@ -289,7 +295,14 @@ CREATE TABLE IF NOT EXISTS `jefatura_daem` (
   `rut_cuerpo` varchar(8) COLLATE utf8mb4_unicode_ci NOT NULL,
   `rut_dv` varchar(1) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `jefatura_daem`
+--
+
+INSERT INTO `jefatura_daem` (`id`, `nombre`, `email`, `telefono`, `fecha_inicio`, `fecha_termino`, `cargo_jefatura`, `rut_cuerpo`, `rut_dv`) VALUES
+(3, 'MONICA CECILIA FIGUEROA ALBORNOZ', 'MONICA.FIGUEROA@DAEMTENO.CL', '992176642', '2025-03-03', '2028-10-20', 'Jefe(a) DAEM (S)', '10151006', '9');
 
 -- --------------------------------------------------------
 
@@ -325,14 +338,14 @@ CREATE TABLE IF NOT EXISTS `ordenes_trabajo` (
   KEY `fk_tipo_contrato` (`tipo_contrato_id`),
   KEY `fk_orden_alcalde` (`alcalde_id`),
   KEY `fk_orden_jefatura` (`jefatura_daem_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=69 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `ordenes_trabajo`
 --
 
 INSERT INTO `ordenes_trabajo` (`id`, `fecha_inicio`, `fecha_termino`, `es_indefinido`, `colegio_rbd`, `observaciones`, `reemplazo_a`, `motivo_reemplazo`, `rut_cuerpo`, `rut_dv`, `financiamiento_id`, `fecha_creacion`, `fecha_modificacion`, `numero_orden`, `tipo_contrato_id`, `horas_disponibles`, `anio`, `alcalde_id`, `jefatura_daem_id`) VALUES
-(62, '2025-03-31', '2025-04-04', 0, '2795-2', '', NULL, NULL, '14326078', 'K', 6, '2025-03-31 23:36:45', NULL, '1', 4, 44, 2025, 0, 0);
+(68, '2025-06-02', '2025-06-27', 0, '2795-2', 'No existen observaciones', NULL, NULL, '7309224', '8', 3, '2025-05-25 15:56:27', NULL, '1', 4, 10, 2025, 7, 3);
 
 -- --------------------------------------------------------
 
@@ -370,14 +383,17 @@ CREATE TABLE IF NOT EXISTS `tipo_contrato` (
   `observacion` text COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nombre` (`nombre`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `tipo_contrato`
 --
 
 INSERT INTO `tipo_contrato` (`id`, `nombre`, `observacion`) VALUES
-(4, 'Código del Trabajo', 'Ley Nro XXXXXXX');
+(4, 'Código del Trabajo', 'Ley Nro XXXXXXX'),
+(5, 'Estatuto Docente', ''),
+(6, 'Honorarios', ''),
+(7, 'Planta', '');
 
 -- --------------------------------------------------------
 

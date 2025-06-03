@@ -12,7 +12,8 @@ from wtforms.validators import (
     DataRequired, Optional, NumberRange, ValidationError, Length, Email, EqualTo
 )
 
-from app import db
+# from app import db
+from app.extensions import db
 from app.models import (
     OrdenesTrabajo, TipoContrato, Funcionarios, Colegios,
     Financiamiento, Alcaldia, JefaturaDAEM  # 👈 aquí todo lo que necesitas

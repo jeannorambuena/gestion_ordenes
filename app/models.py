@@ -3,7 +3,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import validates, relationship, backref, foreign
 from sqlalchemy import Column, String, Integer, Date, Boolean, Text, Enum, ForeignKey, Float
 from datetime import datetime
-from app import db
+# from app import db
+from app.extensions import db
+# from app import login_manager
+from app.extensions import login_manager
+
 
 # Modelo: Alcaldia
 
@@ -193,23 +197,22 @@ class Usuario(UserMixin, db.Model):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     nombre_usuario = Column(String(50), unique=True, nullable=False)
-    contrasena = Column(String(255), nullable=False)
+    contrasena_hash = Column(String(255), nullable=False)
     rol = Column(String(50), nullable=False)
 
-    # Flask-Login requirements (estos los provee UserMixin pero puedes personalizar)
-    def get_id(self):
-        return str(self.id)
-
-    # Métodos para manejo de contraseña segura:
     def set_password(self, password):
-        self.contrasena = generate_password_hash(password)
+        self.contrasena_hash = generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.contrasena, password)
+        return check_password_hash(self.contrasena_hash, password)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Usuario.query.get(int(user_id))
+
 
 # Modelo: Roles
-
-
 class Rol(db.Model):
     __tablename__ = 'roles'
 

@@ -3,9 +3,11 @@ from flask import (
     Blueprint, render_template, request, redirect,
     url_for, flash, jsonify
 )
+from flask_login import login_required
 
 # 📌 Herramientas de base de datos y SQLAlchemy
-from app import db  # Base de datos
+# from app import db  # Base de datos
+from app.extensions import db
 from sqlalchemy.exc import IntegrityError  # Manejo de errores de base de datos
 from sqlalchemy.orm import joinedload  # Carga de relaciones
 from sqlalchemy import text  # Consultas SQL crudas
@@ -42,10 +44,9 @@ main_bp = Blueprint('main', __name__)
 
 roles_bp = Blueprint('roles', __name__)  # Cambiado a 'roles'
 
-# Listar roles
-
 
 @roles_bp.route('/', methods=['GET'])
+@login_required
 def listar_roles():
     roles = Rol.query.all()
     return render_template('roles/list.html', roles=roles)
@@ -54,6 +55,7 @@ def listar_roles():
 
 
 @roles_bp.route('/nuevo', methods=['GET', 'POST'])
+@login_required
 def nuevo_rol():
     form = RolForm()
     if form.validate_on_submit():
@@ -71,6 +73,7 @@ def nuevo_rol():
 
 
 @roles_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
+@login_required
 def editar_rol(id):
     rol = Rol.query.get_or_404(id)
     form = RolForm(obj=rol)
@@ -86,6 +89,7 @@ def editar_rol(id):
 
 
 @roles_bp.route('/eliminar/<int:id>', methods=['POST'])
+@login_required
 def eliminar_rol(id):
     rol = Rol.query.get_or_404(id)
     db.session.delete(rol)
@@ -115,6 +119,7 @@ funcionarios_bp = Blueprint('funcionarios_bp', __name__)
 
 
 @funcionarios_bp.route('/')
+@login_required
 def listar_funcionarios():
     funcionarios = Funcionarios.query.all()
     return render_template('funcionarios/list.html', funcionarios=funcionarios)
@@ -123,6 +128,7 @@ def listar_funcionarios():
 
 
 @funcionarios_bp.route('/nuevo', methods=['GET', 'POST'])
+@login_required
 def nuevo_funcionario():
     form = FuncionarioForm()
     form.id_cargo.choices = [(cargo.id, cargo.nombre_cargo)
@@ -155,6 +161,7 @@ def nuevo_funcionario():
 
 
 @funcionarios_bp.route('/editar/<string:rut_cuerpo>/<string:rut_dv>', methods=['GET', 'POST'])
+@login_required
 def editar_funcionario(rut_cuerpo, rut_dv):
     funcionario = Funcionarios.query.filter_by(
         rut_cuerpo=rut_cuerpo, rut_dv=rut_dv).first_or_404()
@@ -185,6 +192,7 @@ def editar_funcionario(rut_cuerpo, rut_dv):
 
 
 @funcionarios_bp.route('/eliminar/<string:rut_cuerpo>/<string:rut_dv>', methods=['POST'])
+@login_required
 def eliminar_funcionario(rut_cuerpo, rut_dv):
     print(f"Intentando eliminar funcionario con RUT: {rut_cuerpo}-{rut_dv}")
     funcionario = Funcionarios.query.filter_by(

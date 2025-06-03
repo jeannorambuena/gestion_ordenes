@@ -1,13 +1,7 @@
+from app.auth import auth_bp
 from flask import Flask, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_wtf import CSRFProtect
-from config import Config  # Asegúrate de importar Config
-
-# Inicializar extensiones de Flask
-db = SQLAlchemy()
-migrate = Migrate()
-csrf = CSRFProtect()
+from app.extensions import db, migrate, login_manager
+from config import Config
 
 
 def create_app(config_class=Config):
@@ -15,12 +9,11 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
 
     # Inicializar extensiones
-    csrf.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
-
-    # Asignar csrf.exempt para su uso en routes.py
-    app.extensions['csrf_exempt'] = csrf.exempt
+    login_manager.init_app(app)
+    login_manager.login_view = 'login'
+    login_manager.login_message_category = 'info'
 
     # Registrar Blueprints
     from app.routes import (
@@ -42,21 +35,22 @@ def create_app(config_class=Config):
     app.register_blueprint(ordenes_bp, url_prefix='/ordenes_trabajo')
     app.register_blueprint(funcionarios_bp, url_prefix='/funcionarios')
     app.register_blueprint(tipo_contrato_bp, url_prefix='/tipo_contrato')
+    app.register_blueprint(auth_bp, url_prefix='/auth')
 
     # Manejo de errores globales
     @app.errorhandler(400)
     def bad_request(error):
-        print(f"Error 400 capturado: {error}")  # Para depuración
+        print(f"Error 400 capturado: {error}")
         return jsonify({'error': 'Bad request - revisa los datos enviados'}), 400
 
     @app.errorhandler(403)
     def forbidden(error):
-        print(f"Error 403 capturado: {error}")  # Para depuración
-        return jsonify({'error': 'Forbidden: CSRF token missing or incorrect'}), 403
+        print(f"Error 403 capturado: {error}")
+        return jsonify({'error': 'Forbidden: acceso no permitido'}), 403
 
     @app.errorhandler(500)
     def server_error(error):
-        print(f"Error 500 capturado: {error}")  # Para depuración
+        print(f"Error 500 capturado: {error}")
         return jsonify({'error': 'Internal server error'}), 500
 
     return app
