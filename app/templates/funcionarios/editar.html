@@ -9,7 +9,7 @@
         <h2 class="text-center mb-4">Editar Funcionario: {{ funcionario.nombre }} {{ funcionario.apellido }}</h2>
 
         <!-- Cambié 'cedula_identidad' por 'rut_cuerpo' y 'rut_dv' -->
-        <form action="{{ url_for('funcionarios_bp.editar_funcionario', rut_cuerpo=funcionario.rut_cuerpo, rut_dv=funcionario.rut_dv) }}" method="POST">
+        <form id="funcionario-form" action="{{ url_for('funcionarios_bp.editar_funcionario', rut_cuerpo=funcionario.rut_cuerpo, rut_dv=funcionario.rut_dv) }}" method="POST">
 
             {{ form.hidden_tag() }}
 

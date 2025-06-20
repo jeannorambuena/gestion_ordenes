@@ -15,15 +15,22 @@ from app.extensions import login_manager
 class Alcaldia(db.Model):
     __tablename__ = 'alcaldia'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    nombre_alcalde = Column(String(100), nullable=False)
-    cedula_identidad = Column(String(12), unique=True, nullable=False)
-    email = Column(String(100), nullable=True)
-    telefono = Column(String(20), nullable=True)
-    fecha_inicio = Column(Date, nullable=False)
-    fecha_termino = Column(Date, nullable=True)
-    cargo = Column(Enum('Alcalde', 'Alcaldesa', 'Alcalde(S)', 'Alcaldesa(S)',
-                   name='cargo_enum'), nullable=False, default='Alcalde')
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    rut_cuerpo = db.Column(db.String(8), db.ForeignKey(
+        'funcionarios.rut_cuerpo'), nullable=False)
+    rut_dv = db.Column(db.String(1), nullable=False)
+    email = db.Column(db.String(100), nullable=True)
+    telefono = db.Column(db.String(20), nullable=True)
+    fecha_inicio = db.Column(db.Date, nullable=False)
+    fecha_termino = db.Column(db.Date, nullable=True)
+    cargo = db.Column(db.Enum('Alcalde', 'Alcaldesa', 'Alcalde(S)',
+                      'Alcaldesa(S)', name='cargo_enum'), nullable=False, default='Alcalde')
+
+    funcionario = db.relationship(
+        'Funcionarios',
+        primaryjoin="and_(Alcaldia.rut_cuerpo==Funcionarios.rut_cuerpo, Alcaldia.rut_dv==Funcionarios.rut_dv)",
+        backref='alcaldias'
+    )
 
 # Modelo: Cargos
 
@@ -64,18 +71,11 @@ class Funcionarios(db.Model):
     apellido = Column(String(100), nullable=False)
     direccion = Column(String(255), nullable=True)
     telefono = Column(String(15), nullable=True)
+    email = Column(String(100), nullable=True)  # ✅ Agregado
     titulo = Column(String(100), nullable=True)
     id_cargo = Column(Integer, ForeignKey('cargos.id'), nullable=True)
 
-    # Relación con el modelo Cargo
     cargo = relationship('Cargo', backref='funcionarios', lazy='joined')
-
-    # Comentando relación con FuncionarioColegios
-    # colegios_relacion = relationship(
-    #     'FuncionarioColegios',
-    #     backref='funcionario',
-    #     lazy=True
-    # )
 
 # Modelo: Ordenes de Trabajo
 
@@ -238,3 +238,13 @@ class JefaturaDAEM(db.Model):
 
     def __repr__(self):
         return f'<JefaturaDAEM {self.nombre} - {self.cargo_jefatura}>'
+
+
+class Permiso(db.Model):
+    __tablename__ = 'permisos'
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100), unique=True, nullable=False)
+    descripcion = db.Column(db.String(255), nullable=True)
+
+    def __repr__(self):
+        return f"<Permiso {self.nombre}>"

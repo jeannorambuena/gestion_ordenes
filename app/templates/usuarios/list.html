@@ -8,7 +8,7 @@
     <div class="card shadow-lg p-4 mb-5 bg-white rounded" style="width: 100%; max-width: 900px;">
         <h2 class="text-center mb-4">Lista de Usuarios</h2>
         <div class="d-flex justify-content-end mb-3">
-            <a href="{{ url_for('main.nuevo_usuario') }}" class="btn btn-success">Agregar Nuevo Usuario</a>
+            <a href="{{ url_for('usuarios_bp.nuevo_usuario') }}" class="btn btn-success">Agregar Nuevo Usuario</a>
         </div>
         <div class="table-responsive">
             <table class="table table-bordered table-hover">
@@ -24,11 +24,16 @@
                     <tr class="text-center">
                         <td>{{ usuario.nombre_usuario }}</td>
                         <td>{{ usuario.rol }}</td>
-                        <td class="d-flex justify-content-center">
-                            <a href="{{ url_for('main.editar_usuario', id=usuario.id) }}" class="btn btn-warning btn-sm me-2">Editar</a>
-                            <form action="{{ url_for('main.eliminar_usuario', id=usuario.id) }}" method="POST" style="display:inline;">
+                        <td class="d-flex justify-content-center gap-2 flex-wrap">
+                            <a href="{{ url_for('usuarios_bp.editar_usuario', id=usuario.id) }}" class="btn btn-warning btn-sm">Editar</a>
+
+                            <form action="{{ url_for('usuarios_bp.eliminar_usuario', id=usuario.id) }}" method="POST" style="display:inline;">
                                 <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este usuario?')">Eliminar</button>
                             </form>
+
+                            <a href="{{ url_for('usuarios_bp.asignar_permisos', id=usuario.id) }}" class="btn btn-info btn-sm">
+                                <i class="fas fa-key"></i> Permisos
+                            </a>
                         </td>
                     </tr>
                     {% endfor %}

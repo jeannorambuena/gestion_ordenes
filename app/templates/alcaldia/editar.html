@@ -4,81 +4,77 @@
 
 {% block content %}
 <div class="container mt-5 d-flex justify-content-center">
-    <!-- Formulario con tamaño reducido -->
-    <div class="col-md-6 shadow-lg p-4 mb-5 bg-white rounded"> <!-- Ancho ajustado -->
-        <h2 class="text-center mb-4">Editar Alcaldía</h2>
-        <form action="{{ url_for('alcaldia.editar_alcaldia', id=alcaldia.id) }}" method="POST">
+<!-- Formulario con tamaño reducido -->
+<div class="col-md-6 shadow-lg p-4 mb-5 bg-white rounded"> <!-- Ancho ajustado -->
+<h2 class="text-center mb-4">Editar Alcaldía</h2>
+<form action="{{ url_for('alcaldia.editar_alcaldia', id=alcaldia.id) }}" id="alcaldia-form" method="POST">
             {{ form.hidden_tag() }}
 
-            <!-- Nombre del Alcalde -->
-            <div class="mb-3">
-                <label for="nombre_alcalde" class="form-label">Nombre del Alcalde</label>
+            
+<div class="mb-3 row">
+<div class="col-md-8">
+<label class="form-label" for="rut_cuerpo">Cuerpo del RUT</label>
+<input class="form-control" id="rut_cuerpo" name="rut_cuerpo" readonly="" type="text" value="{{ alcaldia.rut_cuerpo }}"/>
+</div>
+<div class="col-md-4">
+<label class="form-label" for="rut_dv">Dígito Verificador</label>
+<input class="form-control" id="rut_dv" name="rut_dv" readonly="" type="text" value="{{ alcaldia.rut_dv }}"/>
+</div>
+</div>
+<!-- Nombre del Alcalde -->
+<div class="mb-3">
+<label class="form-label" for="nombre_alcalde">Nombre del Alcalde</label>
                 {{ form.nombre_alcalde(class="form-control") }}
                 {% if form.nombre_alcalde.errors %}
                     <div class="text-danger">{{ form.nombre_alcalde.errors[0] }}</div>
                 {% endif %}
             </div>
-
-            <!-- Cédula de Identidad -->
-            <div class="mb-3">
-                <label for="cedula_identidad" class="form-label">Cédula de Identidad</label>
-                {{ form.cedula_identidad(class="form-control") }}
-                {% if form.cedula_identidad.errors %}
-                    <div class="text-danger">{{ form.cedula_identidad.errors[0] }}</div>
-                {% endif %}
-            </div>
-
-            <!-- Email -->
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
+<!-- Email -->
+<div class="mb-3">
+<label class="form-label" for="email">Email</label>
                 {{ form.email(class="form-control") }}
                 {% if form.email.errors %}
                     <div class="text-danger">{{ form.email.errors[0] }}</div>
                 {% endif %}
             </div>
-
-            <!-- Teléfono -->
-            <div class="mb-3">
-                <label for="telefono" class="form-label">Teléfono</label>
+<!-- Teléfono -->
+<div class="mb-3">
+<label class="form-label" for="telefono">Teléfono</label>
                 {{ form.telefono(class="form-control") }}
                 {% if form.telefono.errors %}
                     <div class="text-danger">{{ form.telefono.errors[0] }}</div>
                 {% endif %}
             </div>
-
-            <!-- Fecha de Inicio -->
-            <div class="mb-3">
-                <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+<!-- Fecha de Inicio -->
+<div class="mb-3">
+<label class="form-label" for="fecha_inicio">Fecha de Inicio</label>
                 {{ form.fecha_inicio(class="form-control", type="date") }}
                 {% if form.fecha_inicio.errors %}
                     <div class="text-danger">{{ form.fecha_inicio.errors[0] }}</div>
                 {% endif %}
             </div>
-
-            <!-- Fecha de Término -->
-            <div class="mb-3">
-                <label for="fecha_termino" class="form-label">Fecha de Término</label>
+<!-- Fecha de Término -->
+<div class="mb-3">
+<label class="form-label" for="fecha_termino">Fecha de Término</label>
                 {{ form.fecha_termino(class="form-control", type="date") }}
                 {% if form.fecha_termino.errors %}
                     <div class="text-danger">{{ form.fecha_termino.errors[0] }}</div>
                 {% endif %}
             </div>
-
-            <!-- Cargo -->
-            <div class="mb-3">
-                <label for="cargo" class="form-label">Cargo</label>
+<!-- Cargo -->
+<div class="mb-3">
+<label class="form-label" for="cargo">Cargo</label>
                 {{ form.cargo(class="form-control") }}
                 {% if form.cargo.errors %}
                     <div class="text-danger">{{ form.cargo.errors[0] }}</div>
                 {% endif %}
             </div>
-
-            <!-- Botones de acción -->
-            <div class="d-flex justify-content-end">
-                <button type="submit" class="btn btn-primary me-2">Actualizar</button>
-                <a href="{{ url_for('alcaldia.listar_alcaldia') }}" class="btn btn-secondary">Cancelar</a>
-            </div>
-        </form>
-    </div>
+<!-- Botones de acción -->
+<div class="d-flex justify-content-end">
+<button class="btn btn-primary me-2" type="submit">Actualizar</button>
+<a class="btn btn-secondary" href="{{ url_for('alcaldia.listar_alcaldias') }}">Cancelar</a>
+</div>
+</form>
+</div>
 </div>
 {% endblock %}

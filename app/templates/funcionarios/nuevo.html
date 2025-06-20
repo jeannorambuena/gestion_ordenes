@@ -11,13 +11,26 @@
         <div class="card-body">
             <form id="funcionario-form" action="{{ url_for('funcionarios_bp.nuevo_funcionario') }}" method="POST" class="needs-validation" novalidate>
                 {{ form.hidden_tag() }}
-                
+
                 <div class="mb-3">
                     <label for="rut_cuerpo" class="form-label">RUT</label>
                     <div class="input-group">
-                        {{ form.rut_cuerpo(class="form-control", placeholder="Ingrese el cuerpo del RUT", id="rut_cuerpo") }}
+                        {{ form.rut_cuerpo(
+                            class="form-control",
+                            placeholder="Ingrese el cuerpo del RUT",
+                            id="rut_cuerpo",
+                            value=form.rut_cuerpo.data if form.rut_cuerpo.data else '',
+                            readonly=True if form.rut_cuerpo.render_kw and form.rut_cuerpo.render_kw.get('readonly') else None
+                        ) }}
                         <span class="input-group-text">-</span>
-                        {{ form.rut_dv(class="form-control", placeholder="DV", id="rut_dv", style="max-width: 60px;") }}
+                        {{ form.rut_dv(
+                            class="form-control",
+                            placeholder="DV",
+                            id="rut_dv",
+                            style="max-width: 60px;",
+                            value=form.rut_dv.data if form.rut_dv.data else '',
+                            readonly=True if form.rut_dv.render_kw and form.rut_dv.render_kw.get('readonly') else None
+                        ) }}
                     </div>
                     <div class="text-danger" id="rut_cuerpo_error"></div>
                     <div class="text-danger" id="rut_dv_error"></div>
@@ -106,20 +119,34 @@
 
 <!-- Modal: Funcionario No Encontrado -->
 <div class="modal fade" id="modalFuncionarioNoEncontrado" tabindex="-1" aria-labelledby="modalFuncionarioNoEncontradoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-warning text-dark">
-                <h5 class="modal-title" id="modalFuncionarioNoEncontradoLabel">Funcionario No Encontrado</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                El RUT ingresado es válido, pero no está registrado como funcionario.<br>
-                Puede completar los datos y proceder con el registro.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="cerrar-funcionario-no-encontrado" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-warning text-dark">
+        <h5 class="modal-title" id="modalFuncionarioNoEncontradoLabel">Funcionario No Encontrado</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        El RUT ingresado es válido, pero no se encuentra registrado.<br>
+        ¿Deseas agregar un nuevo funcionario con este RUT?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" class="btn btn-primary" id="continuar-creacion">Continuar</button>
+      </div>
     </div>
+  </div>
 </div>
+<script>
+    window.addEventListener('DOMContentLoaded', () => {
+        const rutCuerpo = document.getElementById('rut_cuerpo');
+        const rutDv = document.getElementById('rut_dv');
+        const nombre = document.getElementById('nombre_funcionario');
+
+        if (rutCuerpo.value && rutDv.value && nombre) {
+            nombre.focus();
+            nombre.select();
+        }
+    });
+</script>
+
 {% endblock %}

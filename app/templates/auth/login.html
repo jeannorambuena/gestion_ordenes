@@ -1,18 +1,103 @@
 {% extends 'base.html' %}
+{% block title %}Inicio de Sesión - Gestión de Órdenes{% endblock %}
 {% block content %}
-<div class="container">
-    <h3>Inicio de Sesión</h3>
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        <div class="mb-3">
-            {{ form.nombre_usuario.label(class="form-label") }}
-            {{ form.nombre_usuario(class="form-control") }}
+
+<style>
+    body {
+        background: #ffffff; /* Fondo blanco puro */
+    }
+
+    .login-container {
+        min-height: 90vh;
+    }
+
+    .login-card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease-in-out;
+        padding: 2rem;
+    }
+
+    .login-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .avatar-circle {
+        width: 100px;
+        height: 100px;
+        background-color: #007bff;
+        border-radius: 50%;
+        margin: 0 auto;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .avatar-circle i {
+        font-size: 50px;
+        color: white;
+    }
+
+    .shake {
+        animation: shake 0.5s;
+    }
+
+    @keyframes shake {
+        0% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        50% { transform: translateX(10px); }
+        75% { transform: translateX(-10px); }
+        100% { transform: translateX(0); }
+    }
+</style>
+
+<div class="container d-flex justify-content-center align-items-center login-container">
+    <div class="col-md-4 col-11">
+        <div class="card login-card">
+            <div class="avatar-circle">
+                <i class="fas fa-user"></i>
+            </div>
+            <h3 class="text-center mb-4 text-primary">Gestión de Órdenes</h3>
+
+            <form method="POST" id="loginForm">
+                {{ form.hidden_tag() }}
+
+                <div class="mb-3">
+                    <label class="form-label text-secondary">{{ form.nombre_usuario.label.text }}</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        {{ form.nombre_usuario(class="form-control", placeholder="Ingrese su usuario") }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label text-secondary">{{ form.contrasena.label.text }}</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        {{ form.contrasena(class="form-control", placeholder="Ingrese su contraseña") }}
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2">Ingresar</button>
+            </form>
         </div>
-        <div class="mb-3">
-            {{ form.contrasena.label(class="form-label") }}
-            {{ form.contrasena(class="form-control") }}
-        </div>
-        <button type="submit" class="btn btn-primary">Ingresar</button>
-    </form>
+    </div>
 </div>
+
+<script>
+    const form = document.getElementById("loginForm");
+    form.addEventListener("submit", function (e) {
+        const user = form.querySelector("[name='nombre_usuario']").value.trim();
+        const pass = form.querySelector("[name='contrasena']").value.trim();
+
+        if (user === "" || pass === "") {
+            e.preventDefault();
+            form.classList.add("shake");
+            setTimeout(() => form.classList.remove("shake"), 500);
+        }
+    });
+</script>
+
 {% endblock %}

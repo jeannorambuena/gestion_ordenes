@@ -1,29 +1,30 @@
-# Importaciones necesarias para formularios, modelos, validadores y base de datos
-from app.validators import validar_rut
-from wtforms.validators import DataRequired, Length, Email, ValidationError
-from wtforms import StringField, DateField, SelectField, SubmitField
-from app.validators import validar_rut  # 👈 Importante
+from wtforms.validators import DataRequired, Length, Email
+from wtforms import StringField, SubmitField, SelectField
+from app.models import Funcionarios
+from wtforms.validators import DataRequired
+from wtforms import SelectField, DateField, SubmitField
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, IntegerField, DateField, BooleanField, SelectField,
-    TextAreaField, FloatField, PasswordField, SubmitField
+    SelectMultipleField, TextAreaField, FloatField, PasswordField, SubmitField
 )
 from wtforms.validators import (
-    DataRequired, Optional, NumberRange, ValidationError, Length, Email, EqualTo
+    DataRequired, Optional, NumberRange, ValidationError, Length,
+    Email, EqualTo
 )
 
-# from app import db
+from app.validators import validar_rut
 from app.extensions import db
 from app.models import (
     OrdenesTrabajo, TipoContrato, Funcionarios, Colegios,
-    Financiamiento, Alcaldia, JefaturaDAEM  # 👈 aquí todo lo que necesitas
+    Financiamiento, Alcaldia, JefaturaDAEM
 )
-from app.validators import validar_rut  # 👈 solo una vez es suficiente
-
 
 # -------------------------------------------------------------
 # Formularios para "Ordenes de Trabajo"
 # -------------------------------------------------------------
+
+
 class OrdenTrabajoForm(FlaskForm):
     """
     Formulario para gestionar la creación y edición de órdenes de trabajo.
@@ -77,7 +78,10 @@ class OrdenTrabajoForm(FlaskForm):
             # Cargar alcaldes disponibles
         alcaldes = Alcaldia.query.order_by(Alcaldia.fecha_inicio.desc()).all()
         self.alcalde_id.choices = [
-            (a.id, f"{a.nombre_alcalde} ({a.cargo})") for a in alcaldes]
+            (a.id, f"{a.funcionario.nombre} {a.funcionario.apellido} ({a.cargo})")
+            for a in alcaldes
+            if a.funcionario is not None
+        ]
         if alcaldes:
             actual = next(
                 (a for a in alcaldes if a.fecha_termino is None), alcaldes[0])
@@ -114,32 +118,50 @@ class OrdenTrabajoForm(FlaskForm):
 
 
 class FuncionarioForm(FlaskForm):
-    """
-    Formulario para gestionar la creación y edición de funcionarios.
-    """
     rut_cuerpo = StringField('Cuerpo del RUT', validators=[
         DataRequired(message="El cuerpo del RUT es obligatorio."),
         Length(min=7, max=8,
                message="El cuerpo del RUT debe tener entre 7 y 8 dígitos.")
     ])
+
     rut_dv = StringField('Dígito Verificador', validators=[
         DataRequired(message="El dígito verificador es obligatorio."),
         Length(min=1, max=1, message="El dígito verificador debe ser un carácter.")
     ])
+
     nombre = StringField('Nombre', validators=[
         DataRequired(message="El nombre es obligatorio."),
         Length(max=100, message="El nombre no puede exceder los 100 caracteres.")
     ])
+
     apellido = StringField('Apellido', validators=[
         DataRequired(message="El apellido es obligatorio."),
         Length(max=100, message="El apellido no puede exceder los 100 caracteres.")
     ])
-    direccion = StringField('Dirección', validators=[Length(max=255)])
-    telefono = StringField('Teléfono', validators=[
-        DataRequired(), Length(min=9, max=9, message="El teléfono debe tener 9 dígitos.")
+
+    direccion = StringField('Dirección', validators=[
+        Length(max=255, message="La dirección no puede exceder los 255 caracteres.")
     ])
-    titulo = StringField('Título', validators=[Length(max=100)])
-    id_cargo = SelectField('Cargo', coerce=int, validators=[DataRequired()])
+
+    telefono = StringField('Teléfono', validators=[
+        DataRequired(message="El teléfono es obligatorio."),
+        Length(min=9, max=9, message="El teléfono debe tener 9 dígitos.")
+    ])
+
+    titulo = StringField('Título', validators=[
+        Length(max=100, message="El título no puede exceder los 100 caracteres.")
+    ])
+
+    email = StringField('Email', validators=[
+        DataRequired(message="El email es obligatorio."),
+        Email(message="Debe ser un email válido."),
+        Length(max=100, message="El email no puede exceder los 100 caracteres.")
+    ])
+
+    id_cargo = SelectField('Cargo', coerce=int, validators=[
+        DataRequired(message="Debe seleccionar un cargo.")
+    ])
+
     submit = SubmitField('Guardar')
 
     def __init__(self, *args, **kwargs):
@@ -229,30 +251,21 @@ class ColegioForm(FlaskForm):
 
 
 class AlcaldiaForm(FlaskForm):
-    nombre_alcalde = StringField('Nombre del Alcalde', validators=[
-        DataRequired(), Length(max=100)])
-    rut_cuerpo = StringField('Cuerpo del RUT', validators=[DataRequired()])
-    rut_dv = StringField('Dígito Verificador', validators=[
-        DataRequired(), Length(min=1, max=1)])
-    email = StringField('Email', validators=[Length(max=100), Email()])
-    telefono = StringField('Teléfono', validators=[Length(max=20)])
+    funcionario = SelectField(
+        'Funcionario', coerce=str, validators=[DataRequired()])
     fecha_inicio = DateField(
         'Fecha de Inicio', format='%Y-%m-%d', validators=[DataRequired()])
     fecha_termino = DateField('Fecha de Término', format='%Y-%m-%d')
-    cargo = SelectField('Cargo', choices=[
-        ('Alcalde', 'Alcalde'),
-        ('Alcaldesa', 'Alcaldesa'),
-        ('Alcalde(S)', 'Alcalde(S)'),
-        ('Alcaldesa(S)', 'Alcaldesa(S)')
-    ], validators=[DataRequired()])
-    submit = SubmitField('Guardar')
+    submit = SubmitField('Asignar Alcaldía')
 
-    def validate_rut_cuerpo(self, field):
-        print(">>> Entró a validate_rut_cuerpo()")  # Depuración
-        rut_valido, mensaje = validar_rut(
-            self.rut_cuerpo.data, self.rut_dv.data)
-        if not rut_valido:
-            raise ValidationError(mensaje)
+    def cargar_funcionarios(self):
+        funcionarios = Funcionarios.query.order_by(
+            Funcionarios.nombre.asc()).all()
+        self.funcionario.choices = [
+            (f"{f.rut_cuerpo}-{f.rut_dv}",
+             f"{f.nombre} {f.apellido} - {f.rut_cuerpo}-{f.rut_dv}")
+            for f in funcionarios
+        ]
 
 
 # -------------------------------------------------------------
@@ -307,6 +320,12 @@ class RolForm(FlaskForm):
                              DataRequired(), Length(max=50)])
     descripcion = TextAreaField('Descripción', validators=[Length(max=200)])
     submit = SubmitField('Guardar')
+
+
+class UsuarioPermisosForm(FlaskForm):
+    permisos = SelectMultipleField(
+        'Permisos', coerce=int, validators=[DataRequired()])
+    submit = SubmitField('Guardar Permisos')
 
 
 # -------------------------------------------------------------

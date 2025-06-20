@@ -64,17 +64,17 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link d-flex align-items-center" href="{{ url_for('tipo_contrato.listar_tipo_contrato') }}">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('tipo_contrato_bp.listar_tipo_contrato') }}">
                             <i class="fas fa-file-signature me-2"></i> Tipos de Contrato
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link d-flex align-items-center" href="{{ url_for('alcaldia.listar_alcaldia') }}">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('alcaldia.listar_alcaldias') }}">
                             <i class="fas fa-landmark me-2"></i> Alcaldía
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link d-flex align-items-center" href="{{ url_for('jefatura_daem.listar_jefatura_daem') }}">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('jefatura_daem.listar_jefaturas_daem') }}">
                             <i class="fas fa-user-cog me-2"></i> Jefatura DAEM
                         </a>
                     </li>
@@ -89,10 +89,16 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link d-flex align-items-center" href="#">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('usuarios_bp.listar_usuarios') }}">
                             <i class="fas fa-users-cog me-2"></i> Gestión de Usuarios
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center" href="{{ url_for('auth.logout') }}">
+                            <i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión
+                        </a>
+                    </li>
+
                 </ul>
             </div>
         </div>
@@ -106,7 +112,6 @@
     <!-- Cargar jQuery y Bootstrap JS -->
     <script src="{{ url_for('static', filename='js/jquery/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap/bootstrap.bundle.min.js') }}"></script>
-    <!-- Aquí se agrega el script.js para validaciones y lógica transversal -->
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
 </body>
 </html>

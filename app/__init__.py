@@ -12,21 +12,20 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
-    login_manager.login_view = 'login'
+    # login_manager.login_view = 'login'
+    login_manager.login_view = 'auth.login'
     login_manager.login_message_category = 'info'
 
     # Registrar Blueprints
     from app.routes import (
-        main_bp, cargo_bp, colegio_bp, funcionarios_colegios_bp, alcaldia_bp,
+        main_bp, cargo_bp, colegio_bp, alcaldia_bp,
         jefatura_daem_bp, financiamiento_bp, roles_bp, historial_bp,
-        ordenes_bp, funcionarios_bp, tipo_contrato_bp
+        ordenes_bp, funcionarios_bp, tipo_contrato_bp, usuarios_bp
     )
 
     app.register_blueprint(main_bp)
     app.register_blueprint(cargo_bp, url_prefix='/cargos')
     app.register_blueprint(colegio_bp, url_prefix='/colegios')
-    app.register_blueprint(funcionarios_colegios_bp,
-                           url_prefix='/funcionarios_colegios')
     app.register_blueprint(alcaldia_bp, url_prefix='/alcaldia')
     app.register_blueprint(jefatura_daem_bp, url_prefix='/jefaturas_daem')
     app.register_blueprint(financiamiento_bp, url_prefix='/financiamiento')
@@ -36,6 +35,7 @@ def create_app(config_class=Config):
     app.register_blueprint(funcionarios_bp, url_prefix='/funcionarios')
     app.register_blueprint(tipo_contrato_bp, url_prefix='/tipo_contrato')
     app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(usuarios_bp, url_prefix='/usuarios')
 
     # Manejo de errores globales
     @app.errorhandler(400)

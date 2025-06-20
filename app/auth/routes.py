@@ -11,7 +11,7 @@ from app.extensions import db
 def login():
     if current_user.is_authenticated:
         # Puedes ajustar esto según tu home
-        return redirect(url_for('main_bp.index'))
+        return redirect(url_for('main.home'))
     form = LoginForm()
     if form.validate_on_submit():
         usuario = Usuario.query.filter_by(
@@ -19,7 +19,7 @@ def login():
         if usuario and usuario.check_password(form.contrasena.data):
             login_user(usuario)
             flash('Has iniciado sesión correctamente.', 'success')
-            return redirect(url_for('main_bp.index'))
+            return redirect(url_for('main.home'))
         else:
             flash('Usuario o contraseña incorrectos.', 'danger')
     return render_template('auth/login.html', form=form)

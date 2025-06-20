@@ -3,8 +3,7 @@
 {% block content %}
 <div class="container">
     <h2>Tipos de Contrato</h2>
-    <a href="{{ url_for('tipo_contrato.nuevo_tipo_contrato') }}" class="btn btn-primary mb-3">Nuevo Tipo de Contrato</a>
-    <table class="table">
+    <a href="{{ url_for('tipo_contrato_bp.nuevo_tipo_contrato') }}" class="btn btn-primary mb-3">Nuevo Tipo de Contrato</a>    <table class="table">
         <thead>
             <tr>
                 <th>Nombre</th>
@@ -18,8 +17,8 @@
                 <td>{{ tipo.nombre }}</td>
                 <td>{{ tipo.observacion }}</td>
                 <td>
-                    <a href="{{ url_for('tipo_contrato.editar_tipo_contrato', id=tipo.id) }}" class="btn btn-warning btn-sm">Editar</a>
-                    <form action="{{ url_for('tipo_contrato.eliminar_tipo_contrato', id=tipo.id) }}" method="POST" style="display:inline;">
+                    <a href="{{ url_for('tipo_contrato_bp.editar_tipo_contrato', id=tipo.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                    <form action="{{ url_for('tipo_contrato_bp.eliminar_tipo_contrato', id=tipo.id) }}" method="POST" style="display:inline;">
                         {{ delete_form.csrf_token }}  <!-- Agregar token de CSRF aquí -->
                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este tipo de contrato?')">Eliminar</button>
                     </form>
