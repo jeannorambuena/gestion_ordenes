@@ -1,190 +1,207 @@
-/* Estilos generales */
+/* === ESTILOS AVANZADOS UI/UX - Versión Moderna 2025 === */
+
+/* Tipografía y base visual */
 body {
-    background-color: #f8f9fa;
-    font-family: 'Arial', sans-serif;
+    background-color: #f3f6f9;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    color: #2d2d2d;
+    font-size: 16px;
+    line-height: 1.6;
 }
 
-/* Ajustes de navbar */
+/* Navbar moderno */
 .navbar {
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     padding: 1rem;
-    background-color: #ffffff; /* Fondo blanco para un aspecto moderno */
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    border-bottom: 1px solid #e0e0e0;
 }
 
-.navbar-brand {
-    font-size: 1.5rem;
-    color: #333 !important;
+.navbar-brand, .navbar .nav-link {
+    font-weight: 500;
+    color: #2d2d2d !important;
+    transition: color 0.3s;
 }
 
-/* Estilo del off-canvas */
+.navbar .nav-link:hover {
+    color: #007bff !important;
+}
+
+/* Offcanvas refinado */
 .offcanvas {
-    width: 250px;
-    background-color: #f7f7f7; /* Fondo claro */
-    color: #333;
-    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.1); /* Sombra al menú */
+    background-color: #fff;
+    border-right: 1px solid #dee2e6;
 }
 
-.offcanvas-header {
-    border-bottom: 1px solid #ddd;
+.offcanvas .nav-link {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    color: #495057;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-.offcanvas-body {
-    padding-left: 1rem;
-}
-
-.offcanvas-body .nav-link {
-    color: #333;
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-    transition: all 0.3s ease;
-}
-
-.offcanvas-body .nav-link:hover {
-    color: #007bff; /* Color moderno azul al pasar el cursor */
-    background-color: #e2e6ea; /* Fondo gris claro en hover */
-    padding-left: 10px;
-    border-radius: 5px;
-}
-
-/* Efecto hover con borde colorido */
-.offcanvas-body .hover-color {
-    border-left: 5px solid transparent;
-    transition: 0.3s;
-}
-
-.offcanvas-body .hover-color:hover {
-    border-left: 5px solid #007bff; /* Color azul en hover */
+.offcanvas .nav-link:hover {
+    background-color: #e9f2ff;
     color: #007bff;
 }
 
-/* Botones */
-.btn-outline-light {
-    color: #333;
-    border-color: #007bff;
-}
-
-.btn-outline-light:hover {
-    background-color: #007bff;
-    color: #fff;
-}
-
-/* Estilo para las tarjetas */
+/* Tarjetas y bloques */
 .card {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    border-radius: 15px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-    padding: 20px;
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: #fff;
 }
 
 .card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(0, 123, 255, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 123, 255, 0.15);
 }
 
-.row .col-md-6 {
-    margin-bottom: 20px;
+/* Formularios modernizados */
+.form-control {
+    border-radius: 12px;
+    border: 1px solid #ced4da;
+    padding: 0.75rem 1rem;
+    box-shadow: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.container .row .col-md-6 .card-body {
-    flex-grow: 1;
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.15);
 }
 
-/* Botones */
-.btn-lg {
-    padding: 10px 20px;
-    font-size: 1.1rem;
-    width: 100%;
-    border-radius: 25px;
+label.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #495057;
+}
+
+/* Botones con microinteracciones */
+.btn {
+    border-radius: 50px;
+    font-weight: 500;
+    padding: 0.6rem 1.4rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004ba0;
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.btn-outline-primary {
+    border: 2px solid #007bff;
+    color: #007bff;
+    background-color: transparent;
 }
 
 .btn-outline-primary:hover {
     background-color: #007bff;
     color: #fff;
-}
-
-.btn-warning {
-    color: #fff;
-    background-color: #ffc107;
-    border-color: #ffc107;
-}
-
-.btn-warning:hover {
-    color: #fff;
-    background-color: #e0a800;
-    border-color: #d39e00;
-}
-
-/* Formularios */
-.form-control {
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s ease;
-}
-
-.form-control:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 10px rgba(0, 123, 255, 0.3);
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-/* Títulos */
-h5.card-title, .form-title {
-    font-size: 1.3rem;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-p.card-text {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #555;
-}
-
-/* Tablas */
-.table {
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.table th, .table td {
-    vertical-align: middle;
-    text-align: center;
-    padding: 10px;
-}
-
-.table-striped tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
-.table-bordered {
-    border: 1px solid #ddd;
-}
-
-/* Botones para acciones */
-.btn-sm {
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-}
-
-.btn-primary, .btn-warning {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.btn-primary:hover, .btn-warning:hover {
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.2);
     transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* Efectos para tablas */
+/* Tablas con diseño moderno */
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #fff;
+}
+
+.table th {
+    background-color: #f1f5f9;
+    font-weight: 600;
+    color: #343a40;
+    text-align: center;
+}
+
+.table td {
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.75rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
 .table-hover tbody tr:hover {
-    background-color: #eaf4ff;
+    background-color: #e9f2ff;
+}
+
+/* Tooltip personalizado */
+.tooltip-inner {
+    background-color: #007bff;
+    color: #fff;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.9rem;
+    border-radius: 0.375rem;
+}
+
+.tooltip.bs-tooltip-top .tooltip-arrow::before {
+    border-top-color: #007bff;
+}
+
+/* Responsive ajustado */
+@media (max-width: 576px) {
+    .btn {
+        width: 100%;
+    }
+    .form-control {
+        font-size: 15px;
+    }
+    .card {
+        padding: 1rem;
+    }
+}
+
+/* Transiciones suaves */
+a, button, .form-control {
+    transition: all 0.25s ease-in-out;
+}
+
+/* Scrollbar moderno */
+body::-webkit-scrollbar {
+    width: 8px;
+}
+body::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+body::-webkit-scrollbar-thumb {
+    background: #007bff;
+    border-radius: 4px;
+}
+body::-webkit-scrollbar-thumb:hover {
+    background: #0056b3;
+}
+
+/* Microanimaciones */
+.btn:active {
+    transform: scale(0.98);
+}
+
+/* Separación de formularios */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* Encabezados */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: #2d2d2d;
+}
+
+p {
+    color: #555;
 }

@@ -1,3 +1,4 @@
+from sqlalchemy.orm import foreign, remote
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.orm import validates, relationship, backref, foreign
@@ -23,14 +24,16 @@ class Alcaldia(db.Model):
     telefono = db.Column(db.String(20), nullable=True)
     fecha_inicio = db.Column(db.Date, nullable=False)
     fecha_termino = db.Column(db.Date, nullable=True)
-    cargo = db.Column(db.Enum('Alcalde', 'Alcaldesa', 'Alcalde(S)',
-                      'Alcaldesa(S)', name='cargo_enum'), nullable=False, default='Alcalde')
+
+    id_cargo = db.Column(db.Integer, db.ForeignKey('cargos.id'), nullable=True)
 
     funcionario = db.relationship(
         'Funcionarios',
         primaryjoin="and_(Alcaldia.rut_cuerpo==Funcionarios.rut_cuerpo, Alcaldia.rut_dv==Funcionarios.rut_dv)",
         backref='alcaldias'
     )
+
+    cargo = db.relationship('Cargo', backref='alcaldias', lazy='joined')
 
 # Modelo: Cargos
 
@@ -220,24 +223,31 @@ class Rol(db.Model):
     nombre_rol = Column(String(50), unique=True, nullable=False)
     descripcion = Column(Text, nullable=True)
 
-# Modelo: JefaturaDAEM
-
 
 class JefaturaDAEM(db.Model):
     __tablename__ = 'jefatura_daem'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nombre = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=True)
-    telefono = db.Column(db.String(20), nullable=True)
-    fecha_inicio = db.Column(db.Date, nullable=False)
-    fecha_termino = db.Column(db.Date, nullable=True)
-    cargo_jefatura = db.Column(db.String(50), nullable=False)
     rut_cuerpo = db.Column(db.String(8), nullable=False)
     rut_dv = db.Column(db.String(1), nullable=False)
+    id_cargo = db.Column(db.Integer, db.ForeignKey(
+        'cargos.id'), nullable=False)
+    fecha_inicio = db.Column(db.Date, nullable=False)
+    fecha_termino = db.Column(db.Date, nullable=True)
+
+    cargo = db.relationship('Cargo', backref='jefaturas_daem')
+
+    # ✅ RELACIÓN PERSONALIZADA HACIA FUNCIONARIOS
+    funcionario = db.relationship(
+        "Funcionarios",
+        primaryjoin="and_(foreign(JefaturaDAEM.rut_cuerpo) == remote(Funcionarios.rut_cuerpo), "
+                    "foreign(JefaturaDAEM.rut_dv) == remote(Funcionarios.rut_dv))",
+        viewonly=True,
+        uselist=False
+    )
 
     def __repr__(self):
-        return f'<JefaturaDAEM {self.nombre} - {self.cargo_jefatura}>'
+        return f"<JefaturaDAEM RUT={self.rut_cuerpo}-{self.rut_dv}>"
 
 
 class Permiso(db.Model):

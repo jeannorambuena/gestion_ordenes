@@ -18,18 +18,26 @@
                             <input type="text" id="numero_orden" name="numero_orden" class="form-control" value="{{ numero_orden }}" readonly>
                         </div>
 
-                        <!-- RUT -->
-                        <div class="row mb-3">
+                        <!-- RUT y Búsqueda Manual -->
+                        <div class="row mb-3 align-items-end">
                             <div class="col-md-5">
                                 <input type="text" id="rut_cuerpo" name="rut_cuerpo" class="form-control rounded" placeholder="RUT (cuerpo)">
                             </div>
                             <div class="col-md-2">
                                 <input type="text" id="rut_dv" name="rut_dv" class="form-control rounded" placeholder="DV">
                             </div>
-                            <div class="col-md-5">
-                                <button type="button" id="buscar-funcionario-btn" class="btn btn-primary shadow-lg w-100 px-4">
-                                    <i class="fas fa-search"></i> Buscar Funcionario
+                            <div class="col-md-5 text-end">
+                                <button type="button"
+                                        id="buscar-funcionario-btn"
+                                        class="btn btn-outline-primary w-100"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="top"
+                                        title="Realiza una búsqueda alternativa si no conoces el RUT exacto. Puedes buscar por nombre, apellido o RUT parcial.">
+                                    <i class="fas fa-user-search"></i> Buscar por RUT, Nombre o Apellido
                                 </button>
+                                <small class="text-muted d-block mt-1">
+                                    Alternativa manual si no tienes el RUT completo.
+                                </small>
                             </div>
                         </div>
 

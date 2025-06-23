@@ -5,34 +5,38 @@
 {% block content %}
 <div class="container mt-5">
   <h2 class="text-center mb-4">Asignar Nueva Alcaldía</h2>
-  <form method="POST" action="{{ url_for('alcaldia.nueva_alcaldia') }}" class="mx-auto p-4 shadow rounded bg-light" style="max-width: 600px;">
+
+  <form method="POST" action="{{ url_for('alcaldia.nueva_alcaldia') }}"
+        class="mx-auto p-4 shadow rounded bg-light"
+        style="max-width: 600px;">
     {{ form.hidden_tag() }}
 
-    <!-- Selector de Funcionario -->
+    <!-- Funcionario seleccionado desde modal -->
     <div class="mb-3">
-      <label for="funcionario" class="form-label">Funcionario</label>
-      {{ form.funcionario(class="form-select", id="funcionario") }}
-      {% for error in form.funcionario.errors %}
+      <label for="nombre_alcalde" class="form-label">Funcionario</label>
+      <div class="input-group">
+        {{ form.nombre_alcalde(class="form-control", id="nombre_alcalde", placeholder="Haz clic aquí o en la lupa para buscar un funcionario", readonly=true, required=true) }}
+        {{ form.rut_alcalde(id="rut_alcalde", type="hidden") }}
+        <button type="button"
+                id="buscar-funcionario-btn"
+                class="btn btn-outline-primary"
+                data-target-context="alcaldia"
+                title="Buscar funcionario por RUT, nombre o apellido">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+      {% for error in form.nombre_alcalde.errors %}
         <div class="text-danger">{{ error }}</div>
       {% endfor %}
     </div>
 
-    <!-- Email (readonly) -->
+    <!-- Cargo a asignar desde form.id_cargo -->
     <div class="mb-3">
-      <label for="email" class="form-label">Email</label>
-      <input type="text" id="email" class="form-control" readonly>
-    </div>
-
-    <!-- Teléfono (readonly) -->
-    <div class="mb-3">
-      <label for="telefono" class="form-label">Teléfono</label>
-      <input type="text" id="telefono" class="form-control" readonly>
-    </div>
-
-    <!-- Cargo (readonly) -->
-    <div class="mb-3">
-      <label for="cargo" class="form-label">Cargo</label>
-      <input type="text" id="cargo" class="form-control" readonly>
+      <label for="id_cargo" class="form-label">Cargo a Asignar</label>
+      {{ form.id_cargo(class="form-select", id="id_cargo") }}
+      {% for error in form.id_cargo.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
     </div>
 
     <!-- Fecha de Inicio -->
@@ -55,29 +59,39 @@
 
     <!-- Botones -->
     <div class="d-flex justify-content-between">
-      <button type="submit" class="btn btn-primary">Guardar</button>
+      <button type="submit" class="btn btn-success">Guardar</button>
       <a href="{{ url_for('alcaldia.listar_alcaldias') }}" class="btn btn-secondary">Cancelar</a>
     </div>
   </form>
 </div>
 
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const funcionarioSelect = document.getElementById("funcionario");
-    funcionarioSelect.addEventListener("change", async function () {
-      const value = this.value;
-      if (!value) return;
+<!-- Modal de búsqueda reutilizable -->
+{% include 'componentes/modal_busqueda_funcionario.html' %}
 
-      try {
-        const response = await fetch(`/funcionarios/detalle/${value}`);
-        const data = await response.json();
-        document.getElementById("email").value = data.email || '';
-        document.getElementById("telefono").value = data.telefono || '';
-        document.getElementById("cargo").value = data.cargo || '';
-      } catch (err) {
-        console.error("❌ Error al obtener datos del funcionario:", err);
-      }
+<!-- Script para búsqueda -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const boton = document.getElementById("buscar-funcionario-btn");
+
+  if (boton) {
+    boton.dataset.targetContext = "alcaldia";
+    boton.addEventListener("click", function () {
+      $('#modalBuscarFuncionario').modal('show');
     });
-  });
+  }
+
+  const campoFuncionario = document.getElementById("nombre_alcalde");
+  if (campoFuncionario && boton) {
+    campoFuncionario.addEventListener("click", function () {
+      boton.click(); // Simula el click en el botón
+    });
+  }
+
+  // Función invocada desde scripts.js cuando se selecciona un funcionario
+  window.seleccionarFuncionarioParaAlcaldia = function (data) {
+    document.getElementById("nombre_alcalde").value = `${data.nombre} ${data.apellido}`;
+    document.getElementById("rut_alcalde").value = data.rut;
+  };
+});
 </script>
 {% endblock %}

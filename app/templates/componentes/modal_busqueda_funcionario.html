@@ -1,0 +1,37 @@
+<!-- Modal: Búsqueda de Funcionarios (Reutilizable) -->
+<div class="modal fade" id="modalBuscarFuncionario" tabindex="-1" aria-labelledby="modalBuscarFuncionarioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title">Buscar Funcionario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="text" id="buscar-funcionario-input" class="form-control mb-3" placeholder="Ingrese RUT, nombre o apellido...">
+
+        <table class="table table-bordered table-hover">
+          <thead class="table-light">
+            <tr>
+              <th>RUT</th>
+              <th>Nombre</th>
+              <th>Apellido</th>
+            </tr>
+          </thead>
+          <tbody id="resultado-busqueda"></tbody>
+        </table>
+
+        <p id="mensaje-no-encontrado" class="text-danger text-center mt-2" style="display: none;">
+          ❌ No se encontraron coincidencias.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="usar-funcionario-btn" class="btn btn-success" disabled>✅ Usar Funcionario Seleccionado</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+

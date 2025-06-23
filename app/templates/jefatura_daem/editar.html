@@ -1,96 +1,59 @@
-<!-- app/templates/jefatura_daem/editar.html -->
 {% extends 'base.html' %}
 
 {% block title %}Editar Jefatura DAEM{% endblock %}
 
 {% block content %}
-<div class="container mt-5" style="max-width: 600px;"> <!-- Limitar el ancho a 600px para mantener un formato más compacto -->
-    <h2 class="text-center mb-3">Editar Jefatura DAEM</h2>
+<div class="container mt-5">
+  <h2 class="text-center mb-4">Editar Jefatura DAEM</h2>
 
-    <!-- Botón para volver a la lista -->
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{{ url_for('jefatura_daem.listar_jefatura_daem') }}" class="btn btn-success">Volver a la Lista</a>
+  <form method="POST" action="{{ url_for('jefatura_daem.editar_jefatura_daem', id=jefatura.id) }}"
+        class="mx-auto p-4 shadow rounded bg-light"
+        style="max-width: 600px;">
+    {{ form.hidden_tag() }}
+
+    <!-- Funcionario asociado (no editable) -->
+    <div class="mb-3">
+      <label for="nombre_funcionario" class="form-label">Funcionario</label>
+      <input type="text"
+             id="nombre_funcionario"
+             class="form-control"
+             value="{{ nombre_completo_funcionario }}"
+             readonly>
+      <input type="hidden" name="rut_funcionario" value="{{ form.rut_funcionario.data }}">
     </div>
 
-    <!-- Formulario con estilo y validación -->
-    <div class="shadow-lg p-4 mb-5 bg-white rounded">
-        <form action="{{ url_for('jefatura_daem.editar_jefatura_daem', id=jefatura.id) }}" method="POST" class="needs-validation" novalidate>
-            {{ form.hidden_tag() }}
-
-            <div class="mb-3">
-                <label for="nombre" class="form-label">Nombre</label>
-                {{ form.nombre(class="form-control", placeholder="Ingrese el nombre de la jefatura", required=True) }}
-                {% if form.nombre.errors %}
-                    <div class="text-danger">{{ form.nombre.errors[0] }}</div>
-                {% endif %}
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="rut_cuerpo" class="form-label">Cuerpo del RUT</label>
-                    {{ form.rut_cuerpo(class="form-control", placeholder="Ingrese el cuerpo del RUT", id="rut_cuerpo", required=True) }}
-                    {% if form.rut_cuerpo.errors %}
-                        <div class="text-danger">{{ form.rut_cuerpo.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="rut_dv" class="form-label">Dígito Verificador</label>
-                    {{ form.rut_dv(class="form-control", placeholder="DV", id="rut_dv", required=True) }}
-                    {% if form.rut_dv.errors %}
-                        <div class="text-danger">{{ form.rut_dv.errors[0] }}</div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                {{ form.email(class="form-control", placeholder="Ingrese el email", required=True) }}
-                {% if form.email.errors %}
-                    <div class="text-danger">{{ form.email.errors[0] }}</div>
-                {% endif %}
-            </div>
-
-            <div class="mb-3">
-                <label for="telefono" class="form-label">Teléfono</label>
-                <div class="input-group">
-                    <span class="input-group-text">+56</span>
-                    {{ form.telefono(class="form-control", placeholder="Ingrese el teléfono", required=True) }}
-                </div>
-                {% if form.telefono.errors %}
-                    <div class="text-danger">{{ form.telefono.errors[0] }}</div>
-                {% endif %}
-            </div>
-
-            <div class="mb-3">
-                <label for="cargo_jefatura" class="form-label">Cargo</label>
-                {{ form.cargo_jefatura(class="form-select", required=True) }}
-                {% if form.cargo_jefatura.errors %}
-                    <div class="text-danger">{{ form.cargo_jefatura.errors[0] }}</div>
-                {% endif %}
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
-                    {{ form.fecha_inicio(class="form-control", required=True) }}
-                    {% if form.fecha_inicio.errors %}
-                        <div class="text-danger">{{ form.fecha_inicio.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="fecha_termino" class="form-label">Fecha de Término</label>
-                    {{ form.fecha_termino(class="form-control") }}
-                    {% if form.fecha_termino.errors %}
-                        <div class="text-danger">{{ form.fecha_termino.errors[0] }}</div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-                <a href="{{ url_for('jefatura_daem.listar_jefatura_daem') }}" class="btn btn-secondary">Cancelar</a>
-            </div>
-        </form>
+    <!-- Cargo -->
+    <div class="mb-3">
+      <label for="id_cargo" class="form-label">Cargo</label>
+      {{ form.id_cargo(class="form-select") }}
+      {% for error in form.id_cargo.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
     </div>
+
+    <!-- Fecha de Inicio -->
+    <div class="mb-3">
+      <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+      {{ form.fecha_inicio(class="form-control") }}
+      {% for error in form.fecha_inicio.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <!-- Fecha de Término -->
+    <div class="mb-3">
+      <label for="fecha_termino" class="form-label">Fecha de Término</label>
+      {{ form.fecha_termino(class="form-control") }}
+      {% for error in form.fecha_termino.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <!-- Botones -->
+    <div class="d-flex justify-content-between">
+      <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+      <a href="{{ url_for('jefatura_daem.listar_jefaturas_daem') }}" class="btn btn-secondary">Cancelar</a>
+    </div>
+  </form>
 </div>
 {% endblock %}

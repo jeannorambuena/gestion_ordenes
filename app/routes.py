@@ -388,6 +388,23 @@ def detalle_funcionario(rut):
         return jsonify({"error": f"Error al procesar RUT: {str(e)}"}), 500
 
 
+@funcionarios_bp.route('/buscar', methods=['GET'])
+@login_required
+def buscar_funcionarios_ajax():
+    # Obtener el texto de búsqueda desde el parámetro GET (?query=...)
+    query = request.args.get('query', '').strip()
+
+    # Validar que el usuario escribió al menos 3 caracteres
+    if len(query) < 3:
+        return jsonify([])  # Devolver lista vacía si no cumple
+
+    # Usar la función auxiliar ya importada para buscar funcionarios
+    resultados = buscar_funcionarios(query, db.session)
+
+    # Retornar los resultados como JSON
+    return jsonify(resultados)
+
+
 # ===================== RUTAS PARA CARGOS =====================
 
 @cargo_bp.route('/')
@@ -618,8 +635,8 @@ def nueva_orden():
         for a in Alcaldia.query.all() if a.funcionario is not None
     ]
     form.jefatura_daem_id.choices = [
-        (j.id, f'{j.nombre} ({j.cargo_jefatura})')
-        for j in JefaturaDAEM.query.all() if j.nombre and j.cargo_jefatura
+        (j.id, f'{j.funcionario.nombre} {j.funcionario.apellido} ({j.cargo.nombre_cargo})')
+        for j in JefaturaDAEM.query.all() if j.funcionario and j.cargo
     ]
 
     # Calcular número de orden siguiente
@@ -712,7 +729,19 @@ def eliminar_orden(id):
 @roles_required('administrador')
 def listar_jefaturas_daem():
     jefaturas = JefaturaDAEM.query.all()
-    return render_template('jefatura_daem/list.html', jefaturas=jefaturas)
+    datos = []
+
+    for j in jefaturas:
+        funcionario = Funcionarios.query.filter_by(
+            rut_cuerpo=j.rut_cuerpo,
+            rut_dv=j.rut_dv
+        ).first()
+        datos.append({
+            "jefatura": j,
+            "funcionario": funcionario
+        })
+
+    return render_template('jefatura_daem/list.html', datos=datos)
 
 
 @jefatura_daem_bp.route('/nuevo', methods=['GET', 'POST'])
@@ -720,22 +749,42 @@ def listar_jefaturas_daem():
 @roles_required('administrador')
 def nueva_jefatura_daem():
     form = JefaturaDAEMForm()
+    form.id_cargo.choices = [(c.id, c.nombre_cargo) for c in Cargo.query.order_by(
+        Cargo.nombre_cargo.asc()).all()]
+
     if form.validate_on_submit():
-        nueva_jefatura = JefaturaDAEM(
-            nombre=form.nombre.data,
-            email=form.email.data,
-            telefono=form.telefono.data,
-            fecha_inicio=form.fecha_inicio.data,
-            fecha_termino=form.fecha_termino.data,
-            cargo_jefatura=form.cargo_jefatura.data,
-            rut_cuerpo=form.rut_cuerpo.data,
-            rut_dv=form.rut_dv.data
-        )
-        db.session.add(nueva_jefatura)
-        db.session.commit()
-        flash('Jefatura DAEM creada con éxito', 'success')
-        return redirect(url_for('jefatura_daem.listar_jefaturas_daem'))
-    return render_template('jefatura_daem/nuevo.html', form=form)
+        try:
+            rut_completo = form.rut_funcionario.data.strip()
+            if '-' not in rut_completo:
+                flash("⚠️ RUT inválido: debe contener guion medio.", "warning")
+                return redirect(url_for("jefatura_daem.nueva_jefatura_daem"))
+
+            rut_cuerpo, rut_dv = rut_completo.split("-")
+
+            funcionario = Funcionarios.query.filter_by(
+                rut_cuerpo=rut_cuerpo, rut_dv=rut_dv).first()
+            if not funcionario:
+                flash("⚠️ El funcionario no está registrado.", "warning")
+                return redirect(url_for("funcionarios_bp.nuevo_funcionario", rut=rut_completo))
+
+            nueva_jefatura = JefaturaDAEM(
+                rut_cuerpo=rut_cuerpo,
+                rut_dv=rut_dv,
+                id_cargo=form.id_cargo.data,
+                fecha_inicio=form.fecha_inicio.data,
+                fecha_termino=form.fecha_termino.data
+            )
+
+            db.session.add(nueva_jefatura)
+            db.session.commit()
+            flash("✅ Jefatura DAEM creada con éxito.", "success")
+            return redirect(url_for("jefatura_daem.listar_jefaturas_daem"))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f"❌ Error al guardar la jefatura: {str(e)}", "danger")
+
+    return render_template("jefatura_daem/nuevo.html", form=form)
 
 
 @jefatura_daem_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
@@ -743,21 +792,50 @@ def nueva_jefatura_daem():
 @roles_required('administrador')
 def editar_jefatura_daem(id):
     jefatura = JefaturaDAEM.query.get_or_404(id)
-    form = JefaturaDAEMForm(obj=jefatura)
-    if form.validate_on_submit():
-        jefatura.nombre = form.nombre.data
-        jefatura.email = form.email.data
-        jefatura.telefono = form.telefono.data
-        jefatura.fecha_inicio = form.fecha_inicio.data
-        jefatura.fecha_termino = form.fecha_termino.data
-        jefatura.cargo_jefatura = form.cargo_jefatura.data
-        jefatura.rut_cuerpo = form.rut_cuerpo.data
-        jefatura.rut_dv = form.rut_dv.data
 
-        db.session.commit()
-        flash('Jefatura DAEM actualizada con éxito', 'success')
+    # Obtener funcionario relacionado
+    funcionario = Funcionarios.query.filter_by(
+        rut_cuerpo=jefatura.rut_cuerpo,
+        rut_dv=jefatura.rut_dv
+    ).first()
+
+    if not funcionario:
+        flash("⚠️ Funcionario asociado no encontrado.", "warning")
         return redirect(url_for('jefatura_daem.listar_jefaturas_daem'))
-    return render_template('jefatura_daem/editar.html', form=form, jefatura=jefatura)
+
+    rut_formateado = f"{funcionario.rut_cuerpo}-{funcionario.rut_dv}"
+    nombre_completo_funcionario = f"{funcionario.nombre} {funcionario.apellido}"
+
+    form = JefaturaDAEMForm(
+        rut_funcionario=rut_formateado,
+        fecha_inicio=jefatura.fecha_inicio,
+        fecha_termino=jefatura.fecha_termino
+    )
+
+    form.id_cargo.choices = [(c.id, c.nombre_cargo)
+                             for c in Cargo.query.order_by(Cargo.nombre_cargo).all()]
+    if request.method == 'GET':
+        form.id_cargo.data = jefatura.id_cargo
+
+    if form.validate_on_submit():
+        try:
+            jefatura.fecha_inicio = form.fecha_inicio.data
+            jefatura.fecha_termino = form.fecha_termino.data
+            jefatura.id_cargo = form.id_cargo.data
+            db.session.commit()
+
+            flash("✅ Jefatura DAEM actualizada con éxito.", "success")
+            return redirect(url_for('jefatura_daem.listar_jefaturas_daem'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f"❌ Error al actualizar la jefatura: {str(e)}", "danger")
+
+    return render_template(
+        'jefatura_daem/editar.html',
+        form=form,
+        jefatura=jefatura,
+        nombre_completo_funcionario=nombre_completo_funcionario
+    )
 
 
 @jefatura_daem_bp.route('/eliminar/<int:id>', methods=['POST'])
@@ -770,8 +848,8 @@ def eliminar_jefatura_daem(id):
     flash('Jefatura DAEM eliminada con éxito', 'success')
     return redirect(url_for('jefatura_daem.listar_jefaturas_daem'))
 
-
 # ===================== RUTAS PARA ALCALDÍA =====================
+
 
 @alcaldia_bp.route('/')
 @login_required
@@ -786,27 +864,33 @@ def listar_alcaldias():
 @roles_required('administrador')
 def nueva_alcaldia():
     form = AlcaldiaForm()
-    form.cargar_funcionarios()  # Asegura que las opciones estén cargadas
+    form.id_cargo.choices = [(c.id, c.nombre_cargo) for c in Cargo.query.order_by(
+        Cargo.nombre_cargo.asc()).all()]
 
     if form.validate_on_submit():
         try:
-            rut_cuerpo, rut_dv = form.funcionario.data.split("-")
+            rut_completo = form.rut_alcalde.data.strip()
+            if '-' not in rut_completo:
+                flash("⚠️ RUT inválido: debe tener guion medio.", "warning")
+                return redirect(url_for("alcaldia.nueva_alcaldia"))
+
+            rut_cuerpo, rut_dv = rut_completo.split("-")
 
             funcionario = Funcionarios.query.filter_by(
-                rut_cuerpo=rut_cuerpo,
-                rut_dv=rut_dv
-            ).first()
-
+                rut_cuerpo=rut_cuerpo, rut_dv=rut_dv).first()
             if not funcionario:
-                flash("El funcionario seleccionado no existe.", "danger")
+                flash(
+                    "⚠️ El funcionario seleccionado no se encuentra en la base de datos.", "warning")
                 return redirect(url_for("alcaldia.nueva_alcaldia"))
 
             nueva_alcaldia = Alcaldia(
                 rut_cuerpo=rut_cuerpo,
                 rut_dv=rut_dv,
+                email=funcionario.email,
+                telefono=funcionario.telefono,
                 fecha_inicio=form.fecha_inicio.data,
                 fecha_termino=form.fecha_termino.data,
-                cargo=form.cargo.data
+                id_cargo=form.id_cargo.data
             )
 
             db.session.add(nueva_alcaldia)
@@ -826,21 +910,61 @@ def nueva_alcaldia():
 @roles_required('administrador')
 def editar_alcaldia(id):
     alcaldia = Alcaldia.query.get_or_404(id)
-    form = AlcaldiaForm(obj=alcaldia)
-    form.rut_cuerpo.data = str(alcaldia.rut_cuerpo)
-    form.rut_dv.data = alcaldia.rut_dv
-    if form.validate_on_submit():
-        alcaldia.nombre_alcalde = form.nombre_alcalde.data
-        alcaldia.email = form.email.data
-        alcaldia.telefono = form.telefono.data
-        alcaldia.fecha_inicio = form.fecha_inicio.data
-        alcaldia.fecha_termino = form.fecha_termino.data
-        alcaldia.cargo = form.cargo.data
 
-        db.session.commit()
-        flash('Alcaldía actualizada con éxito', 'success')
-        return redirect(url_for('alcaldia.listar_alcaldias'))
-    return render_template('alcaldia/editar.html', form=form, alcaldia=alcaldia)
+    form = AlcaldiaForm(
+        rut_alcalde=f"{alcaldia.rut_cuerpo}-{alcaldia.rut_dv}",
+        nombre_alcalde=f"{alcaldia.funcionario.nombre} {alcaldia.funcionario.apellido}" if alcaldia.funcionario else "",
+        fecha_inicio=alcaldia.fecha_inicio,
+        fecha_termino=alcaldia.fecha_termino
+    )
+
+    form.id_cargo.choices = [(c.id, c.nombre_cargo) for c in Cargo.query.order_by(
+        Cargo.nombre_cargo.asc()).all()]
+
+    if request.method == 'GET':
+        form.id_cargo.data = alcaldia.id_cargo  # Solo en GET
+
+    if form.validate_on_submit():
+        try:
+            rut_cuerpo, rut_dv = form.rut_alcalde.data.strip().split("-")
+
+            funcionario = Funcionarios.query.filter_by(
+                rut_cuerpo=rut_cuerpo, rut_dv=rut_dv).first()
+            if not funcionario:
+                flash("❌ El funcionario no existe.", "danger")
+                return redirect(url_for("alcaldia.editar_alcaldia", id=id))
+
+            alcaldia.rut_cuerpo = rut_cuerpo
+            alcaldia.rut_dv = rut_dv
+            alcaldia.email = funcionario.email
+            alcaldia.telefono = funcionario.telefono
+            alcaldia.fecha_inicio = form.fecha_inicio.data
+            alcaldia.fecha_termino = form.fecha_termino.data
+
+            # 🎯 Prints de depuración
+            print("📥 Valor recibido desde el formulario:", form.id_cargo.data)
+            print("📌 Valor actual en la base de datos ANTES del cambio:",
+                  alcaldia.id_cargo)
+
+            alcaldia.id_cargo = form.id_cargo.data
+
+            print("✅ Valor en objeto alcaldia.id_cargo DESPUÉS de asignar:",
+                  alcaldia.id_cargo)
+
+            db.session.commit()
+
+            alcaldia_post_commit = Alcaldia.query.get(id)
+            print("💾 Valor en la base de datos DESPUÉS de commit:",
+                  alcaldia_post_commit.id_cargo)
+
+            flash("✅ Alcaldía actualizada correctamente.", "success")
+            return redirect(url_for("alcaldia.listar_alcaldias"))
+
+        except Exception as e:
+            db.session.rollback()
+            flash(f"❌ Error al actualizar la alcaldía: {str(e)}", "danger")
+
+    return render_template("alcaldia/editar.html", form=form, alcaldia=alcaldia)
 
 
 @alcaldia_bp.route('/eliminar/<int:id>', methods=['POST'])
@@ -848,9 +972,13 @@ def editar_alcaldia(id):
 @roles_required('administrador')
 def eliminar_alcaldia(id):
     alcaldia = Alcaldia.query.get_or_404(id)
-    db.session.delete(alcaldia)
-    db.session.commit()
-    flash('Alcaldía eliminada con éxito', 'success')
+    try:
+        db.session.delete(alcaldia)
+        db.session.commit()
+        flash('✅ Alcaldía eliminada con éxito', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error al eliminar alcaldía: {str(e)}', 'danger')
     return redirect(url_for('alcaldia.listar_alcaldias'))
 
 

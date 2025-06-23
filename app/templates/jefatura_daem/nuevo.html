@@ -1,164 +1,107 @@
 {% extends 'base.html' %}
 
-{% block title %}Agregar Nueva Jefatura DAEM{% endblock %}
+{% block title %}Nueva Jefatura DAEM{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center mb-3">Agregar Nueva Jefatura DAEM</h2>
+  <h2 class="text-center mb-4">Asignar Nueva Jefatura DAEM</h2>
 
-    <form action="{{ url_for('jefatura_daem.nueva_jefatura_daem') }}" method="POST"
-          class="mx-auto p-4 shadow-lg bg-white rounded {% if form.rut_cuerpo.errors or form.rut_dv.errors %}animate__animated animate__shakeX{% endif %}"
-          style="max-width: 600px;" id="form-daem">
+  <form method="POST" action="{{ url_for('jefatura_daem.nueva_jefatura_daem') }}"
+        class="mx-auto p-4 shadow rounded bg-light"
+        style="max-width: 600px;">
+    {{ form.hidden_tag() }}
 
-        {{ form.hidden_tag() }}
-
-        <!-- Cuerpo del RUT y Dígito Verificador -->
-        <div class="mb-3 row">
-            <div class="col-md-8">
-                <label for="rut_cuerpo" class="form-label">Cuerpo del RUT</label>
-                {{ form.rut_cuerpo(class="form-control", placeholder="Ingrese el cuerpo del RUT", id="rut_cuerpo") }}
-                {% for error in form.rut_cuerpo.errors %}
-                    <div class="text-danger">{{ error }}</div>
-                {% endfor %}
-            </div>
-            <div class="col-md-4">
-                <label for="rut_dv" class="form-label">Dígito Verificador</label>
-                {{ form.rut_dv(class="form-control", placeholder="DV", id="rut_dv") }}
-                {% for error in form.rut_dv.errors %}
-                    <div class="text-danger">{{ error }}</div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- Nombre -->
-        <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre</label>
-            {{ form.nombre(class="form-control", placeholder="Ingrese el nombre") }}
-            {% for error in form.nombre.errors %}
-                <div class="text-danger">{{ error }}</div>
-            {% endfor %}
-        </div>
-
-        <!-- Email -->
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            {{ form.email(class="form-control", placeholder="Ingrese el email") }}
-            {% for error in form.email.errors %}
-                <div class="text-danger">{{ error }}</div>
-            {% endfor %}
-        </div>
-
-        <!-- Teléfono -->
-        <div class="mb-3">
-            <label for="telefono" class="form-label">Teléfono</label>
-            <div class="input-group">
-                <span class="input-group-text">+56</span>
-                {{ form.telefono(class="form-control", placeholder="9 dígitos del teléfono") }}
-            </div>
-            {% for error in form.telefono.errors %}
-                <div class="text-danger">{{ error }}</div>
-            {% endfor %}
-        </div>
-
-        <!-- Cargo -->
-        <div class="mb-3">
-            <label for="cargo_jefatura" class="form-label">Cargo</label>
-            {{ form.cargo_jefatura(class="form-select") }}
-            {% for error in form.cargo_jefatura.errors %}
-                <div class="text-danger">{{ error }}</div>
-            {% endfor %}
-        </div>
-
-        <!-- Fecha de Inicio -->
-        <div class="mb-3">
-            <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
-            {{ form.fecha_inicio(class="form-control", type="date") }}
-            {% for error in form.fecha_inicio.errors %}
-                <div class="text-danger">{{ error }}</div>
-            {% endfor %}
-        </div>
-
-        <!-- Fecha de Término -->
-        <div class="mb-3">
-            <label for="fecha_termino" class="form-label">Fecha de Término</label>
-            {{ form.fecha_termino(class="form-control", type="date") }}
-            {% for error in form.fecha_termino.errors %}
-                <div class="text-danger">{{ error }}</div>
-            {% endfor %}
-        </div>
-
-        <!-- Botones -->
-        <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <a href="{{ url_for('jefatura_daem.listar_jefatura_daem') }}" class="btn btn-secondary">Cancelar</a>
-        </div>
-    </form>
-</div>
-
-<!-- Modal de error si hay problemas con el RUT -->
-<div class="modal fade" id="rutErrorModal" tabindex="-1" aria-labelledby="rutErrorModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content border-danger">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="rutErrorModalLabel">Error en RUT</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                Por favor, revisa el RUT ingresado. Verifica el cuerpo y el dígito verificador.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
+    <!-- Funcionario seleccionado desde modal -->
+    <div class="mb-3">
+      <label for="nombre_funcionario" class="form-label">Funcionario</label>
+      <div class="input-group">
+        {{ form.rut_funcionario(type="hidden", id="rut_funcionario") }}
+        <input type="text"
+               id="nombre_funcionario"
+               class="form-control"
+               placeholder="Haz clic aquí o en la lupa para buscar un funcionario"
+               readonly required>
+        <button type="button"
+                id="buscar-funcionario-btn"
+                class="btn btn-outline-primary"
+                data-target-context="jefatura_daem"
+                title="Buscar funcionario por RUT, nombre o apellido">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+      {% for error in form.rut_funcionario.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
     </div>
+
+    <!-- Cargo a asignar desde form.id_cargo -->
+    <div class="mb-3">
+      <label for="id_cargo" class="form-label">Cargo a Asignar</label>
+      {{ form.id_cargo(class="form-select", id="id_cargo") }}
+      {% for error in form.id_cargo.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <!-- Fecha de Inicio -->
+    <div class="mb-3">
+      <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+      {{ form.fecha_inicio(class="form-control", id="fecha_inicio") }}
+      {% for error in form.fecha_inicio.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <!-- Fecha de Término -->
+    <div class="mb-3">
+      <label for="fecha_termino" class="form-label">Fecha de Término</label>
+      {{ form.fecha_termino(class="form-control", id="fecha_termino") }}
+      {% for error in form.fecha_termino.errors %}
+        <div class="text-danger">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <!-- Botones -->
+    <div class="d-flex justify-content-between">
+      <button type="submit" class="btn btn-success">Guardar</button>
+      <a href="{{ url_for('jefatura_daem.listar_jefaturas_daem') }}" class="btn btn-secondary">Cancelar</a>
+    </div>
+  </form>
 </div>
 
-<!-- Script de validación inmediata del RUT -->
+<!-- Modal reutilizable -->
+{% include 'componentes/modal_busqueda_funcionario.html' %}
+
+<!-- Scripts -->
 <script>
-    function validarRUT(rut, dv) {
-        rut = rut.replace(/\D/g, '');
-        if (!rut || rut.length < 7) return false;
+  // ✅ Esta función debe estar en el scope global, NO dentro de DOMContentLoaded
+  window.seleccionarFuncionarioParaJefaturaDaem = function (data) {
+    const campoNombre = document.getElementById("nombre_funcionario");
+    const campoRut = document.getElementById("rut_funcionario");
 
-        let suma = 0, factor = 2;
-        for (let i = rut.length - 1; i >= 0; i--) {
-            suma += parseInt(rut.charAt(i)) * factor;
-            factor = factor === 7 ? 2 : factor + 1;
-        }
+    if (campoNombre) campoNombre.value = `${data.nombre} ${data.apellido}`;
+    if (campoRut) campoRut.value = data.rut;
 
-        let dvEsperado = 11 - (suma % 11);
-        dvEsperado = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
-        return dv.toUpperCase() === dvEsperado;
+    console.log("✅ Funcionario traspasado al formulario Jefatura DAEM");
+  };
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const boton = document.getElementById("buscar-funcionario-btn");
+
+    if (boton) {
+      boton.dataset.targetContext = "jefatura_daem";
+      boton.addEventListener("click", function () {
+        $('#modalBuscarFuncionario').modal('show');
+      });
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const rutCuerpo = document.getElementById("rut_cuerpo");
-        const rutDV = document.getElementById("rut_dv");
-        const form = document.getElementById("form-daem");
-
-        rutDV.addEventListener("input", () => {
-            const rut = rutCuerpo.value.trim();
-            const dv = rutDV.value.trim();
-
-            if (dv.length === 1 && rut.length >= 7) {
-                if (!validarRUT(rut, dv)) {
-                    form.classList.remove("animate__shakeX");
-                    void form.offsetWidth;
-                    form.classList.add("animate__animated", "animate__shakeX");
-
-                    const modal = new bootstrap.Modal(document.getElementById("rutErrorModal"));
-                    modal.show();
-
-                    rutCuerpo.focus();
-                }
-            }
-        });
-
-        const modalElement = document.getElementById('rutErrorModal');
-        modalElement.addEventListener('hidden.bs.modal', () => {
-            rutCuerpo.value = '';
-            rutDV.value = '';
-            rutCuerpo.focus();
-        });
-    });
+    const campoFuncionario = document.getElementById("nombre_funcionario");
+    if (campoFuncionario && boton) {
+      campoFuncionario.addEventListener("click", function () {
+        boton.click(); // Simula el click en el botón
+      });
+    }
+  });
 </script>
+
 {% endblock %}

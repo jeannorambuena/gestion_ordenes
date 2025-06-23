@@ -1,3 +1,6 @@
+let funcionarioSeleccionado = null;
+let contextoModal = null;
+
 // ✅ scripts.js con validación, redirección y control único de modal "Funcionario No Encontrado"
 
 $(document).ready(function () {
@@ -158,4 +161,127 @@ $(document).ready(function () {
         const modal = bootstrap.Modal.getInstance(document.getElementById('modalFuncionarioEncontrado'));
         if (modal) cerrarModalCompleto(modal);
     });
+        // 🔍 Búsqueda y selección de funcionario en modal "Buscar Funcionario"
+    // let funcionarioSeleccionado = null;
+
+    // Abrir modal al hacer clic en el botón principal
+    //let contextoModal = null; // Global
+
+    $('[data-target-context]').on('click', function () {
+        contextoModal = $(this).data('target-context'); // ← Guarda el contexto
+        $('#buscar-funcionario-input').val('');
+        $('#resultado-busqueda').empty();
+        $('#mensaje-no-encontrado').hide();
+        $('#usar-funcionario-btn').prop('disabled', true);
+        $('#modalBuscarFuncionario').modal('show');
+    });
+
+
+    // Buscar mientras se escribe
+    $('#buscar-funcionario-input').on('input', function () {
+        const query = $(this).val().trim();
+
+        if (query.length < 3) {
+            $('#resultado-busqueda').empty();
+            $('#mensaje-no-encontrado').hide();
+            $('#usar-funcionario-btn').prop('disabled', true);
+            return;
+        }
+
+        $.get('/funcionarios/buscar', { query: query }, function (data) {
+            const $tbody = $('#resultado-busqueda');
+            $tbody.empty();
+            funcionarioSeleccionado = null;
+            $('#usar-funcionario-btn').prop('disabled', true);
+
+            if (data.length === 0) {
+                $('#mensaje-no-encontrado').show();
+                return;
+            }
+
+            $('#mensaje-no-encontrado').hide();
+
+            data.forEach(funcionario => {
+                const row = `
+                    <tr class="fila-funcionario" data-rut="${funcionario.rut}" data-nombre="${funcionario.nombre}" data-apellido="${funcionario.apellido}">
+                        <td>${funcionario.rut}</td>
+                        <td>${funcionario.nombre}</td>
+                        <td>${funcionario.apellido}</td>
+                    </tr>
+                `;
+                $tbody.append(row);
+            });
+        });
+    });
+
+    // Selección con clic
+    $('#resultado-busqueda').on('click', '.fila-funcionario', function () {
+        $('#resultado-busqueda tr').removeClass('table-primary');
+        $(this).addClass('table-primary');
+
+        funcionarioSeleccionado = {
+            rut: $(this).data('rut'),
+            nombre: $(this).data('nombre'),
+            apellido: $(this).data('apellido')
+        };
+
+        $('#usar-funcionario-btn').prop('disabled', false);
+    });
+
+    // Doble clic = seleccionar directamente
+    $('#resultado-busqueda').on('dblclick', '.fila-funcionario', function () {
+        $(this).trigger('click');
+        $('#usar-funcionario-btn').trigger('click');
+    });
+
+    // Usar funcionario seleccionado
+    $('#usar-funcionario-btn').on('click', function () {
+    console.log("🌐 Contexto activo al usar:", contextoModal);
+    console.log("👤 Funcionario seleccionado al usar:", funcionarioSeleccionado);
+
+    if (!funcionarioSeleccionado || !contextoModal) {
+        console.warn("⚠️ No hay funcionario seleccionado o no hay contexto.");
+        return;
+    }
+
+    if (contextoModal === 'alcaldia' && typeof window.seleccionarFuncionarioParaAlcaldia === 'function') {
+        window.seleccionarFuncionarioParaAlcaldia(funcionarioSeleccionado);
+    } else if (contextoModal === 'jefatura_daem' && typeof window.seleccionarFuncionarioParaJefaturaDaem === 'function') {
+        window.seleccionarFuncionarioParaJefaturaDaem(funcionarioSeleccionado);
+    }
+
+    const modal = bootstrap.Modal.getInstance(document.getElementById('modalBuscarFuncionario'));
+    if (modal) modal.hide();
+});
+
+
+    
+    // Inicializar tooltips de Bootstrap (poner al final del $(document).ready())
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    // 🌟 Función reutilizable para Alcaldía
+    window.seleccionarFuncionarioParaAlcaldia = function (funcionario) {
+        console.log("➡️ Funcionario seleccionado para Alcaldía:", funcionario);
+
+        // Insertar datos en campos específicos del formulario de alcaldía
+        const campoNombre = document.getElementById('nombre_alcalde');
+        const campoRut = document.getElementById('rut_alcalde');
+
+        if (campoNombre) campoNombre.value = `${funcionario.nombre} ${funcionario.apellido}`;
+        if (campoRut) campoRut.value = funcionario.rut;
+
+    };
+    // 🌟 Función reutilizable para Jefatura DAEM
+    window.seleccionarFuncionarioParaJefaturaDaem = function (funcionario) {
+        console.log("➡️ Funcionario seleccionado para Jefatura DAEM:", funcionario);
+
+        const campoNombre = document.getElementById('nombre_funcionario');
+        const campoRut = document.getElementById('rut_funcionario');
+
+        if (campoNombre) campoNombre.value = `${funcionario.nombre} ${funcionario.apellido}`;
+        if (campoRut) campoRut.value = funcionario.rut;
+    };
+
 });

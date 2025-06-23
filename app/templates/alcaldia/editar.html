@@ -1,80 +1,66 @@
 {% extends 'base.html' %}
 
-{% block title %}Editar Alcaldía{% endblock %}
+{% block title %}Editar Jefatura DAEM{% endblock %}
 
 {% block content %}
 <div class="container mt-5 d-flex justify-content-center">
-<!-- Formulario con tamaño reducido -->
-<div class="col-md-6 shadow-lg p-4 mb-5 bg-white rounded"> <!-- Ancho ajustado -->
-<h2 class="text-center mb-4">Editar Alcaldía</h2>
-<form action="{{ url_for('alcaldia.editar_alcaldia', id=alcaldia.id) }}" id="alcaldia-form" method="POST">
-            {{ form.hidden_tag() }}
+  <div class="col-md-8 shadow-lg p-4 mb-5 bg-white rounded">
+    <h2 class="text-center mb-4">Editar Jefatura DAEM</h2>
 
-            
-<div class="mb-3 row">
-<div class="col-md-8">
-<label class="form-label" for="rut_cuerpo">Cuerpo del RUT</label>
-<input class="form-control" id="rut_cuerpo" name="rut_cuerpo" readonly="" type="text" value="{{ alcaldia.rut_cuerpo }}"/>
-</div>
-<div class="col-md-4">
-<label class="form-label" for="rut_dv">Dígito Verificador</label>
-<input class="form-control" id="rut_dv" name="rut_dv" readonly="" type="text" value="{{ alcaldia.rut_dv }}"/>
-</div>
-</div>
-<!-- Nombre del Alcalde -->
-<div class="mb-3">
-<label class="form-label" for="nombre_alcalde">Nombre del Alcalde</label>
-                {{ form.nombre_alcalde(class="form-control") }}
-                {% if form.nombre_alcalde.errors %}
-                    <div class="text-danger">{{ form.nombre_alcalde.errors[0] }}</div>
-                {% endif %}
-            </div>
-<!-- Email -->
-<div class="mb-3">
-<label class="form-label" for="email">Email</label>
-                {{ form.email(class="form-control") }}
-                {% if form.email.errors %}
-                    <div class="text-danger">{{ form.email.errors[0] }}</div>
-                {% endif %}
-            </div>
-<!-- Teléfono -->
-<div class="mb-3">
-<label class="form-label" for="telefono">Teléfono</label>
-                {{ form.telefono(class="form-control") }}
-                {% if form.telefono.errors %}
-                    <div class="text-danger">{{ form.telefono.errors[0] }}</div>
-                {% endif %}
-            </div>
-<!-- Fecha de Inicio -->
-<div class="mb-3">
-<label class="form-label" for="fecha_inicio">Fecha de Inicio</label>
-                {{ form.fecha_inicio(class="form-control", type="date") }}
-                {% if form.fecha_inicio.errors %}
-                    <div class="text-danger">{{ form.fecha_inicio.errors[0] }}</div>
-                {% endif %}
-            </div>
-<!-- Fecha de Término -->
-<div class="mb-3">
-<label class="form-label" for="fecha_termino">Fecha de Término</label>
-                {{ form.fecha_termino(class="form-control", type="date") }}
-                {% if form.fecha_termino.errors %}
-                    <div class="text-danger">{{ form.fecha_termino.errors[0] }}</div>
-                {% endif %}
-            </div>
-<!-- Cargo -->
-<div class="mb-3">
-<label class="form-label" for="cargo">Cargo</label>
-                {{ form.cargo(class="form-control") }}
-                {% if form.cargo.errors %}
-                    <div class="text-danger">{{ form.cargo.errors[0] }}</div>
-                {% endif %}
-            </div>
-<!-- Botones de acción -->
-<div class="d-flex justify-content-end">
-<button class="btn btn-primary me-2" type="submit">Actualizar</button>
-<a class="btn btn-secondary" href="{{ url_for('alcaldia.listar_alcaldias') }}">Cancelar</a>
-</div>
-</form>
-</div>
+    <form action="{{ url_for('jefatura_daem.editar_jefatura_daem', id=jefatura.id) }}" method="POST">
+      {{ form.hidden_tag() }}
+
+      <!-- RUT y Nombre (no editables) -->
+      <div class="mb-3 row">
+        <div class="col-md-6">
+          <label class="form-label">Cédula de Identidad</label>
+          <input type="text" class="form-control" value="{{ funcionario.rut_cuerpo }}-{{ funcionario.rut_dv }}" readonly>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Nombre</label>
+          <input type="text" class="form-control" value="{{ funcionario.nombre }} {{ funcionario.apellido }}" readonly>
+        </div>
+      </div>
+
+      <!-- Email (no editable) -->
+      <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="text" class="form-control" value="{{ funcionario.email or 'Sin correo' }}" readonly>
+      </div>
+
+      <!-- Fechas -->
+      <div class="mb-3 row">
+        <div class="col-md-6">
+          <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+          {{ form.fecha_inicio(class="form-control") }}
+          {% for error in form.fecha_inicio.errors %}
+            <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-md-6">
+          <label for="fecha_termino" class="form-label">Fecha de Término</label>
+          {{ form.fecha_termino(class="form-control") }}
+          {% for error in form.fecha_termino.errors %}
+            <div class="text-danger">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Cargo -->
+      <div class="mb-3">
+        <label for="id_cargo" class="form-label">Cargo</label>
+        {{ form.id_cargo(class="form-select") }}
+        {% for error in form.id_cargo.errors %}
+          <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Botones -->
+      <div class="d-flex justify-content-between">
+        <a href="{{ url_for('jefatura_daem.listar_jefaturas_daem') }}" class="btn btn-secondary">Cancelar</a>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+      </div>
+    </form>
+  </div>
 </div>
 {% endblock %}
