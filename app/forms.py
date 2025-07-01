@@ -23,6 +23,9 @@ class OrdenTrabajoForm(FlaskForm):
     rut_cuerpo = StringField('RUT Cuerpo', validators=[DataRequired()])
     rut_dv = StringField('Dígito Verificador', validators=[
         DataRequired(), Length(min=1, max=1)])
+    anio = IntegerField('Año', validators=[
+                        DataRequired(), NumberRange(min=2000, max=2100)])
+
     colegio_rbd = SelectField('Colegio', coerce=str,
                               choices=[], validators=[DataRequired()])
     tipo_contrato = SelectField(

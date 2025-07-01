@@ -1,5 +1,5 @@
-let funcionarioSeleccionado = null;
-let contextoModal = null;
+window.funcionarioSeleccionado = null;
+window.contextoModal = null;
 
 // ✅ scripts.js con validación, redirección y control único de modal "Funcionario No Encontrado"
 
@@ -248,7 +248,10 @@ $(document).ready(function () {
         window.seleccionarFuncionarioParaAlcaldia(funcionarioSeleccionado);
     } else if (contextoModal === 'jefatura_daem' && typeof window.seleccionarFuncionarioParaJefaturaDaem === 'function') {
         window.seleccionarFuncionarioParaJefaturaDaem(funcionarioSeleccionado);
+    } else if (contextoModal === 'orden_trabajo' && typeof window.seleccionarFuncionarioParaOrdenTrabajo === 'function') {
+        window.seleccionarFuncionarioParaOrdenTrabajo(funcionarioSeleccionado);
     }
+
 
     const modal = bootstrap.Modal.getInstance(document.getElementById('modalBuscarFuncionario'));
     if (modal) modal.hide();
@@ -283,5 +286,18 @@ $(document).ready(function () {
         if (campoNombre) campoNombre.value = `${funcionario.nombre} ${funcionario.apellido}`;
         if (campoRut) campoRut.value = funcionario.rut;
     };
+// 🌟 Función reutilizable para Orden de Trabajo
+window.seleccionarFuncionarioParaOrdenTrabajo = function (funcionario) {
+    console.log("➡️ Funcionario seleccionado para Orden de Trabajo:", funcionario);
+
+    if (funcionario.rut && funcionario.rut.includes('-')) {
+        const partes = funcionario.rut.split('-');
+        $('#rut_cuerpo').val(partes[0]);
+        $('#rut_dv').val(partes[1]);
+    }
+
+    $('#nombre_funcionario').val(funcionario.nombre);
+    $('#apellido_funcionario').val(funcionario.apellido);
+};
 
 });

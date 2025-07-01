@@ -10,38 +10,39 @@
                 </div>
                 <div class="card-body">
                     <form id="formulario-orden" method="POST" action="{{ url_for('ordenes_bp.nueva_orden') }}" novalidate>
-                        {{ form.hidden_tag() }}
-
+                        
                         <!-- Número de Orden (No Modificable) -->
                         <div class="form-group mb-3">
                             <label for="numero_orden" class="form-label">Número de Orden</label>
                             <input type="text" id="numero_orden" name="numero_orden" class="form-control" value="{{ numero_orden }}" readonly>
                         </div>
-
                         <!-- RUT y Búsqueda Manual -->
                         <div class="row mb-3 align-items-end">
                             <div class="col-md-5">
-                                <input type="text" id="rut_cuerpo" name="rut_cuerpo" class="form-control rounded" placeholder="RUT (cuerpo)">
+                                {{ form.rut_cuerpo(class="form-control rounded", placeholder="RUT (cuerpo)", id="rut_cuerpo") }}
                             </div>
                             <div class="col-md-2">
-                                <input type="text" id="rut_dv" name="rut_dv" class="form-control rounded" placeholder="DV">
+                                {{ form.rut_dv(class="form-control rounded", placeholder="DV", id="rut_dv") }}
                             </div>
-                            <div class="col-md-5 text-end">
-                                <button type="button"
-                                        id="buscar-funcionario-btn"
-                                        class="btn btn-outline-primary w-100"
-                                        data-bs-toggle="tooltip"
-                                        data-bs-placement="top"
-                                        title="Realiza una búsqueda alternativa si no conoces el RUT exacto. Puedes buscar por nombre, apellido o RUT parcial.">
-                                    <i class="fas fa-user-search"></i> Buscar por RUT, Nombre o Apellido
-                                </button>
-                                <small class="text-muted d-block mt-1">
-                                    Alternativa manual si no tienes el RUT completo.
+                            <div class="col-md-5 mt-3 mt-md-0">
+                                <div class="d-grid d-sm-flex justify-content-end align-items-center gap-2">
+                                    <button type="button"
+                                            class="btn btn-outline-primary btn-buscar-funcionario"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Buscar funcionario por nombre, RUT o apellido"
+                                            data-target-context="orden_trabajo">
+                                        <i class="fas fa-user-search me-2"></i>
+                                        <span class="d-none d-sm-inline">Buscar por RUT, Nombre o Apellido</span>
+                                        <span class="d-inline d-sm-none">Buscar</span>
+                                    </button>
+                                </div>
+                                <small class="text-muted mt-1 d-block text-end">
+                                    <span class="d-none d-sm-inline">Alternativa manual si no tienes el RUT completo.</span>
                                 </small>
                             </div>
                         </div>
 
-                        <div id="rut-error" class="text-danger"></div>
 
                         <!-- Nombre y Apellido -->
                         <div class="form-group mb-3">
@@ -126,7 +127,7 @@
                             <label for="observaciones" class="form-label">Observaciones</label>
                             {{ form.observaciones(class="form-control rounded", id="observaciones", rows="3") }}
                         </div>
-
+                        {{ form.anio(type="hidden") }}
                         <!-- Botón Guardar -->
                         <button type="submit" id="guardar-btn" class="btn btn-success w-100 shadow">Guardar</button>
                     </form>

@@ -68,13 +68,15 @@ class Colegios(db.Model):
 class Funcionarios(db.Model):
     __tablename__ = 'funcionarios'
 
-    rut_cuerpo = Column(String(8), primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)  # NUEVO
+    # Ya no es primary_key
+    rut_cuerpo = Column(String(8), nullable=False)
     rut_dv = Column(String(1), nullable=False)
     nombre = Column(String(100), nullable=False)
     apellido = Column(String(100), nullable=False)
     direccion = Column(String(255), nullable=True)
     telefono = Column(String(15), nullable=True)
-    email = Column(String(100), nullable=True)  # ✅ Agregado
+    email = Column(String(100), nullable=True)
     titulo = Column(String(100), nullable=True)
     id_cargo = Column(Integer, ForeignKey('cargos.id'), nullable=True)
 
@@ -101,6 +103,8 @@ class OrdenesTrabajo(db.Model):
         'financiamiento.id'), nullable=True)
     rut_cuerpo = Column(String(8), nullable=False)
     rut_dv = Column(String(1), nullable=False)
+    funcionario_id = Column(Integer, ForeignKey(
+        'funcionarios.id'), nullable=True)  # NUEVA CLAVE
     alcalde_id = Column(Integer, ForeignKey('alcaldia.id'), nullable=False)
     jefatura_daem_id = Column(Integer, ForeignKey(
         'jefatura_daem.id'), nullable=False)
@@ -109,55 +113,21 @@ class OrdenesTrabajo(db.Model):
     funcionario = relationship(
         'Funcionarios',
         primaryjoin="and_(foreign(OrdenesTrabajo.rut_cuerpo) == Funcionarios.rut_cuerpo, "
-        "foreign(OrdenesTrabajo.rut_dv) == Funcionarios.rut_dv)",
+                    "foreign(OrdenesTrabajo.rut_dv) == Funcionarios.rut_dv)",
         backref='ordenes_trabajo'
     )
+
+    funcionario_directo = relationship(
+        'Funcionarios',
+        foreign_keys=[funcionario_id],
+        backref='ordenes_directas'
+    )
+
     tipo_contrato = relationship('TipoContrato', backref='ordenes_trabajo')
     financiamiento = relationship('Financiamiento', backref='ordenes_trabajo')
     colegio = relationship('Colegios', backref='ordenes_trabajo')
     alcalde = relationship('Alcaldia', backref='ordenes_trabajo')
     jefatura_daem = relationship('JefaturaDAEM', backref='ordenes_trabajo')
-
-    # Comentando relación inversa con FuncionarioColegios
-    # funcionarios_colegios_relacion = relationship(
-    #     'FuncionarioColegios',
-    #     backref='orden_trabajo',
-    #     lazy='joined'
-    # )
-
-# Comentando clase FuncionarioColegios
-# class FuncionarioColegios(db.Model):
-#     __tablename__ = 'funcionarios_colegios'
-
-#     id = Column(Integer, primary_key=True, autoincrement=True)
-#     funcionario_id = Column(String(8), ForeignKey(
-#         'funcionarios.rut_cuerpo'), nullable=False)
-#     colegio_rbd = Column(String(20), ForeignKey(
-#         'colegios.rbd'), nullable=False)
-#     horas_disponibles = Column(Integer, nullable=False)
-#     orden_id = Column(Integer, ForeignKey('ordenes_trabajo.id'), nullable=True)
-
-#     # Relación con OrdenesTrabajo
-#     ordenes_relacion = relationship(
-#         'OrdenesTrabajo',
-#         backref='funcionarios_colegios',
-#         lazy='joined'
-#     )
-
-#     # Relación con Colegios
-#     colegio = relationship(
-#         'Colegios',
-#         backref='funcionarios_colegios',
-#         lazy='joined'
-#     )
-
-#     # Relación con Funcionarios
-#     funcionario_relacion = relationship(
-#         'Funcionarios',
-#         backref='asignaciones_colegios',
-#         foreign_keys='FuncionarioColegios.funcionario_id',
-#         lazy='joined'
-#     )
 
 # Modelo: Financiamiento
 

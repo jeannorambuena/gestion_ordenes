@@ -584,12 +584,14 @@ def eliminar_financiamiento(id):
 def listar_ordenes():
     ordenes = OrdenesTrabajo.query.options(
         joinedload(OrdenesTrabajo.funcionario),
+        joinedload(OrdenesTrabajo.funcionario_directo),
         joinedload(OrdenesTrabajo.colegio),
         joinedload(OrdenesTrabajo.tipo_contrato),
         joinedload(OrdenesTrabajo.financiamiento),
         joinedload(OrdenesTrabajo.alcalde),
         joinedload(OrdenesTrabajo.jefatura_daem)
     ).all()
+
     return render_template('ordenes_trabajo/list.html', ordenes=ordenes)
 
 
@@ -621,7 +623,9 @@ def generar_pdf_orden(id):
 @login_required
 @roles_required('administrador')
 def nueva_orden():
-    form = OrdenTrabajoForm()
+    from datetime import datetime
+
+    form = OrdenTrabajoForm(anio=datetime.now().year)
 
     # Cargar opciones de selección
     form.colegio_rbd.choices = [(c.rbd, c.nombre_colegio)
@@ -643,10 +647,25 @@ def nueva_orden():
     ultimo = OrdenesTrabajo.query.order_by(OrdenesTrabajo.id.desc()).first()
     numero_orden = int(ultimo.numero_orden) + 1 if ultimo else 1
 
-    # Procesar formulario
     if form.validate_on_submit():
+        print("✅ Formulario validado correctamente")
+
+        rut_cuerpo = form.rut_cuerpo.data.strip()
+        rut_dv = form.rut_dv.data.strip().upper()
+        print(
+            f"🔍 Buscando funcionario con rut_cuerpo={rut_cuerpo} y rut_dv={rut_dv}")
+
+        funcionario = Funcionarios.query.filter_by(
+            rut_cuerpo=rut_cuerpo, rut_dv=rut_dv).first()
+
+        if funcionario:
+            print("✅ Funcionario encontrado:",
+                  funcionario.nombre, funcionario.apellido)
+        else:
+            print("❌ Funcionario NO encontrado")
+
         nueva_orden = OrdenesTrabajo(
-            numero_orden=numero_orden,  # ← usa el número calculado
+            numero_orden=numero_orden,
             anio=form.anio.data,
             fecha_inicio=form.fecha_inicio.data,
             fecha_termino=form.fecha_termino.data,
@@ -654,19 +673,20 @@ def nueva_orden():
             observaciones=form.observaciones.data,
             horas_disponibles=form.horas_disponibles.data,
             colegio_rbd=form.colegio_rbd.data,
-            tipo_contrato_id=form.tipo_contrato_id.data,
-            financiamiento_id=form.financiamiento_id.data,
-            rut_cuerpo=form.rut_cuerpo.data,
-            rut_dv=form.rut_dv.data,
+            tipo_contrato_id=form.tipo_contrato.data,
+            financiamiento_id=form.financiamiento.data,
+            rut_cuerpo=rut_cuerpo,
+            rut_dv=rut_dv,
             alcalde_id=form.alcalde_id.data,
-            jefatura_daem_id=form.jefatura_daem_id.data
+            jefatura_daem_id=form.jefatura_daem_id.data,
+            funcionario_id=funcionario.id if funcionario else None
         )
+
         db.session.add(nueva_orden)
         db.session.commit()
         flash('Orden de trabajo creada con éxito', 'success')
         return redirect(url_for('ordenes_bp.listar_ordenes'))
 
-    # Renderizar formulario con número de orden prellenado
     return render_template('ordenes_trabajo/nueva.html', form=form, numero_orden=numero_orden)
 
 
@@ -697,8 +717,8 @@ def editar_orden(id):
         orden.observaciones = form.observaciones.data
         orden.horas_disponibles = form.horas_disponibles.data
         orden.colegio_rbd = form.colegio_rbd.data
-        orden.tipo_contrato_id = form.tipo_contrato_id.data
-        orden.financiamiento_id = form.financiamiento_id.data
+        orden.tipo_contrato_id = form.tipo_contrato.data
+        orden.financiamiento_id = form.financiamiento.data
         orden.rut_cuerpo = form.rut_cuerpo.data
         orden.rut_dv = form.rut_dv.data
         orden.alcalde_id = form.alcalde_id.data

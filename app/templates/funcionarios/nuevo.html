@@ -18,19 +18,16 @@
                         {{ form.rut_cuerpo(
                             class="form-control",
                             placeholder="Ingrese el cuerpo del RUT",
-                            id="rut_cuerpo",
-                            value=form.rut_cuerpo.data if form.rut_cuerpo.data else '',
-                            readonly=True if form.rut_cuerpo.render_kw and form.rut_cuerpo.render_kw.get('readonly') else None
+                            id="rut_cuerpo"
                         ) }}
                         <span class="input-group-text">-</span>
                         {{ form.rut_dv(
                             class="form-control",
                             placeholder="DV",
                             id="rut_dv",
-                            style="max-width: 60px;",
-                            value=form.rut_dv.data if form.rut_dv.data else '',
-                            readonly=True if form.rut_dv.render_kw and form.rut_dv.render_kw.get('readonly') else None
+                            style="max-width: 60px;"
                         ) }}
+
                     </div>
                     <div class="text-danger" id="rut_cuerpo_error"></div>
                     <div class="text-danger" id="rut_dv_error"></div>
@@ -131,7 +128,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary" id="continuar-creacion">Continuar</button>
+        <button type="button" class="btn btn-primary" id="redirigir-nuevo">Continuar</button>
       </div>
     </div>
   </div>
