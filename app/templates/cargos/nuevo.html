@@ -3,49 +3,63 @@
 {% block title %}Agregar Nuevo Cargo{% endblock %}
 
 {% block content %}
-<div class="container mt-5 d-flex justify-content-center">
-    <!-- Centralizado y con ancho fijo -->
-    <div class="card shadow-lg p-4 mb-5 bg-white rounded" style="max-width: 600px;">
-        <h2 class="text-center mb-4">Agregar Nuevo Cargo</h2>
-
-        <form action="{{ url_for('cargo.nuevo_cargo') }}" method="POST" class="needs-validation" novalidate>
-            {{ form.hidden_tag() }}
-
-            <!-- Campo de Nombre del Cargo -->
-            <div class="mb-3">
-                <label for="nombre_cargo" class="form-label">Nombre del Cargo</label>
-                {{ form.nombre_cargo(class="form-control", placeholder="Ingrese el nombre del cargo") }}
-                {% if form.nombre_cargo.errors %}
-                    <div class="text-danger">{{ form.nombre_cargo.errors[0] }}</div>
-                {% endif %}
-            </div>
-
-            <!-- Campo de Descripción del Cargo -->
-            <div class="mb-3">
-                <label for="descripcion" class="form-label">Descripción</label>
-                {{ form.descripcion(class="form-control", placeholder="Ingrese la descripción del cargo") }}
-                {% if form.descripcion.errors %}
-                    <div class="text-danger">{{ form.descripcion.errors[0] }}</div>
-                {% endif %}
-            </div>
-
-            <!-- Botones para guardar o cancelar -->
-            <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary me-2">Guardar</button>
-                <a href="{{ url_for('cargo.listar_cargos') }}" class="btn btn-secondary">Cancelar</a>
-            </div>
-        </form>
-
-        {% if form.errors %}
-            <div class="mt-3 alert alert-danger">
-                <strong>Por favor, corrige los siguientes errores:</strong>
-                <ul>
-                    {% for field, errors in form.errors.items() %}
-                        <li>{{ field }}: {{ errors[0] }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
+<div class="container mt-4" style="max-width: 700px;">
+  <div class="card shadow-lg border-0 rounded">
+    <!-- Cabecera institucional del formulario -->
+    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #33658A;">
+      <div class="d-flex align-items-center gap-3">
+        <i class="fas fa-briefcase text-white fa-lg"></i>
+        <h3 class="text-white mb-0">Agregar Nuevo Cargo</h3>
+      </div>
+      <a href="{{ url_for('cargo.listar_cargos') }}" class="btn btn-light btn-sm">
+        <i class="fas fa-arrow-left me-1"></i> Volver
+      </a>
     </div>
+
+    <div class="card-body px-4 py-3">
+      <form action="{{ url_for('cargo.nuevo_cargo') }}" method="POST" class="needs-validation" novalidate>
+        {{ form.hidden_tag() }}
+
+        <!-- Nombre del Cargo -->
+        <div class="mb-3">
+          <label for="nombre_cargo" class="form-label">Nombre del Cargo</label>
+          {{ form.nombre_cargo(class="form-control", placeholder="Ingrese el nombre del cargo") }}
+          {% if form.nombre_cargo.errors %}
+            <div class="text-danger">{{ form.nombre_cargo.errors[0] }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Descripción -->
+        <div class="mb-4">
+          <label for="descripcion" class="form-label">Descripción</label>
+          {{ form.descripcion(class="form-control", placeholder="Ingrese la descripción del cargo") }}
+          {% if form.descripcion.errors %}
+            <div class="text-danger">{{ form.descripcion.errors[0] }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-center gap-3">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-check me-1"></i> Guardar
+          </button>
+          <a href="{{ url_for('cargo.listar_cargos') }}" class="btn btn-secondary">
+            <i class="fas fa-times me-1"></i> Cancelar
+          </a>
+        </div>
+      </form>
+
+      {% if form.errors %}
+        <div class="mt-3 alert alert-danger">
+          <strong>Por favor, corrige los siguientes errores:</strong>
+          <ul>
+            {% for field, errors in form.errors.items() %}
+              <li>{{ field }}: {{ errors[0] }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+  </div>
 </div>
 {% endblock %}

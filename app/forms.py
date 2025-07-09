@@ -1,3 +1,6 @@
+from app.models import Cargo
+from wtforms.validators import DataRequired, Length, ValidationError
+from wtforms import StringField, SelectField, DateField, BooleanField, SubmitField
 from flask_wtf import FlaskForm
 from wtforms import (
     StringField, IntegerField, DateField, BooleanField, SelectField,
@@ -14,6 +17,7 @@ from app.models import (
     Financiamiento, Alcaldia, JefaturaDAEM, Cargo
 )
 from app.validators import validar_rut
+
 # -------------------------------------------------------------
 # Formularios para "Ordenes de Trabajo"
 # -------------------------------------------------------------
@@ -24,7 +28,7 @@ class OrdenTrabajoForm(FlaskForm):
     rut_dv = StringField('Dígito Verificador', validators=[
         DataRequired(), Length(min=1, max=1)])
     anio = IntegerField('Año', validators=[
-                        DataRequired(), NumberRange(min=2000, max=2100)])
+        DataRequired(), NumberRange(min=2000, max=2100)])
 
     colegio_rbd = SelectField('Colegio', coerce=str,
                               choices=[], validators=[DataRequired()])
@@ -37,58 +41,58 @@ class OrdenTrabajoForm(FlaskForm):
     fecha_termino = DateField(
         'Fecha de Término', format='%Y-%m-%d', validators=[Optional()])
     horas_disponibles = IntegerField('Horas Disponibles', validators=[
-                                     DataRequired(), NumberRange(min=1, max=44)])
+        DataRequired(), NumberRange(min=1, max=44)])
     alcalde_id = SelectField('Alcalde o Alcaldesa',
                              coerce=int, validators=[DataRequired()])
     jefatura_daem_id = SelectField(
         'Jefe(a) DAEM', coerce=int, validators=[DataRequired()])
     observaciones = TextAreaField('Observaciones', validators=[
-                                  Optional(), Length(max=500)])
+        Optional(), Length(max=500)])
     es_indefinido = BooleanField('Es Indefinido', default=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Colegio
         self.colegio_rbd.choices = [(col.rbd, col.nombre_colegio)
                                     for col in Colegios.query.all()]
         if not self.colegio_rbd.choices:
             self.colegio_rbd.choices = [('', 'No hay colegios disponibles')]
 
+        # Tipo de contrato
         self.tipo_contrato.choices = [(tc.id, tc.nombre)
                                       for tc in TipoContrato.query.all()]
         if not self.tipo_contrato.choices:
             self.tipo_contrato.choices = [
                 ('', 'No hay tipos de contrato disponibles')]
 
+        # Financiamiento
         self.financiamiento.choices = [
             (f.id, f.nombre_financiamiento) for f in Financiamiento.query.all()]
         if not self.financiamiento.choices:
             self.financiamiento.choices = [
                 ('', 'No hay financiamientos disponibles')]
 
+        # Alcalde activo
         alcaldes = Alcaldia.query.order_by(Alcaldia.fecha_inicio.desc()).all()
         self.alcalde_id.choices = [
             (a.id, f"{a.funcionario.nombre} {a.funcionario.apellido} ({a.cargo.nombre_cargo})")
             for a in alcaldes if a.funcionario and a.cargo
         ]
-        if alcaldes:
-            actual = next(
-                (a for a in alcaldes if a.fecha_termino is None), alcaldes[0])
-            self.alcalde_id.data = actual.id
+        actual_alcalde = next((a for a in alcaldes if a.es_activo), None)
+        if actual_alcalde:
+            self.alcalde_id.data = actual_alcalde.id
 
+        # Jefatura DAEM activa
         jefaturas = JefaturaDAEM.query.order_by(
             JefaturaDAEM.fecha_inicio.desc()).all()
         self.jefatura_daem_id.choices = [
             (j.id, f"{j.funcionario.nombre} {j.funcionario.apellido} ({j.cargo.nombre_cargo})")
             for j in jefaturas if j.funcionario and j.cargo
         ]
-        if self.jefatura_daem_id.choices:
-            actual = next(
-                (j for j in jefaturas if j.fecha_termino is None and j.funcionario and j.cargo),
-                jefaturas[0] if jefaturas and jefaturas[0].funcionario and jefaturas[0].cargo else None
-            )
-            if actual:
-                self.jefatura_daem_id.data = actual.id
+        actual_jefatura = next((j for j in jefaturas if j.es_activo), None)
+        if actual_jefatura:
+            self.jefatura_daem_id.data = actual_jefatura.id
 
     def validate_horas_disponibles(self, field):
         if field.data < 1 or field.data > 44:
@@ -183,14 +187,19 @@ class ColegioForm(FlaskForm):
 
 class AlcaldiaForm(FlaskForm):
     rut_alcalde = StringField('RUT del Alcalde', validators=[
-                              DataRequired()], render_kw={"readonly": True})
+        DataRequired()], render_kw={"readonly": True})
     nombre_alcalde = StringField('Nombre del Alcalde', validators=[
-                                 DataRequired()], render_kw={"readonly": True})
+        DataRequired()], render_kw={"readonly": True})
     id_cargo = SelectField('Cargo', coerce=int, validators=[DataRequired()])
     fecha_inicio = DateField(
         'Fecha de Inicio', format='%Y-%m-%d', validators=[DataRequired()])
     fecha_termino = DateField(
         'Fecha de Término', format='%Y-%m-%d', validators=[Optional()])
+
+    # Nuevos campos agregados
+    es_activo = BooleanField('¿Está en funciones actualmente?', default=True)
+    es_titular = BooleanField('¿Es el alcalde titular?', default=False)
+
     submit = SubmitField('Asignar Alcaldía')
 
     def __init__(self, *args, **kwargs):
@@ -202,20 +211,28 @@ class AlcaldiaForm(FlaskForm):
 
 
 class JefaturaDAEMForm(FlaskForm):
-    rut_funcionario = StringField('RUT del Funcionario', validators=[
-        DataRequired(), Length(
-            min=9, max=10, message="Debe ingresar el RUT completo, ej: 12345678-9")
-    ])
+    rut_funcionario = StringField(
+        'RUT del Funcionario',
+        validators=[
+            DataRequired(),
+            Length(min=9, max=10,
+                   message="Debe ingresar el RUT completo, ej: 12345678-9")
+        ]
+    )
+
     id_cargo = SelectField('Cargo Asociado', coerce=int,
                            validators=[DataRequired()])
     fecha_inicio = DateField('Fecha de Inicio', validators=[DataRequired()])
     fecha_termino = DateField('Fecha de Término', validators=[])
+    es_activo = BooleanField('¿Está actualmente en funciones?', default=True)
     submit = SubmitField('Guardar')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.id_cargo.choices = [(c.id, c.nombre_cargo) for c in Cargo.query.order_by(
-            Cargo.nombre_cargo.asc()).all()]
+        self.id_cargo.choices = [
+            (c.id, c.nombre_cargo)
+            for c in Cargo.query.order_by(Cargo.nombre_cargo.asc()).all()
+        ]
         if not self.id_cargo.choices:
             self.id_cargo.choices = [('', 'No hay cargos disponibles')]
 

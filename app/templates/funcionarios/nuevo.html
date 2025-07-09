@@ -3,147 +3,121 @@
 {% block title %}Agregar Nuevo Funcionario{% endblock %}
 
 {% block content %}
-<div class="container mt-4" style="max-width: 700px;">
-    <div class="card shadow-lg border-0 rounded-lg">
-        <div class="card-header bg-primary text-white text-center">
-            <h3 class="font-weight-light my-3">Agregar Nuevo Funcionario</h3>
-        </div>
-        <div class="card-body">
-            <form id="funcionario-form" action="{{ url_for('funcionarios_bp.nuevo_funcionario') }}" method="POST" class="needs-validation" novalidate>
-                {{ form.hidden_tag() }}
-
-                <div class="mb-3">
-                    <label for="rut_cuerpo" class="form-label">RUT</label>
-                    <div class="input-group">
-                        {{ form.rut_cuerpo(
-                            class="form-control",
-                            placeholder="Ingrese el cuerpo del RUT",
-                            id="rut_cuerpo"
-                        ) }}
-                        <span class="input-group-text">-</span>
-                        {{ form.rut_dv(
-                            class="form-control",
-                            placeholder="DV",
-                            id="rut_dv",
-                            style="max-width: 60px;"
-                        ) }}
-
-                    </div>
-                    <div class="text-danger" id="rut_cuerpo_error"></div>
-                    <div class="text-danger" id="rut_dv_error"></div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="nombre" class="form-label">Nombre</label>
-                    {{ form.nombre(class="form-control", placeholder="Ingrese el nombre", id="nombre_funcionario") }}
-                </div>
-
-                <div class="mb-3">
-                    <label for="apellido" class="form-label">Apellido</label>
-                    {{ form.apellido(class="form-control", placeholder="Ingrese el apellido", id="apellido_funcionario") }}
-                </div>
-
-                <div class="mb-3">
-                    <label for="direccion" class="form-label">Dirección</label>
-                    {{ form.direccion(class="form-control", placeholder="Ingrese la dirección") }}
-                </div>
-
-                <div class="mb-3">
-                    <label for="telefono" class="form-label">Teléfono</label>
-                    <div class="input-group">
-                        <span class="input-group-text">+56</span>
-                        {{ form.telefono(class="form-control", placeholder="9 dígitos del teléfono") }}
-                    </div>
-                </div>
-
-                <div class="mb-3">
-                    <label for="titulo" class="form-label">Título</label>
-                    {{ form.titulo(class="form-control", placeholder="Ingrese el título") }}
-                </div>
-
-                <div class="mb-3">
-                    <label for="id_cargo" class="form-label">Cargo</label>
-                    {{ form.id_cargo(class="form-select") }}
-                </div>
-
-                <div class="d-flex justify-content-center gap-2">
-                    <button type="submit" class="btn btn-success">Agregar Funcionario</button>
-                    <a href="{{ url_for('funcionarios_bp.listar_funcionarios') }}" class="btn btn-danger">Cancelar</a>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- ====== Modales de feedback de validación de RUT ====== -->
-
-<!-- Modal: RUT Inválido -->
-<div class="modal fade" id="modalRutInvalido" tabindex="-1" aria-labelledby="modalRutInvalidoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="modalRutInvalidoLabel">RUT Inválido</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                El RUT ingresado no es válido. Por favor, intente nuevamente.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Funcionario Encontrado -->
-<div class="modal fade" id="modalFuncionarioEncontrado" tabindex="-1" aria-labelledby="modalFuncionarioEncontradoLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="modalFuncionarioEncontradoLabel">Funcionario Encontrado</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                El funcionario ya está registrado. ¿Desea continuar con la edición de sus datos?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="cerrar-funcionario-encontrado" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" id="continuar-funcionario">Continuar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal: Funcionario No Encontrado -->
-<div class="modal fade" id="modalFuncionarioNoEncontrado" tabindex="-1" aria-labelledby="modalFuncionarioNoEncontradoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-warning text-dark">
-        <h5 class="modal-title" id="modalFuncionarioNoEncontradoLabel">Funcionario No Encontrado</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+<div class="container mt-4 d-flex justify-content-center">
+  <div class="card shadow-lg border-0 rounded" style="max-width: 500px; width: 100%;">
+    <!-- Cabecera institucional con color de funcionarios -->
+    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #2F4858;">
+      <div class="d-flex align-items-center gap-3">
+        <i class="fas fa-user text-white fa-lg"></i>
+        <h3 class="text-white mb-0">Agregar Nuevo Funcionario</h3>
       </div>
-      <div class="modal-body">
-        El RUT ingresado es válido, pero no se encuentra registrado.<br>
-        ¿Deseas agregar un nuevo funcionario con este RUT?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        <button type="button" class="btn btn-primary" id="redirigir-nuevo">Continuar</button>
-      </div>
+      <a href="{{ url_for('funcionarios_bp.listar_funcionarios') }}" class="btn btn-light btn-sm">
+        <i class="fas fa-arrow-left me-1"></i> Volver
+      </a>
+    </div>
+
+    <div class="card-body">
+      <form id="funcionario-form" action="{{ url_for('funcionarios_bp.nuevo_funcionario') }}" method="POST" class="needs-validation" novalidate>
+        {{ form.hidden_tag() }}
+
+        <!-- RUT -->
+        <div class="mb-3">
+          <label for="rut_cuerpo" class="form-label">RUT</label>
+          <div class="input-group">
+            {{ form.rut_cuerpo(class="form-control", placeholder="Ingrese el cuerpo del RUT", id="rut_cuerpo") }}
+            <span class="input-group-text">-</span>
+            {{ form.rut_dv(class="form-control", placeholder="DV", id="rut_dv", style="max-width: 60px;") }}
+          </div>
+          <div class="text-danger" id="rut_cuerpo_error"></div>
+          <div class="text-danger" id="rut_dv_error"></div>
+        </div>
+
+        <!-- Nombre -->
+        <div class="mb-3">
+          <label for="nombre" class="form-label">Nombres</label>
+          {{ form.nombre(class="form-control", placeholder="Ingrese el nombre", id="nombre_funcionario") }}
+        </div>
+
+        <!-- Apellido -->
+        <div class="mb-3">
+          <label for="apellido" class="form-label">Apellidos</label>
+          {{ form.apellido(class="form-control", placeholder="Ingrese el apellido", id="apellido_funcionario") }}
+        </div>
+
+        <!-- Dirección -->
+        <div class="mb-3">
+          <label for="direccion" class="form-label">Dirección</label>
+          {{ form.direccion(class="form-control", placeholder="Ingrese la dirección") }}
+        </div>
+
+        <!-- Teléfono -->
+        <div class="mb-3">
+          <label for="telefono" class="form-label">Teléfono</label>
+          <div class="input-group">
+            <span class="input-group-text">+56</span>
+            {{ form.telefono(class="form-control", placeholder="9 dígitos del teléfono") }}
+          </div>
+        </div>
+
+        <!-- Título -->
+        <div class="mb-3">
+          <label for="titulo" class="form-label">Título Profesional</label>
+          {{ form.titulo(class="form-control", placeholder="Ingrese el título") }}
+        </div>
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label for="email" class="form-label">Correo Electrónico</label>
+          {{ form.email(class="form-control", placeholder="ejemplo@correo.cl") }}
+        </div>
+
+        <!-- Cargo -->
+        <div class="mb-4">
+          <label for="id_cargo" class="form-label">Cargo</label>
+          {{ form.id_cargo(class="form-select") }}
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-center gap-3">
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-check me-1"></i> Agregar Funcionario
+          </button>
+          <a href="{{ url_for('funcionarios_bp.listar_funcionarios') }}" class="btn btn-danger">
+            <i class="fas fa-times me-1"></i> Cancelar
+          </a>
+        </div>
+      </form>
     </div>
   </div>
 </div>
+
+{% include 'funcionarios/modales_rut.html' %}
+
 <script>
-    window.addEventListener('DOMContentLoaded', () => {
-        const rutCuerpo = document.getElementById('rut_cuerpo');
-        const rutDv = document.getElementById('rut_dv');
-        const nombre = document.getElementById('nombre_funcionario');
+  window.addEventListener('DOMContentLoaded', () => {
+    const rutCuerpo = document.getElementById('rut_cuerpo');
+    const rutDv = document.getElementById('rut_dv');
+    const nombre = document.getElementById('nombre_funcionario');
 
-        if (rutCuerpo.value && rutDv.value && nombre) {
-            nombre.focus();
-            nombre.select();
-        }
+    if (rutCuerpo.value && rutDv.value && nombre) {
+      nombre.focus();
+      nombre.select();
+    }
+
+    // Reasignamos eventos para el modal de "Funcionario No Encontrado"
+    const modalId = 'modalFuncionarioNoEncontrado';
+    const modalElement = document.getElementById(modalId);
+    const modal = new bootstrap.Modal(modalElement);
+
+    document.getElementById('continuar-creacion').addEventListener('click', function () {
+      modal.hide();
+      setTimeout(() => {
+        const rutCuerpo = document.getElementById('rut_cuerpo').value.trim();
+        const rutDv = document.getElementById('rut_dv').value.trim();
+        const rutCompleto = `${rutCuerpo}-${rutDv}`;
+        window.location.href = `/funcionarios/nuevo?rut=${encodeURIComponent(rutCompleto)}`;
+      }, 300);
     });
+  });
 </script>
-
 {% endblock %}

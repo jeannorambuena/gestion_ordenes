@@ -1,66 +1,108 @@
-<!-- app/templates/colegios/list.html -->
 {% extends 'base.html' %}
 
 {% block title %}Lista de Colegios{% endblock %}
 
 {% block content %}
-<div class="container mt-0"> <!-- Reducido el margen superior -->
-    <h2 class="text-center mb-3">Lista de Colegios</h2> <!-- Reducido el espacio debajo del título -->
-    
-    <!-- Botón para agregar un nuevo colegio -->
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{{ url_for('colegio.nuevo_colegio') }}" class="btn btn-success">Agregar Nuevo Colegio</a>
-    </div>
+<div class="container mt-0">
+  <div class="card shadow-lg border-0 rounded" style="background-color: #4C6E91;">
+    <div class="card-body">
+      <!-- Cabecera del módulo con ícono -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-3">
+          <i class="fas fa-school fa-2x text-white"></i>
+          <h2 class="text-white mb-0">Lista de Colegios</h2>
+        </div>
+        <a href="{{ url_for('colegio.nuevo_colegio') }}" class="btn btn-light shadow-sm">
+          <i class="fas fa-plus-circle me-2"></i> Nuevo Colegio
+        </a>
+      </div>
 
-    {% if colegios %}
-    <!-- Tabla con bordes, colores y clases de Bootstrap -->
-    <div class="table-responsive shadow-lg p-3 mb-5 bg-white rounded">
-        <table class="table table-bordered table-hover">
-            <thead class="bg-success text-white"> <!-- Fondo verde y texto blanco para la cabecera -->
-                <tr class="text-center">
-                    <th>RBD</th>
-                    <th>Nombre del Colegio</th>
-                    <th>Dirección</th>
-                    <th>Teléfono</th>
-                    <th>Director</th>
-                    <th>Tipo de Enseñanza</th>
-                    <th>Ubicación</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for colegio in colegios %}
-                <tr>
-                    <td class="text-center">{{ colegio.rbd }}</td>
-                    <td>{{ colegio.nombre_colegio }}</td>
-                    <td>{{ colegio.direccion }}</td>
-                    <td class="text-center">{{ colegio.telefono }}</td>
-                    <td>{{ colegio.director }}</td>
-                    <td class="text-center">{{ colegio.tipo_ensenanza }}</td>
-                    <td class="text-center">
-                        <!-- Enlace para ver ubicación en Google Maps -->
-                        <a href="https://www.google.com/maps?q={{ colegio.latitud }},{{ colegio.longitud }}" target="_blank" class="btn btn-info btn-sm">
-                            Ver Mapa
-                        </a>
-                    </td>
-                    <td class="d-flex justify-content-center">
-                        <!-- Botón para editar colegio -->
-                        <a href="{{ url_for('colegio.editar_colegio', rbd=colegio.rbd) }}" class="btn btn-warning btn-sm me-2">Editar</a>
-                        <!-- Formulario para eliminar colegio -->
-                        <form action="{{ url_for('colegio.eliminar_colegio', rbd=colegio.rbd) }}" method="POST">
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este colegio?')">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
+      {% if colegios %}
+      <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-bordered table-hover mb-0">
+          <thead style="background-color: #4C6E91;" class="text-white text-center">
+            <tr>
+              <th>RBD</th>
+              <th>Nombre</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Director</th>
+              <th>Enseñanza</th>
+              <th>Mapa</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for colegio in colegios %}
+            <tr>
+              <td class="text-center">{{ colegio.rbd }}</td>
+              <td>{{ colegio.nombre_colegio }}</td>
+              <td>{{ colegio.direccion }}</td>
+              <td class="text-center">{{ colegio.telefono }}</td>
+              <td>{{ colegio.director }}</td>
+              <td class="text-center">{{ colegio.tipo_ensenanza }}</td>
+              <td class="text-center">
+                <a href="https://www.google.com/maps?q={{ colegio.latitud }},{{ colegio.longitud }}" target="_blank" class="btn btn-info btn-sm shadow-sm">
+                  <i class="fas fa-map-marked-alt"></i>
+                </a>
+              </td>
+              <td class="d-flex justify-content-center gap-2">
+                <a href="{{ url_for('colegio.editar_colegio', rbd=colegio.rbd) }}" class="btn btn-warning btn-sm shadow-sm">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <button type="button" class="btn btn-danger btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#modalConfirmarEliminacion" data-nombre="{{ colegio.nombre_colegio }}" data-url="{{ url_for('colegio.eliminar_colegio', rbd=colegio.rbd) }}">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
         </table>
-    </div>
-    {% else %}
-    <!-- Mensaje cuando no hay colegios registrados -->
-    <div class="alert alert-info text-center" role="alert">
+      </div>
+      {% else %}
+      <div class="alert alert-light text-center text-dark mt-3" role="alert">
         No hay colegios registrados.
+      </div>
+      {% endif %}
     </div>
-    {% endif %}
+  </div>
 </div>
+
+<!-- Modal Confirmar Eliminación -->
+<div class="modal fade" id="modalConfirmarEliminacion" tabindex="-1" aria-labelledby="modalConfirmarEliminacionLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="POST" id="formEliminarColegio">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title" id="modalConfirmarEliminacionLabel">
+            Confirmar Eliminación
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          ¿Estás seguro que deseas eliminar el colegio <strong id="nombreColegioEliminar"></strong>? Esta acción no se puede deshacer.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const modalEliminar = document.getElementById('modalConfirmarEliminacion');
+  modalEliminar.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const nombre = button.getAttribute('data-nombre');
+    const url = button.getAttribute('data-url');
+
+    const modalBody = modalEliminar.querySelector('#nombreColegioEliminar');
+    const form = modalEliminar.querySelector('#formEliminarColegio');
+
+    modalBody.textContent = nombre;
+    form.action = url;
+  });
+</script>
 {% endblock %}

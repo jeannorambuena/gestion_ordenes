@@ -1,135 +1,181 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mt-4">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-7 col-xl-6">
             <div class="card shadow-lg border-0 rounded-lg">
-                <div class="card-header bg-primary text-white text-center">
-                    <h3 class="font-weight-light my-3">Nueva Orden de Trabajo</h3>
+                <!-- Cabecera con color institucional -->
+                <div class="card-header text-white text-center" style="background-color: #F6AE2D;">
+                    <h3 class="font-weight-light my-3">
+                        <i class="fas fa-file-signature me-2"></i>
+                        Nueva Orden de Trabajo
+                    </h3>
                 </div>
                 <div class="card-body">
                     <form id="formulario-orden" method="POST" action="{{ url_for('ordenes_bp.nueva_orden') }}" novalidate>
-                        
-                        <!-- Número de Orden (No Modificable) -->
-                        <div class="form-group mb-3">
-                            <label for="numero_orden" class="form-label">Número de Orden</label>
-                            <input type="text" id="numero_orden" name="numero_orden" class="form-control" value="{{ numero_orden }}" readonly>
-                        </div>
-                        <!-- RUT y Búsqueda Manual -->
-                        <div class="row mb-3 align-items-end">
-                            <div class="col-md-5">
-                                {{ form.rut_cuerpo(class="form-control rounded", placeholder="RUT (cuerpo)", id="rut_cuerpo") }}
-                            </div>
-                            <div class="col-md-2">
-                                {{ form.rut_dv(class="form-control rounded", placeholder="DV", id="rut_dv") }}
-                            </div>
-                            <div class="col-md-5 mt-3 mt-md-0">
-                                <div class="d-grid d-sm-flex justify-content-end align-items-center gap-2">
-                                    <button type="button"
-                                            class="btn btn-outline-primary btn-buscar-funcionario"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-placement="top"
-                                            title="Buscar funcionario por nombre, RUT o apellido"
-                                            data-target-context="orden_trabajo">
-                                        <i class="fas fa-user-search me-2"></i>
-                                        <span class="d-none d-sm-inline">Buscar por RUT, Nombre o Apellido</span>
-                                        <span class="d-inline d-sm-none">Buscar</span>
-                                    </button>
-                                </div>
-                                <small class="text-muted mt-1 d-block text-end">
-                                    <span class="d-none d-sm-inline">Alternativa manual si no tienes el RUT completo.</span>
-                                </small>
-                            </div>
+
+                        <!-- N° Orden -->
+                        <div class="form-group mb-4">
+                            <label for="numero_orden" class="form-label fw-bold text-muted d-block text-center">N° Orden</label>
+                            <input type="text"
+                                   id="numero_orden"
+                                   name="numero_orden"
+                                   class="form-control text-center fs-4 fw-bold border-2 border-warning"
+                                   style="max-width: 160px; margin: 0 auto;"
+                                   value="{{ numero_orden }}"
+                                   readonly>
                         </div>
 
-
-                        <!-- Nombre y Apellido -->
-                        <div class="form-group mb-3">
-                            <label for="nombre_funcionario" class="form-label">Nombre</label>
-                            <input type="text" id="nombre_funcionario" name="nombre_funcionario" class="form-control rounded" readonly>
-                        </div>
-                        <div class="form-group mb-3">
-                            <label for="apellido_funcionario" class="form-label">Apellido</label>
-                            <input type="text" id="apellido_funcionario" name="apellido_funcionario" class="form-control rounded" readonly>
-                        </div>
-
-                        <!-- Colegio -->
-                        <div class="form-group mb-3">
-                            <label for="colegio_rbd" class="form-label">Colegio</label>
-                            {{ form.colegio_rbd(class="form-select rounded", id="colegio_rbd") }}
-                        </div>
-
-                        <!-- Tipo de Contrato -->
-                        <div class="form-group mb-3">
-                            <label for="tipo_contrato" class="form-label">Tipo de Contrato</label>
-                            {{ form.tipo_contrato(class="form-select rounded", id="tipo_contrato") }}
-                        </div>
-
-                        <!-- Financiamiento -->
-                        <div class="form-group mb-3">
-                            <label for="financiamiento_id" class="form-label">Financiamiento</label>
-                            {{ form.financiamiento(class="form-select rounded", id="financiamiento_id") }}
-                        </div>
-
-                        <!-- Fechas -->
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
-                                    {{ form.fecha_inicio(class="form-control rounded", id="fecha_inicio") }}
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group mb-3">
-                                    <label for="fecha_termino" class="form-label">Fecha de Término</label>
-                                    {{ form.fecha_termino(class="form-control rounded", id="fecha_termino") }}
+                        <!-- RUT -->
+                        <div class="form-group mb-4">
+                            <label class="form-label fw-bold">RUT</label>
+                            <div class="border rounded p-3 bg-light">
+                                <div class="row g-2">
+                                    <div class="col-8">
+                                        {{ form.rut_cuerpo(class="form-control", placeholder="RUT", id="rut_cuerpo") }}
+                                    </div>
+                                    <div class="col-4">
+                                        {{ form.rut_dv(class="form-control", placeholder="DV", id="rut_dv") }}
+                                    </div>
                                 </div>
                             </div>
                         </div>
+<!-- Botón Buscar - color institucional y estilo unificado -->
+<div class="form-group mb-4">
+    <label class="form-label fw-bold">Buscar Funcionario</label>
+    <div class="border rounded p-3 bg-light">
+        <button type="button"
+                class="btn w-100 py-3 fw-semibold shadow-sm"
+                style="background-color: #F6AE2D; color: white;"
+                data-bs-toggle="tooltip"
+                data-bs-placement="top"
+                title="Haz clic para buscar al funcionario ingresado por RUT, nombre o apellido"
+                data-target-context="orden_trabajo">
+            <i class="fas fa-user-search me-2"></i> Buscar Funcionario
+        </button>
+    </div>
+</div>
 
-                        <!-- Checkbox "Es Indefinido" -->
-                        <div class="form-check mb-3">
-                            {{ form.es_indefinido(class="form-check-input", id="es_indefinido") }}
-                            <label class="form-check-label">Es Indefinido</label>
-                        </div>
+<!-- Nombre y Apellido -->
+<div class="form-group mb-4">
+    <label class="form-label fw-bold">Nombre y Apellido</label>
+    <div class="border rounded p-3 bg-light">
+        <div class="form-group mb-3">
+            <label for="nombre_funcionario" class="form-label">Nombre</label>
+            <input type="text" id="nombre_funcionario" name="nombre_funcionario" class="form-control rounded" placeholder="Nombre" readonly>
+        </div>
+        <div class="form-group mb-0">
+            <label for="apellido_funcionario" class="form-label">Apellido</label>
+            <input type="text" id="apellido_funcionario" name="apellido_funcionario" class="form-control rounded" placeholder="Apellido" readonly>
+        </div>
+    </div>
+</div>
+<!-- Colegio -->
+<div class="form-group mb-4">
+    <div class="border rounded p-3 bg-light">
+        <label for="colegio_rbd" class="form-label">Colegio</label>
+        {{ form.colegio_rbd(class="form-select rounded", id="colegio_rbd") }}
+    </div>
+</div>
 
-                                                <!-- Horas Disponibles -->
-                        <div class="form-group mb-3">
-                            <label for="horas_disponibles" class="form-label">Horas Disponibles</label>
-                            {{ form.horas_disponibles(class="form-control rounded", id="horas_disponibles") }}
-                            <div id="mensaje-horas"></div>
+<!-- Tipo de Contrato -->
+<div class="form-group mb-4">
+    <div class="border rounded p-3 bg-light">
+        <label for="tipo_contrato" class="form-label">Tipo de Contrato</label>
+        {{ form.tipo_contrato(class="form-select rounded", id="tipo_contrato") }}
+    </div>
+</div>
 
-                            <!-- Botón Ver Detalle de Órdenes Activas -->
-                            <button type="button" id="ver-ordenes-activas-btn" class="btn btn-outline-info mt-2 w-100">
-                                Ver Detalle de Órdenes Activas
-                            </button>
-                        </div>
+<!-- Financiamiento -->
+<div class="form-group mb-4">
+    <div class="border rounded p-3 bg-light">
+        <label for="financiamiento_id" class="form-label">Financiamiento</label>
+        {{ form.financiamiento(class="form-select rounded", id="financiamiento_id") }}
+    </div>
+</div>
 
-                        <!-- Advertencia si el funcionario tiene más de dos órdenes en el año -->
-                        <div id="advertencia-tercera-orden" class="alert alert-warning" style="display: none;">
-                            <p>⚠️ Este funcionario ya tiene más de dos órdenes en el año. Esto podría tener implicaciones legales.</p>
-                            <input type="checkbox" id="aceptar-implicaciones" name="aceptar_implicaciones" required>
-                            <label for="aceptar-implicaciones">Confirmo que entiendo las implicaciones legales de esta tercera orden.</label>
-                        </div>
-                        <!-- Alcalde o Alcaldesa -->
-                        <div class="form-group mb-3">
-                            <label for="alcalde_id" class="form-label">Alcalde o Alcaldesa</label>
-                            {{ form.alcalde_id(class="form-select rounded", id="alcalde_id") }}
-                        </div>
-                        <!-- Jefe(a) DAEM -->
-                        <div class="form-group mb-3">
-                            <label for="jefatura_daem_id" class="form-label">Jefe(a) DAEM</label>
-                            {{ form.jefatura_daem_id(class="form-select rounded", id="jefatura_daem_id") }}
+<!-- Fechas y Contrato -->
+<div class="form-group mb-4">
+    <div class="border rounded p-3 bg-light">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-6">
+                <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                {{ form.fecha_inicio(class="form-control rounded", id="fecha_inicio") }}
+            </div>
+            <div class="col-md-6">
+                <label for="fecha_termino" class="form-label">Fecha de Término</label>
+                {{ form.fecha_termino(class="form-control rounded", id="fecha_termino") }}
+            </div>
+        </div>
+        <div class="form-check d-flex align-items-center gap-2 mt-3">
+            {{ form.es_indefinido(class="form-check-input", id="es_indefinido") }}
+            <label for="es_indefinido" class="form-check-label mb-0">Contrato indefinido</label>
+        </div>
+    </div>
+</div>
+
+<!-- Horas Disponibles y Detalle de Órdenes Activas -->
+<div class="form-group mb-4">
+    <div class="border rounded p-3 bg-light">
+        <!-- Campo Horas -->
+        <label for="horas_disponibles" class="form-label">Horas Disponibles</label>
+        {{ form.horas_disponibles(class="form-control rounded", id="horas_disponibles") }}
+
+        <!-- Mensaje validación (se muestra dinámicamente) -->
+        <div id="mensaje-horas" class="mt-2"></div>
+
+        <!-- Botón Detalle de Órdenes Activas -->
+        <div class="text-center mt-3">
+            <button type="button"
+                    id="ver-ordenes-activas-btn"
+                    class="btn btn-outline-secondary shadow-sm d-flex justify-content-center align-items-center gap-2 px-4 py-2 mx-auto"
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title="Ver todas las órdenes activas asociadas a este funcionario">
+                <i class="fas fa-list fa-lg"></i>
+                <span class="fw-semibold">Ver Detalle de Órdenes Activas</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Advertencia si el funcionario tiene más de dos órdenes en el año -->
+<div id="advertencia-tercera-orden" class="alert alert-warning" style="display: none;">
+    <p>⚠️ Este funcionario ya tiene más de dos órdenes en el año. Esto podría tener implicaciones legales.</p>
+    <input type="checkbox" id="aceptar-implicaciones" name="aceptar_implicaciones" required>
+    <label for="aceptar-implicaciones">Confirmo que entiendo las implicaciones legales de esta tercera orden.</label>
+</div>
+                        <!-- Autoridades Firmantes -->
+                        <div class="form-group mb-4">
+                            <div class="border rounded p-3 bg-light">
+                                <label class="form-label fw-semibold text-muted">Autoridades Firmantes</label>
+
+                                <!-- Alcalde o Alcaldesa -->
+                                <div class="mb-3">
+                                    <label for="alcalde_id" class="form-label">Alcalde o Alcaldesa</label>
+                                    {{ form.alcalde_id(class="form-select rounded", id="alcalde_id") }}
+                                </div>
+
+                                <!-- Jefatura DAEM -->
+                                <div>
+                                    <label for="jefatura_daem_id" class="form-label">Jefe(a) DAEM</label>
+                                    {{ form.jefatura_daem_id(class="form-select rounded", id="jefatura_daem_id") }}
+                                </div>
+                            </div>
                         </div>
                         <!-- Observaciones -->
-                        <div class="form-group mb-3">
-                            <label for="observaciones" class="form-label">Observaciones</label>
-                            {{ form.observaciones(class="form-control rounded", id="observaciones", rows="3") }}
+                        <div class="form-group mb-4">
+                            <div class="border rounded p-3 bg-light">
+                                <label for="observaciones" class="form-label">Observaciones</label>
+                                {{ form.observaciones(class="form-control rounded", id="observaciones", rows="3") }}
+                            </div>
                         </div>
                         {{ form.anio(type="hidden") }}
                         <!-- Botón Guardar -->
-                        <button type="submit" id="guardar-btn" class="btn btn-success w-100 shadow">Guardar</button>
+                        <button type="submit" id="guardar-btn" class="btn w-100 shadow text-white fw-semibold" style="background-color: #F6AE2D; border: none;">
+                        Guardar
+                        </button>
                     </form>
                 </div>
             </div>

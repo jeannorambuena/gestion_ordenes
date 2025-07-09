@@ -286,18 +286,94 @@ $(document).ready(function () {
         if (campoNombre) campoNombre.value = `${funcionario.nombre} ${funcionario.apellido}`;
         if (campoRut) campoRut.value = funcionario.rut;
     };
-// 🌟 Función reutilizable para Orden de Trabajo
-window.seleccionarFuncionarioParaOrdenTrabajo = function (funcionario) {
-    console.log("➡️ Funcionario seleccionado para Orden de Trabajo:", funcionario);
+    window.seleccionarFuncionarioParaOrdenTrabajo = function (funcionario) {
+        console.log("➡️ Funcionario seleccionado para Orden de Trabajo:", funcionario);
 
-    if (funcionario.rut && funcionario.rut.includes('-')) {
-        const partes = funcionario.rut.split('-');
-        $('#rut_cuerpo').val(partes[0]);
-        $('#rut_dv').val(partes[1]);
+        if (funcionario.rut && funcionario.rut.includes('-')) {
+            const partes = funcionario.rut.split('-');
+            $('#rut_cuerpo').val(partes[0]);
+            $('#rut_dv').val(partes[1]);
+        }
+
+        $('#nombre_funcionario').val(funcionario.nombre);
+        $('#apellido_funcionario').val(funcionario.apellido);
+
+        obtenerHorasYDetalle(); // ✅ Asegura que se carguen las horas al insertar
+    };
+
+    // ✅ Cargar horas disponibles automáticamente y mostrar detalle
+function obtenerHorasYDetalle() {
+    const rutCuerpo = $('#rut_cuerpo').val().trim();
+    const rutDv = $('#rut_dv').val().trim().toUpperCase();
+
+    if (rutCuerpo && rutDv) {
+        const url = `/ordenes_trabajo/horas_disponibles/${rutCuerpo}-${rutDv}`;
+
+        $.getJSON(url, function (data) {
+            if (data.horas_disponibles !== undefined) {
+                $('#horas_disponibles').val(data.horas_disponibles);
+                window.detalleOrdenesActivas = data.detalle_ordenes || [];
+
+                // Mostrar mensaje si no hay horas
+                if (data.horas_disponibles === 0) {
+                    $('#mensaje-horas').html(`
+                        <div class="text-danger small fw-bold mt-1">
+                            ❌ Sin horas disponibles. Revisa el <a href="#" id="link-ver-detalle">detalle de órdenes activas</a>.
+                        </div>
+                    `);
+                } else {
+                    $('#mensaje-horas').empty();
+                }
+
+                // Advertencia por tercera orden
+                if (window.detalleOrdenesActivas.length > 2) {
+                    $('#advertencia-tercera-orden').show();
+                } else {
+                    $('#advertencia-tercera-orden').hide();
+                    $('#aceptar-implicaciones').prop('checked', false);
+                }
+            }
+        }).fail(function (jqXHR, textStatus, errorThrown) {
+            console.error("❌ Error al obtener horas disponibles:", errorThrown);
+        });
     }
+}
 
-    $('#nombre_funcionario').val(funcionario.nombre);
-    $('#apellido_funcionario').val(funcionario.apellido);
-};
+
+    // Llamar función al perder foco en RUT o al completar desde modal
+    $('#rut_cuerpo, #rut_dv').on('blur', obtenerHorasYDetalle);
+
+    // Mostrar detalle de órdenes activas
+    $('#ver-ordenes-activas-btn').on('click', function () {
+        const rut = $('#rut_cuerpo').val() + '-' + $('#rut_dv').val();
+        $('#modal-rut').text(rut);
+        $('#modal-nombre').text($('#nombre_funcionario').val());
+        $('#modal-apellido').text($('#apellido_funcionario').val());
+        $('#modal-horas-disponibles').text($('#horas_disponibles').val());
+
+        const tbody = $('#detalle-ordenes');
+        tbody.empty();
+
+        window.detalleOrdenesActivas.forEach(o => {
+            const fila = `
+                <tr>
+                    <td>${o.numero_orden}</td>
+                    <td>${o.colegio}</td>
+                    <td>${o.horas}</td>
+                    <td>${o.financiamiento}</td>
+                    <td>${o.fecha_inicio}</td>
+                    <td>${o.fecha_termino}</td>
+                </tr>
+            `;
+            tbody.append(fila);
+        });
+
+        $('#modalOrdenesActivas').modal('show');
+    });
+    // Habilita click en el mensaje "Revisa el detalle..."
+    $('#mensaje-horas').on('click', '#link-ver-detalle', function (e) {
+        e.preventDefault();
+        $('#ver-ordenes-activas-btn').trigger('click');
+    });
 
 });

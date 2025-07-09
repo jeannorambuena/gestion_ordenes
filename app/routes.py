@@ -1,4 +1,6 @@
 # 📌 Importaciones de Flask y Extensiones
+from babel.dates import format_date
+from datetime import datetime
 from flask import (
     Blueprint, render_template, request, redirect,
     url_for, flash, jsonify, abort, make_response
@@ -10,10 +12,10 @@ from weasyprint import HTML
 from app.extensions import db
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
-from sqlalchemy import text
+from sqlalchemy import text, or_, and_
 
 # 📌 Manejo de fechas y validaciones
-from datetime import datetime
+from datetime import datetime, date
 from wtforms import ValidationError
 
 # 📌 Validadores y funciones auxiliares
@@ -321,6 +323,7 @@ def nuevo_funcionario():
 def editar_funcionario(rut_cuerpo, rut_dv):
     funcionario = Funcionarios.query.filter_by(
         rut_cuerpo=rut_cuerpo, rut_dv=rut_dv).first_or_404()
+
     form = FuncionarioForm(obj=funcionario)
     form.id_cargo.choices = [(cargo.id, cargo.nombre_cargo)
                              for cargo in Cargo.query.all()]
@@ -331,6 +334,7 @@ def editar_funcionario(rut_cuerpo, rut_dv):
         funcionario.direccion = form.direccion.data
         funcionario.telefono = form.telefono.data
         funcionario.titulo = form.titulo.data
+        funcionario.email = form.email.data  # ✅ ESTA LÍNEA FALTABA
         funcionario.id_cargo = form.id_cargo.data
 
         try:
@@ -610,8 +614,14 @@ def imprimir_orden(id):
 def generar_pdf_orden(id):
     orden = OrdenesTrabajo.query.get_or_404(id)
     fecha_actual = datetime.now()
+    fecha_larga = format_date(
+        fecha_actual, "d 'de' MMMM 'de' y", locale='es_CL')
+
     html = render_template('ordenes_trabajo/pdf.html',
-                           orden=orden, fecha_actual=fecha_actual)
+                           orden=orden,
+                           fecha_actual=fecha_actual,
+                           fecha_larga=fecha_larga)
+
     pdf = HTML(string=html).write_pdf()
     response = make_response(pdf)
     response.headers['Content-Type'] = 'application/pdf'
@@ -625,44 +635,33 @@ def generar_pdf_orden(id):
 def nueva_orden():
     from datetime import datetime
 
+    # Inicializa el formulario con el año actual
     form = OrdenTrabajoForm(anio=datetime.now().year)
 
-    # Cargar opciones de selección
+    # Carga de listas desplegables
     form.colegio_rbd.choices = [(c.rbd, c.nombre_colegio)
                                 for c in Colegios.query.all()]
     form.tipo_contrato.choices = [(t.id, t.nombre)
                                   for t in TipoContrato.query.all()]
     form.financiamiento.choices = [
         (f.id, f.nombre_financiamiento) for f in Financiamiento.query.all()]
-    form.alcalde_id.choices = [
-        (a.id, f'{a.funcionario.nombre} {a.funcionario.apellido} ({a.cargo})')
-        for a in Alcaldia.query.all() if a.funcionario is not None
-    ]
-    form.jefatura_daem_id.choices = [
-        (j.id, f'{j.funcionario.nombre} {j.funcionario.apellido} ({j.cargo.nombre_cargo})')
-        for j in JefaturaDAEM.query.all() if j.funcionario and j.cargo
-    ]
 
-    # Calcular número de orden siguiente
+    # Buscar automáticamente el alcalde y la jefatura DAEM activa
+    alcalde_activo = Alcaldia.query.filter_by(es_activo=True).first()
+    jefatura_activa = JefaturaDAEM.query.filter_by(es_activo=True).first()
+
+    # Calcular el próximo número de orden
     ultimo = OrdenesTrabajo.query.order_by(OrdenesTrabajo.id.desc()).first()
     numero_orden = int(ultimo.numero_orden) + 1 if ultimo else 1
 
     if form.validate_on_submit():
-        print("✅ Formulario validado correctamente")
-
         rut_cuerpo = form.rut_cuerpo.data.strip()
         rut_dv = form.rut_dv.data.strip().upper()
-        print(
-            f"🔍 Buscando funcionario con rut_cuerpo={rut_cuerpo} y rut_dv={rut_dv}")
 
         funcionario = Funcionarios.query.filter_by(
-            rut_cuerpo=rut_cuerpo, rut_dv=rut_dv).first()
-
-        if funcionario:
-            print("✅ Funcionario encontrado:",
-                  funcionario.nombre, funcionario.apellido)
-        else:
-            print("❌ Funcionario NO encontrado")
+            rut_cuerpo=rut_cuerpo,
+            rut_dv=rut_dv
+        ).first()
 
         nueva_orden = OrdenesTrabajo(
             numero_orden=numero_orden,
@@ -677,17 +676,74 @@ def nueva_orden():
             financiamiento_id=form.financiamiento.data,
             rut_cuerpo=rut_cuerpo,
             rut_dv=rut_dv,
-            alcalde_id=form.alcalde_id.data,
-            jefatura_daem_id=form.jefatura_daem_id.data,
-            funcionario_id=funcionario.id if funcionario else None
+            funcionario_id=funcionario.id if funcionario else None,
+            alcalde_id=alcalde_activo.id if alcalde_activo else None,
+            jefatura_daem_id=jefatura_activa.id if jefatura_activa else None
         )
 
         db.session.add(nueva_orden)
         db.session.commit()
+
         flash('Orden de trabajo creada con éxito', 'success')
         return redirect(url_for('ordenes_bp.listar_ordenes'))
 
-    return render_template('ordenes_trabajo/nueva.html', form=form, numero_orden=numero_orden)
+    return render_template(
+        'ordenes_trabajo/nueva.html',
+        form=form,
+        numero_orden=numero_orden,
+        alcalde_activo=alcalde_activo,
+        jefatura_activa=jefatura_activa
+    )
+
+
+@ordenes_bp.route('/horas_disponibles/<rut_cuerpo>-<rut_dv>', methods=['GET'])
+@login_required
+def obtener_horas_disponibles(rut_cuerpo, rut_dv):
+    try:
+        hoy = date.today()
+        MAX_HORAS_SEMANALES = 44
+
+        # Buscar órdenes activas hoy (vigentes por fecha o indefinidas, pero ya iniciadas)
+        ordenes = OrdenesTrabajo.query.filter_by(rut_cuerpo=rut_cuerpo, rut_dv=rut_dv).filter(
+            and_(
+                OrdenesTrabajo.fecha_inicio <= hoy,
+                or_(
+                    OrdenesTrabajo.fecha_termino >= hoy,
+                    OrdenesTrabajo.es_indefinido == True
+                )
+            )
+        ).options(
+            joinedload(OrdenesTrabajo.colegio),
+            joinedload(OrdenesTrabajo.financiamiento)
+        ).all()
+
+        # Sumar las horas asignadas
+        total_horas_activas = sum(o.horas_disponibles or 0 for o in ordenes)
+        horas_disponibles = max(0, MAX_HORAS_SEMANALES - total_horas_activas)
+
+        # Preparar el detalle para mostrar en el modal
+        detalle = []
+        for orden in ordenes:
+            detalle.append({
+                "numero_orden": orden.numero_orden,
+                "colegio": orden.colegio.nombre_colegio if orden.colegio else "No asignado",
+                "financiamiento": orden.financiamiento.nombre_financiamiento if orden.financiamiento else "N/D",
+                "fecha_inicio": orden.fecha_inicio.strftime('%d-%m-%Y') if orden.fecha_inicio else "—",
+                "fecha_termino": orden.fecha_termino.strftime('%d-%m-%Y') if orden.fecha_termino else "—",
+                "horas": orden.horas_disponibles or 0,
+                "es_indefinido": orden.es_indefinido
+            })
+
+        return jsonify({
+            "horas_disponibles": horas_disponibles,
+            "detalle_ordenes": detalle
+        })
+
+    except Exception as e:
+        return jsonify({
+            "error": "Error al calcular horas disponibles.",
+            "detalle": str(e)
+        }), 500
 
 
 @ordenes_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
@@ -704,12 +760,17 @@ def editar_orden(id):
     form.financiamiento.choices = [
         (f.id, f.nombre_financiamiento) for f in Financiamiento.query.all()]
     form.alcalde_id.choices = [
-        (a.id, f'{a.nombre_alcalde} ({a.cargo})') for a in Alcaldia.query.all()]
+        (a.id, f'{a.funcionario.nombre} {a.funcionario.apellido} ({a.cargo.nombre_cargo})')
+        for a in Alcaldia.query.all()
+        if a.funcionario and a.cargo
+    ]
     form.jefatura_daem_id.choices = [
-        (j.id, f'{j.nombre} ({j.cargo_jefatura})') for j in JefaturaDAEM.query.all()]
+        (j.id, f'{j.funcionario.nombre} {j.funcionario.apellido} ({j.cargo.nombre_cargo})')
+        for j in JefaturaDAEM.query.all()
+        if j.funcionario and j.cargo
+    ]
 
     if form.validate_on_submit():
-        orden.numero_orden = form.numero_orden.data
         orden.anio = form.anio.data
         orden.fecha_inicio = form.fecha_inicio.data
         orden.fecha_termino = form.fecha_termino.data
@@ -741,8 +802,8 @@ def eliminar_orden(id):
     flash('Orden de trabajo eliminada con éxito', 'success')
     return redirect(url_for('ordenes_bp.listar_ordenes'))
 
-# ===================== RUTAS PARA JEFATURA DAEM =====================
 
+# ===================== RUTAS PARA JEFATURA DAEM =====================
 
 @jefatura_daem_bp.route('/')
 @login_required
@@ -769,8 +830,6 @@ def listar_jefaturas_daem():
 @roles_required('administrador')
 def nueva_jefatura_daem():
     form = JefaturaDAEMForm()
-    form.id_cargo.choices = [(c.id, c.nombre_cargo) for c in Cargo.query.order_by(
-        Cargo.nombre_cargo.asc()).all()]
 
     if form.validate_on_submit():
         try:
@@ -792,7 +851,8 @@ def nueva_jefatura_daem():
                 rut_dv=rut_dv,
                 id_cargo=form.id_cargo.data,
                 fecha_inicio=form.fecha_inicio.data,
-                fecha_termino=form.fecha_termino.data
+                fecha_termino=form.fecha_termino.data,
+                es_activo=form.es_activo.data  # ✅ Incluido
             )
 
             db.session.add(nueva_jefatura)
@@ -813,7 +873,6 @@ def nueva_jefatura_daem():
 def editar_jefatura_daem(id):
     jefatura = JefaturaDAEM.query.get_or_404(id)
 
-    # Obtener funcionario relacionado
     funcionario = Funcionarios.query.filter_by(
         rut_cuerpo=jefatura.rut_cuerpo,
         rut_dv=jefatura.rut_dv
@@ -832,20 +891,34 @@ def editar_jefatura_daem(id):
         fecha_termino=jefatura.fecha_termino
     )
 
-    form.id_cargo.choices = [(c.id, c.nombre_cargo)
-                             for c in Cargo.query.order_by(Cargo.nombre_cargo).all()]
     if request.method == 'GET':
         form.id_cargo.data = jefatura.id_cargo
+        form.es_activo.data = jefatura.es_activo
 
     if form.validate_on_submit():
         try:
             jefatura.fecha_inicio = form.fecha_inicio.data
             jefatura.fecha_termino = form.fecha_termino.data
             jefatura.id_cargo = form.id_cargo.data
-            db.session.commit()
 
+            # ⚙️ Control de activación
+            if form.es_activo.data:
+                if not jefatura.es_titular:
+                    titular = JefaturaDAEM.query.filter_by(
+                        es_titular=True,
+                        es_activo=True
+                    ).first()
+
+                    if titular and titular.id != jefatura.id:
+                        titular.es_activo = False
+                        titular.fecha_termino = datetime.now().date()
+
+            jefatura.es_activo = form.es_activo.data
+
+            db.session.commit()
             flash("✅ Jefatura DAEM actualizada con éxito.", "success")
             return redirect(url_for('jefatura_daem.listar_jefaturas_daem'))
+
         except Exception as e:
             db.session.rollback()
             flash(f"❌ Error al actualizar la jefatura: {str(e)}", "danger")
@@ -858,14 +931,18 @@ def editar_jefatura_daem(id):
     )
 
 
-@jefatura_daem_bp.route('/eliminar/<int:id>', methods=['POST'])
+@jefatura_daem_bp.route('/desactivar/<int:id>', methods=['POST'])
 @login_required
 @roles_required('administrador')
-def eliminar_jefatura_daem(id):
+def desactivar_jefatura_daem(id):
     jefatura = JefaturaDAEM.query.get_or_404(id)
-    db.session.delete(jefatura)
-    db.session.commit()
-    flash('Jefatura DAEM eliminada con éxito', 'success')
+    try:
+        jefatura.es_activo = False
+        db.session.commit()
+        flash('⚠️ Jefatura DAEM desactivada correctamente.', 'info')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'❌ Error al desactivar jefatura: {str(e)}', 'danger')
     return redirect(url_for('jefatura_daem.listar_jefaturas_daem'))
 
 # ===================== RUTAS PARA ALCALDÍA =====================
@@ -875,9 +952,12 @@ def eliminar_jefatura_daem(id):
 @login_required
 @roles_required('administrador')
 def listar_alcaldias():
-    alcaldias = Alcaldia.query.all()
+    alcaldias = Alcaldia.query.order_by(
+        Alcaldia.es_activo.desc(), Alcaldia.fecha_inicio.desc()).all()
     return render_template('alcaldia/list.html', alcaldias=alcaldias)
 
+
+# Extracto de routes.py para nueva alcaldía con validaciones robustas
 
 @alcaldia_bp.route('/nuevo', methods=['GET', 'POST'])
 @login_required
@@ -887,6 +967,9 @@ def nueva_alcaldia():
     form.id_cargo.choices = [(c.id, c.nombre_cargo) for c in Cargo.query.order_by(
         Cargo.nombre_cargo.asc()).all()]
 
+    # 🔎 Verificamos si ya hay un alcalde titular
+    existe_titular = Alcaldia.query.filter_by(es_titular=True).first()
+
     if form.validate_on_submit():
         try:
             rut_completo = form.rut_alcalde.data.strip()
@@ -895,12 +978,17 @@ def nueva_alcaldia():
                 return redirect(url_for("alcaldia.nueva_alcaldia"))
 
             rut_cuerpo, rut_dv = rut_completo.split("-")
-
             funcionario = Funcionarios.query.filter_by(
                 rut_cuerpo=rut_cuerpo, rut_dv=rut_dv).first()
             if not funcionario:
                 flash(
-                    "⚠️ El funcionario seleccionado no se encuentra en la base de datos.", "warning")
+                    "⚠️ El funcionario no se encuentra en la base de datos.", "warning")
+                return redirect(url_for("alcaldia.nueva_alcaldia"))
+
+            # 🚫 Si ya existe titular y se intenta marcar otro
+            if form.es_titular.data and existe_titular:
+                flash(
+                    "⚠️ Ya existe un alcalde titular registrado. Solo uno puede existir.", "warning")
                 return redirect(url_for("alcaldia.nueva_alcaldia"))
 
             nueva_alcaldia = Alcaldia(
@@ -910,7 +998,9 @@ def nueva_alcaldia():
                 telefono=funcionario.telefono,
                 fecha_inicio=form.fecha_inicio.data,
                 fecha_termino=form.fecha_termino.data,
-                id_cargo=form.id_cargo.data
+                id_cargo=form.id_cargo.data,
+                es_activo=form.es_activo.data,
+                es_titular=form.es_titular.data
             )
 
             db.session.add(nueva_alcaldia)
@@ -922,7 +1012,7 @@ def nueva_alcaldia():
             db.session.rollback()
             flash(f"❌ Error al guardar la alcaldía: {str(e)}", "danger")
 
-    return render_template("alcaldia/nuevo.html", form=form)
+    return render_template("alcaldia/nuevo.html", form=form, existe_titular=existe_titular)
 
 
 @alcaldia_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
@@ -942,7 +1032,9 @@ def editar_alcaldia(id):
         Cargo.nombre_cargo.asc()).all()]
 
     if request.method == 'GET':
-        form.id_cargo.data = alcaldia.id_cargo  # Solo en GET
+        form.id_cargo.data = alcaldia.id_cargo
+        form.es_activo.data = alcaldia.es_activo
+        form.es_titular.data = alcaldia.es_titular  # ✅ NUEVO
 
     if form.validate_on_submit():
         try:
@@ -960,22 +1052,11 @@ def editar_alcaldia(id):
             alcaldia.telefono = funcionario.telefono
             alcaldia.fecha_inicio = form.fecha_inicio.data
             alcaldia.fecha_termino = form.fecha_termino.data
-
-            # 🎯 Prints de depuración
-            print("📥 Valor recibido desde el formulario:", form.id_cargo.data)
-            print("📌 Valor actual en la base de datos ANTES del cambio:",
-                  alcaldia.id_cargo)
-
             alcaldia.id_cargo = form.id_cargo.data
-
-            print("✅ Valor en objeto alcaldia.id_cargo DESPUÉS de asignar:",
-                  alcaldia.id_cargo)
+            alcaldia.es_activo = form.es_activo.data
+            alcaldia.es_titular = form.es_titular.data  # ✅ NUEVO
 
             db.session.commit()
-
-            alcaldia_post_commit = Alcaldia.query.get(id)
-            print("💾 Valor en la base de datos DESPUÉS de commit:",
-                  alcaldia_post_commit.id_cargo)
 
             flash("✅ Alcaldía actualizada correctamente.", "success")
             return redirect(url_for("alcaldia.listar_alcaldias"))
@@ -984,25 +1065,25 @@ def editar_alcaldia(id):
             db.session.rollback()
             flash(f"❌ Error al actualizar la alcaldía: {str(e)}", "danger")
 
-    return render_template("alcaldia/editar.html", form=form, alcaldia=alcaldia)
+    return render_template("alcaldia/editar.html", form=form, alcaldia=alcaldia, funcionario=alcaldia.funcionario)
 
 
-@alcaldia_bp.route('/eliminar/<int:id>', methods=['POST'])
+@alcaldia_bp.route('/desactivar/<int:id>', methods=['POST'])
 @login_required
 @roles_required('administrador')
-def eliminar_alcaldia(id):
+def desactivar_alcaldia(id):
     alcaldia = Alcaldia.query.get_or_404(id)
     try:
-        db.session.delete(alcaldia)
+        alcaldia.es_activo = False  # 🔁 Desactivar en vez de eliminar
         db.session.commit()
-        flash('✅ Alcaldía eliminada con éxito', 'success')
+        flash('⚠️ Alcaldía desactivada. Ya no está activa como firmante.', 'info')
     except Exception as e:
         db.session.rollback()
-        flash(f'❌ Error al eliminar alcaldía: {str(e)}', 'danger')
+        flash(f'❌ Error al desactivar alcaldía: {str(e)}', 'danger')
     return redirect(url_for('alcaldia.listar_alcaldias'))
 
-
 # ===================== RUTAS PARA TIPO DE CONTRATO =====================
+
 
 @tipo_contrato_bp.route('/')
 @login_required

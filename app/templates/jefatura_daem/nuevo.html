@@ -30,16 +30,16 @@
         </button>
       </div>
       {% for error in form.rut_funcionario.errors %}
-        <div class="text-danger">{{ error }}</div>
+        <div class="text-danger small">{{ error }}</div>
       {% endfor %}
     </div>
 
-    <!-- Cargo a asignar desde form.id_cargo -->
+    <!-- Cargo -->
     <div class="mb-3">
       <label for="id_cargo" class="form-label">Cargo a Asignar</label>
       {{ form.id_cargo(class="form-select", id="id_cargo") }}
       {% for error in form.id_cargo.errors %}
-        <div class="text-danger">{{ error }}</div>
+        <div class="text-danger small">{{ error }}</div>
       {% endfor %}
     </div>
 
@@ -48,7 +48,7 @@
       <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
       {{ form.fecha_inicio(class="form-control", id="fecha_inicio") }}
       {% for error in form.fecha_inicio.errors %}
-        <div class="text-danger">{{ error }}</div>
+        <div class="text-danger small">{{ error }}</div>
       {% endfor %}
     </div>
 
@@ -57,7 +57,18 @@
       <label for="fecha_termino" class="form-label">Fecha de Término</label>
       {{ form.fecha_termino(class="form-control", id="fecha_termino") }}
       {% for error in form.fecha_termino.errors %}
-        <div class="text-danger">{{ error }}</div>
+        <div class="text-danger small">{{ error }}</div>
+      {% endfor %}
+    </div>
+
+    <!-- ¿Es el jefe DAEM en funciones? -->
+    <div class="form-check mb-4">
+      {{ form.es_activo(class="form-check-input", id="es_activo") }}
+      <label class="form-check-label" for="es_activo">
+        ¿Está actualmente en funciones?
+      </label>
+      {% for error in form.es_activo.errors %}
+        <div class="text-danger small">{{ error }}</div>
       {% endfor %}
     </div>
 
@@ -74,14 +85,11 @@
 
 <!-- Scripts -->
 <script>
-  // ✅ Esta función debe estar en el scope global, NO dentro de DOMContentLoaded
   window.seleccionarFuncionarioParaJefaturaDaem = function (data) {
     const campoNombre = document.getElementById("nombre_funcionario");
     const campoRut = document.getElementById("rut_funcionario");
-
     if (campoNombre) campoNombre.value = `${data.nombre} ${data.apellido}`;
     if (campoRut) campoRut.value = data.rut;
-
     console.log("✅ Funcionario traspasado al formulario Jefatura DAEM");
   };
 
@@ -103,5 +111,4 @@
     }
   });
 </script>
-
 {% endblock %}

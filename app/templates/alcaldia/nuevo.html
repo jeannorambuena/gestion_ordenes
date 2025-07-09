@@ -3,95 +3,131 @@
 {% block title %}Nueva Alcaldía{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2 class="text-center mb-4">Asignar Nueva Alcaldía</h2>
-
-  <form method="POST" action="{{ url_for('alcaldia.nueva_alcaldia') }}"
-        class="mx-auto p-4 shadow rounded bg-light"
-        style="max-width: 600px;">
-    {{ form.hidden_tag() }}
-
-    <!-- Funcionario seleccionado desde modal -->
-    <div class="mb-3">
-      <label for="nombre_alcalde" class="form-label">Funcionario</label>
-      <div class="input-group">
-        {{ form.nombre_alcalde(class="form-control", id="nombre_alcalde", placeholder="Haz clic aquí o en la lupa para buscar un funcionario", readonly=true, required=true) }}
-        {{ form.rut_alcalde(id="rut_alcalde", type="hidden") }}
-        <button type="button"
-                id="buscar-funcionario-btn"
-                class="btn btn-outline-primary"
-                data-target-context="alcaldia"
-                title="Buscar funcionario por RUT, nombre o apellido">
-          <i class="fas fa-search"></i>
-        </button>
+  <div class="container mt-4 d-flex justify-content-center">
+  <div class="card shadow-lg border-0 rounded" style="max-width: 500px; width: 100%;">
+  <div class="card shadow-lg border-0 rounded">
+    <!-- Cabecera institucional -->
+    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #2F4858;">
+      <div class="d-flex align-items-center gap-3">
+        <i class="fas fa-city text-white fa-lg"></i>
+        <h3 class="text-white mb-0">Asignar Nueva Alcaldía</h3>
       </div>
-      {% for error in form.nombre_alcalde.errors %}
-        <div class="text-danger">{{ error }}</div>
-      {% endfor %}
+      <a href="{{ url_for('alcaldia.listar_alcaldias') }}" class="btn btn-light btn-sm">
+        <i class="fas fa-arrow-left me-1"></i> Volver
+      </a>
     </div>
 
-    <!-- Cargo a asignar desde form.id_cargo -->
-    <div class="mb-3">
-      <label for="id_cargo" class="form-label">Cargo a Asignar</label>
-      {{ form.id_cargo(class="form-select", id="id_cargo") }}
-      {% for error in form.id_cargo.errors %}
-        <div class="text-danger">{{ error }}</div>
-      {% endfor %}
-    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('alcaldia.nueva_alcaldia') }}">
+        {{ form.hidden_tag() }}
 
-    <!-- Fecha de Inicio -->
-    <div class="mb-3">
-      <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
-      {{ form.fecha_inicio(class="form-control", id="fecha_inicio") }}
-      {% for error in form.fecha_inicio.errors %}
-        <div class="text-danger">{{ error }}</div>
-      {% endfor %}
-    </div>
+        <!-- Funcionario -->
+        <div class="mb-3">
+          <label for="nombre_alcalde" class="form-label">Funcionario</label>
+          <div class="input-group">
+            {{ form.nombre_alcalde(class="form-control", id="nombre_alcalde", placeholder="Haz clic aquí o en la lupa para buscar", readonly=true, required=true) }}
+            {{ form.rut_alcalde(id="rut_alcalde", type="hidden") }}
+            <button type="button" id="buscar-funcionario-btn" class="btn btn-outline-primary" data-target-context="alcaldia" title="Buscar funcionario">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+          {% for error in form.nombre_alcalde.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
 
-    <!-- Fecha de Término -->
-    <div class="mb-3">
-      <label for="fecha_termino" class="form-label">Fecha de Término</label>
-      {{ form.fecha_termino(class="form-control", id="fecha_termino") }}
-      {% for error in form.fecha_termino.errors %}
-        <div class="text-danger">{{ error }}</div>
-      {% endfor %}
-    </div>
+        <!-- Cargo -->
+        <div class="mb-3">
+          <label for="id_cargo" class="form-label">Cargo a Asignar</label>
+          {{ form.id_cargo(class="form-select", id="id_cargo") }}
+          {% for error in form.id_cargo.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
 
-    <!-- Botones -->
-    <div class="d-flex justify-content-between">
-      <button type="submit" class="btn btn-success">Guardar</button>
-      <a href="{{ url_for('alcaldia.listar_alcaldias') }}" class="btn btn-secondary">Cancelar</a>
+        <!-- Fecha Inicio -->
+        <div class="mb-3">
+          <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+          {{ form.fecha_inicio(class="form-control", id="fecha_inicio") }}
+          {% for error in form.fecha_inicio.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <!-- Fecha Término -->
+        <div class="mb-3">
+          <label for="fecha_termino" class="form-label">Fecha de Término</label>
+          {{ form.fecha_termino(class="form-control", id="fecha_termino") }}
+          {% for error in form.fecha_termino.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <!-- Titular -->
+        <div class="form-check mb-2" style="text-align: left;">
+          {{ form.es_titular(class="form-check-input form-check-input-lg", id="es_titular", disabled=ya_hay_titular) }}
+          <label class="form-check-label fw-bold" for="es_titular">
+            ¿Es el alcalde titular?
+          </label>
+          <div class="text-muted small" style="text-align: left;">
+            {% if ya_hay_titular %}
+              Ya existe un alcalde titular registrado. Este campo está deshabilitado.
+            {% else %}
+              Solo debe marcarse si el funcionario ocupará el cargo de forma oficial y permanente. Solo un alcalde titular puede estar activo a la vez.
+            {% endif %}
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- Activo -->
+        <div class="form-check mb-4" style="text-align: left;">
+          {{ form.es_activo(class="form-check-input form-check-input-lg", id="es_activo") }}
+          <label class="form-check-label fw-bold" for="es_activo">
+            ¿Está actualmente en funciones?
+          </label>
+          <div class="text-muted small" style="text-align: left;">
+            Indica si el funcionario está ejerciendo el cargo actualmente. Si no está activo, la alcaldía permanecerá registrada pero no será considerada vigente.
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-center gap-3">
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-check me-1"></i> Guardar
+          </button>
+          <a href="{{ url_for('alcaldia.listar_alcaldias') }}" class="btn btn-danger">
+            <i class="fas fa-times me-1"></i> Cancelar
+          </a>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>
 
-<!-- Modal de búsqueda reutilizable -->
+<!-- Modal búsqueda -->
 {% include 'componentes/modal_busqueda_funcionario.html' %}
 
-<!-- Script para búsqueda -->
+<!-- Script -->
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const boton = document.getElementById("buscar-funcionario-btn");
+  document.addEventListener("DOMContentLoaded", function () {
+    const boton = document.getElementById("buscar-funcionario-btn");
+    if (boton) {
+      boton.dataset.targetContext = "alcaldia";
+      boton.addEventListener("click", () => {
+        $('#modalBuscarFuncionario').modal('show');
+      });
+    }
 
-  if (boton) {
-    boton.dataset.targetContext = "alcaldia";
-    boton.addEventListener("click", function () {
-      $('#modalBuscarFuncionario').modal('show');
-    });
-  }
+    const campoFuncionario = document.getElementById("nombre_alcalde");
+    if (campoFuncionario && boton) {
+      campoFuncionario.addEventListener("click", () => boton.click());
+    }
 
-  const campoFuncionario = document.getElementById("nombre_alcalde");
-  if (campoFuncionario && boton) {
-    campoFuncionario.addEventListener("click", function () {
-      boton.click(); // Simula el click en el botón
-    });
-  }
-
-  // Función invocada desde scripts.js cuando se selecciona un funcionario
-  window.seleccionarFuncionarioParaAlcaldia = function (data) {
-    document.getElementById("nombre_alcalde").value = `${data.nombre} ${data.apellido}`;
-    document.getElementById("rut_alcalde").value = data.rut;
-  };
-});
+    window.seleccionarFuncionarioParaAlcaldia = function (data) {
+      document.getElementById("nombre_alcalde").value = `${data.nombre} ${data.apellido}`;
+      document.getElementById("rut_alcalde").value = data.rut;
+    };
+  });
 </script>
 {% endblock %}

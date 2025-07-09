@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 03-07-2025 a las 19:38:36
+-- Tiempo de generación: 01-07-2025 a las 05:40:39
 -- Versión del servidor: 8.3.0
 -- Versión de PHP: 8.2.18
 
@@ -37,20 +37,16 @@ CREATE TABLE IF NOT EXISTS `alcaldia` (
   `email` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `telefono` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `id_cargo` int DEFAULT NULL,
-  `es_activo` tinyint(1) NOT NULL DEFAULT '0',
-  `es_titular` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_rut_alcaldia` (`rut_cuerpo`,`rut_dv`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `alcaldia`
 --
 
-INSERT INTO `alcaldia` (`id`, `rut_cuerpo`, `rut_dv`, `fecha_inicio`, `fecha_termino`, `email`, `telefono`, `id_cargo`, `es_activo`, `es_titular`) VALUES
-(5, '7309224', '8', '2025-06-02', '2025-06-30', NULL, '999999999', 9, 0, 0),
-(6, '14326078', 'k', '2025-07-03', '2025-07-03', NULL, '997718963', 8, 1, 1),
-(7, '7309224', '8', '2025-07-04', '2025-07-04', NULL, '999999999', 8, 0, 0);
+INSERT INTO `alcaldia` (`id`, `rut_cuerpo`, `rut_dv`, `fecha_inicio`, `fecha_termino`, `email`, `telefono`, `id_cargo`) VALUES
+(5, '7309224', '8', '2025-06-02', '2025-06-30', NULL, '999999999', 9);
 
 -- --------------------------------------------------------
 
@@ -74,6 +70,7 @@ INSERT INTO `cargos` (`id`, `nombre_cargo`, `descripcion`) VALUES
 (1, 'Profesor', 'Encargado de impartir clases a los estudiante'),
 (5, 'Asistente de Aula', 'Asistente de Aula '),
 (6, 'Director', 'Director de Comalle'),
+(7, 'Fonoaudiólogo', 'Profesional de la Salud'),
 (8, 'Alcalde', 'Máxima autoridad comunal'),
 (9, 'Alcaldesa', 'Máxima autoridad comunal'),
 (10, 'Alcalde(S)', 'Alcalde subrogante'),
@@ -249,22 +246,22 @@ INSERT INTO `funcionarios_bkp` (`nombre`, `apellido`, `direccion`, `telefono`, `
 DROP TABLE IF EXISTS `funcionarios_colegios`;
 CREATE TABLE IF NOT EXISTS `funcionarios_colegios` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `funcionario_id` int DEFAULT NULL,
+  `funcionario_id` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL,
   `colegio_rbd` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `horas_disponibles` int NOT NULL,
   `orden_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `fk_fc_funcionario` (`funcionario_id`),
-  KEY `fk_fc_colegio` (`colegio_rbd`),
-  KEY `fk_fc_orden` (`orden_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `funcionario_id` (`funcionario_id`),
+  KEY `colegio_id` (`colegio_rbd`),
+  KEY `orden_id` (`orden_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `funcionarios_colegios`
 --
 
 INSERT INTO `funcionarios_colegios` (`id`, `funcionario_id`, `colegio_rbd`, `horas_disponibles`, `orden_id`) VALUES
-(8, 4, '2816-9', 15, NULL);
+(7, '15130287', '2816-9', 15, NULL);
 
 -- --------------------------------------------------------
 
@@ -274,7 +271,7 @@ INSERT INTO `funcionarios_colegios` (`id`, `funcionario_id`, `colegio_rbd`, `hor
 
 DROP TABLE IF EXISTS `funcionario_financiamiento`;
 CREATE TABLE IF NOT EXISTS `funcionario_financiamiento` (
-  `funcionario_id` int NOT NULL,
+  `funcionario_id` varchar(12) COLLATE utf8mb4_unicode_ci NOT NULL,
   `financiamiento_id` int NOT NULL,
   PRIMARY KEY (`funcionario_id`,`financiamiento_id`),
   KEY `financiamiento_id` (`financiamiento_id`)
@@ -361,20 +358,17 @@ CREATE TABLE IF NOT EXISTS `jefatura_daem` (
   `id_cargo` int NOT NULL,
   `fecha_inicio` date NOT NULL,
   `fecha_termino` date DEFAULT NULL,
-  `es_activo` tinyint(1) NOT NULL DEFAULT '0',
-  `es_titular` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_rut_daem` (`rut_cuerpo`,`rut_dv`),
   KEY `fk_jefatura_cargo` (`id_cargo`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `jefatura_daem`
 --
 
-INSERT INTO `jefatura_daem` (`id`, `rut_cuerpo`, `rut_dv`, `id_cargo`, `fecha_inicio`, `fecha_termino`, `es_activo`, `es_titular`) VALUES
-(2, '14326078', 'k', 16, '2025-06-01', '2025-06-30', 0, 0),
-(3, '15130287', '4', 18, '2025-07-03', '2025-07-03', 1, 0);
+INSERT INTO `jefatura_daem` (`id`, `rut_cuerpo`, `rut_dv`, `id_cargo`, `fecha_inicio`, `fecha_termino`) VALUES
+(2, '14326078', 'k', 16, '2025-06-01', '2025-06-30');
 
 -- --------------------------------------------------------
 
@@ -406,20 +400,23 @@ CREATE TABLE IF NOT EXISTS `ordenes_trabajo` (
   `funcionario_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `numero_orden` (`numero_orden`),
-  KEY `fk_orden_funcionario` (`funcionario_id`),
-  KEY `fk_orden_alcalde` (`alcalde_id`),
-  KEY `fk_orden_jefatura` (`jefatura_daem_id`),
+  KEY `colegio_rbd` (`colegio_rbd`),
   KEY `fk_financiamiento` (`financiamiento_id`),
   KEY `fk_tipo_contrato` (`tipo_contrato_id`),
-  KEY `fk_colegio` (`colegio_rbd`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `fk_orden_alcalde` (`alcalde_id`),
+  KEY `fk_orden_jefatura` (`jefatura_daem_id`),
+  KEY `fk_orden_funcionario` (`funcionario_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `ordenes_trabajo`
 --
 
 INSERT INTO `ordenes_trabajo` (`id`, `fecha_inicio`, `fecha_termino`, `es_indefinido`, `colegio_rbd`, `observaciones`, `reemplazo_a`, `motivo_reemplazo`, `rut_cuerpo`, `rut_dv`, `financiamiento_id`, `fecha_creacion`, `fecha_modificacion`, `numero_orden`, `tipo_contrato_id`, `horas_disponibles`, `anio`, `alcalde_id`, `jefatura_daem_id`, `funcionario_id`) VALUES
-(1, '2025-07-03', '2025-07-31', 0, '0504-4', 'Nada', NULL, NULL, '7309224', '8', 6, '2025-07-03 15:13:41', NULL, '1', 5, 44, 2025, 7, 3, 4);
+(68, '2025-06-02', '2025-06-27', 0, '2795-2', 'No existen observaciones', NULL, NULL, '7309224', '8', 3, '2025-05-25 15:56:27', '2025-06-21 15:04:22', '1', 4, 10, 2025, 0, 0, NULL),
+(69, '2025-06-01', '2025-06-30', 0, '2795-2', '', NULL, NULL, '7309224', '8', 2, '2025-06-30 21:19:31', NULL, '2', 4, 22, 2025, 5, 2, 4),
+(70, '2025-06-01', '2025-07-31', 0, '2820-7', 'no', NULL, NULL, '7309224', '8', 6, '2025-07-01 01:22:31', NULL, '3', 5, 10, 2025, 5, 2, 4),
+(71, '2025-07-01', '2025-07-31', 0, '2809-6', '', NULL, NULL, '7309224', '8', 6, '2025-07-01 01:23:27', NULL, '4', 5, 44, 2025, 5, 2, 4);
 
 -- --------------------------------------------------------
 
@@ -558,29 +555,10 @@ CREATE TABLE IF NOT EXISTS `usuario_permisos` (
 --
 
 --
--- Filtros para la tabla `funcionarios_colegios`
---
-ALTER TABLE `funcionarios_colegios`
-  ADD CONSTRAINT `fk_fc_colegio` FOREIGN KEY (`colegio_rbd`) REFERENCES `colegios` (`rbd`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_fc_funcionario` FOREIGN KEY (`funcionario_id`) REFERENCES `funcionarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_fc_orden` FOREIGN KEY (`orden_id`) REFERENCES `ordenes_trabajo` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
---
 -- Filtros para la tabla `jefatura_daem`
 --
 ALTER TABLE `jefatura_daem`
   ADD CONSTRAINT `fk_jefatura_cargo` FOREIGN KEY (`id_cargo`) REFERENCES `cargos` (`id`) ON DELETE CASCADE;
-
---
--- Filtros para la tabla `ordenes_trabajo`
---
-ALTER TABLE `ordenes_trabajo`
-  ADD CONSTRAINT `fk_colegio` FOREIGN KEY (`colegio_rbd`) REFERENCES `colegios` (`rbd`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_financiamiento` FOREIGN KEY (`financiamiento_id`) REFERENCES `financiamiento` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_orden_alcalde` FOREIGN KEY (`alcalde_id`) REFERENCES `alcaldia` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_orden_funcionario` FOREIGN KEY (`funcionario_id`) REFERENCES `funcionarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_orden_jefatura` FOREIGN KEY (`jefatura_daem_id`) REFERENCES `jefatura_daem` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_tipo_contrato` FOREIGN KEY (`tipo_contrato_id`) REFERENCES `tipo_contrato` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

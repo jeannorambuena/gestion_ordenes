@@ -3,44 +3,100 @@
 {% block title %}Lista de Cargos{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center mb-4">Lista de Cargos</h2>
-    
-    <!-- Botón para agregar un nuevo cargo -->
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{{ url_for('cargo.nuevo_cargo') }}" class="btn btn-success">Agregar Nuevo Cargo</a>
-    </div>
+<div class="container mt-4" style="max-width: 960px;">
+  <div class="card shadow-lg border-0 rounded mx-auto" style="background-color: #33658A;">
+    <div class="card-body px-3 py-4">
+      <!-- Cabecera del módulo con ícono -->
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <i class="fas fa-briefcase fa-lg text-white"></i>
+          <h2 class="text-white mb-0 fs-4">Lista de Cargos</h2>
+        </div>
+        <a href="{{ url_for('cargo.nuevo_cargo') }}" class="btn btn-light btn-sm shadow-sm">
+          <i class="fas fa-plus me-1"></i> Nuevo Cargo
+        </a>
+      </div>
 
-    <!-- Tabla estilizada -->
-    <div class="table-responsive shadow-lg p-3 mb-5 bg-white rounded">
-        <table class="table table-bordered table-hover">
-            <thead class="bg-primary text-white">
-                <tr class="text-center">
-                    <th>ID</th>
-                    <th>Nombre del Cargo</th>
-                    <th>Descripción</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cargo in cargos %}
-                <tr>
-                    <td class="text-center">{{ cargo.id }}</td>
-                    <td>{{ cargo.nombre_cargo }}</td>
-                    <td>{{ cargo.descripcion }}</td>
-                    <td class="d-flex justify-content-center">
-                        <!-- Botón de editar -->
-                        <a href="{{ url_for('cargo.editar_cargo', id=cargo.id) }}" class="btn btn-warning btn-sm me-2">Editar</a>
-                        
-                        <!-- Formulario para eliminar con confirmación -->
-                        <form action="{{ url_for('cargo.eliminar_cargo', id=cargo.id) }}" method="POST">
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este cargo?')">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
+      {% if cargos %}
+      <div class="table-responsive rounded shadow-sm overflow-x-auto">
+        <table class="table table-bordered table-hover align-middle mb-0">
+          <thead style="background-color: #33658A;" class="text-white text-center">
+            <tr>
+              <th style="min-width: 60px;">ID</th>
+              <th style="min-width: 160px;">Nombre del Cargo</th>
+              <th style="min-width: 220px;">Descripción</th>
+              <th style="min-width: 100px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cargo in cargos %}
+            <tr>
+              <td class="text-center">{{ cargo.id }}</td>
+              <td>{{ cargo.nombre_cargo }}</td>
+              <td>{{ cargo.descripcion }}</td>
+              <td class="d-flex justify-content-center gap-2">
+                <a href="{{ url_for('cargo.editar_cargo', id=cargo.id) }}" class="btn btn-warning btn-sm">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <button type="button"
+                        class="btn btn-danger btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalConfirmarEliminacion"
+                        data-nombre="{{ cargo.nombre_cargo }}"
+                        data-url="{{ url_for('cargo.eliminar_cargo', id=cargo.id) }}">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
         </table>
+      </div>
+      {% else %}
+      <div class="alert alert-light text-center text-dark mt-3" role="alert">
+        No hay cargos registrados.
+      </div>
+      {% endif %}
     </div>
+  </div>
 </div>
+
+<!-- Modal Confirmar Eliminación -->
+<div class="modal fade" id="modalConfirmarEliminacion" tabindex="-1" aria-labelledby="modalConfirmarEliminacionLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form method="POST" id="formEliminarCargo">
+        <div class="modal-header" style="background-color: #33658A;">
+          <h5 class="modal-title text-white fw-bold mb-0" id="modalConfirmarEliminacionLabel">
+            Confirmar Eliminación
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          ¿Estás seguro que deseas eliminar el cargo <strong id="nombreCargoEliminar"></strong>?<br>
+          <small class="text-muted">Esta acción no se puede deshacer.</small>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="submit" class="btn btn-danger">Eliminar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const modalEliminar = document.getElementById('modalConfirmarEliminacion');
+  modalEliminar.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const nombre = button.getAttribute('data-nombre');
+    const url = button.getAttribute('data-url');
+
+    const modalBody = modalEliminar.querySelector('#nombreCargoEliminar');
+    const form = modalEliminar.querySelector('#formEliminarCargo');
+
+    modalBody.textContent = nombre;
+    form.action = url;
+  });
+</script>
 {% endblock %}

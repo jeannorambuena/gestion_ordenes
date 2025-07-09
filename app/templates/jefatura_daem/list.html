@@ -8,7 +8,9 @@
 
   <!-- Botón para agregar nueva jefatura -->
   <div class="d-flex justify-content-end mb-3">
-    <a href="{{ url_for('jefatura_daem.nueva_jefatura_daem') }}" class="btn btn-success">Agregar Nueva Jefatura</a>
+    <a href="{{ url_for('jefatura_daem.nueva_jefatura_daem') }}" class="btn btn-success">
+      <i class="fas fa-plus-circle me-1"></i> Nueva Jefatura
+    </a>
   </div>
 
   {% if datos %}
@@ -22,6 +24,7 @@
           <th>Fecha de Inicio</th>
           <th>Fecha de Término</th>
           <th>Email</th>
+          <th>Activo</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -33,18 +36,36 @@
           <td>{{ item.jefatura.cargo.nombre_cargo }}</td>
           <td class="text-center">{{ item.jefatura.fecha_inicio.strftime('%d-%m-%Y') }}</td>
           <td class="text-center">
-            {% if item.jefatura.fecha_termino %}
-              {{ item.jefatura.fecha_termino.strftime('%d-%m-%Y') }}
-            {% else %}
-              N/A
-            {% endif %}
+            {{ item.jefatura.fecha_termino.strftime('%d-%m-%Y') if item.jefatura.fecha_termino else '—' }}
           </td>
           <td>{{ item.funcionario.email or 'Sin correo' }}</td>
           <td class="text-center">
-            <a href="{{ url_for('jefatura_daem.editar_jefatura_daem', id=item.jefatura.id) }}" class="btn btn-warning btn-sm me-2">Editar</a>
-            <form action="{{ url_for('jefatura_daem.eliminar_jefatura_daem', id=item.jefatura.id) }}" method="POST" style="display:inline-block;">
-              <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta jefatura?')">Eliminar</button>
-            </form>
+            {% if item.jefatura.es_activo %}
+              <span class="text-success fw-bold">✔️</span>
+            {% else %}
+              <span class="text-muted">—</span>
+            {% endif %}
+          </td>
+          <td class="text-center">
+            <div class="d-flex justify-content-center gap-2">
+              <a href="{{ url_for('jefatura_daem.editar_jefatura_daem', id=item.jefatura.id) }}"
+                 class="btn btn-warning btn-sm">
+                <i class="fas fa-edit"></i> Editar
+              </a>
+
+              {% if item.jefatura.es_activo %}
+              <form action="{{ url_for('jefatura_daem.desactivar_jefatura_daem', id=item.jefatura.id) }}"
+                    method="POST" class="d-inline">
+                <button type="submit"
+                        class="btn btn-outline-danger btn-sm"
+                        onclick="return confirm('¿Deseas desactivar esta jefatura?')">
+                  <i class="fas fa-user-slash"></i> Desactivar
+                </button>
+              </form>
+              {% else %}
+              <span class="badge bg-secondary align-self-center">Inactiva</span>
+              {% endif %}
+            </div>
           </td>
         </tr>
         {% endfor %}

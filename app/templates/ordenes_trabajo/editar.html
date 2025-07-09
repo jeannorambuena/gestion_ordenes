@@ -3,70 +3,105 @@
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
-        <div class="col-md-8">
+        <div class="col-12 col-sm-10 col-md-8 col-lg-7 col-xl-6">
             <div class="card shadow-lg border-0 rounded-lg">
-                <div class="card-header text-center">
-                    <h3 class="font-weight-light my-4">Editar Orden de Trabajo</h3>
+                <!-- Cabecera -->
+                <div class="card-header text-white text-center" style="background-color: #F6AE2D;">
+                    <h3 class="font-weight-light my-3">
+                        <i class="fas fa-edit me-2"></i>Editar Orden de Trabajo
+                    </h3>
                 </div>
                 <div class="card-body">
                     <form method="POST">
                         {{ form.hidden_tag() }}
 
-                        <!-- Campo Número de Orden (Solo lectura) -->
-                        <div class="form-group">
-                            <label for="numero_orden">Número de Orden</label>
-                            <input type="text" class="form-control" id="numero_orden" 
-                                   value="{{ orden.numero_orden }}" readonly>
+                        <!-- Número de Orden -->
+                        <div class="form-group mb-4">
+                            <label class="form-label fw-bold text-muted d-block text-center">Nº Orden</label>
+                            <input type="text" id="numero_orden" class="form-control text-center fs-4 fw-bold border-2 border-warning" value="{{ orden.numero_orden }}" readonly>
                         </div>
 
-                        <!-- Selección de Colegio -->
-                        <div class="form-group">
-                            <label for="colegio_rbd">Colegio</label>
-                            {{ form.colegio_rbd(class="form-control") }}
+                        <!-- RUT y Nombre -->
+                        <div class="form-group mb-4">
+                            <label class="form-label fw-bold">Funcionario</label>
+                            <div class="border rounded p-3 bg-light">
+                                <div class="mb-2">
+                                    <strong>RUT:</strong> {{ orden.rut_cuerpo }}-{{ orden.rut_dv }}
+                                </div>
+                                <div>
+                                    <strong>Nombre:</strong> {{ orden.funcionario.nombre }} {{ orden.funcionario.apellido }}
+                                </div>
+                            </div>
                         </div>
 
-                        <!-- Selección de Tipo de Contrato -->
-                        <div class="form-group">
-                            <label for="tipo_contrato">Tipo de Contrato</label>
-                            {{ form.tipo_contrato(class="form-control") }}
+                        <!-- Colegio -->
+                        <div class="form-group mb-4">
+                            <label for="colegio_rbd" class="form-label">Colegio</label>
+                            {{ form.colegio_rbd(class="form-select rounded", id="colegio_rbd") }}
                         </div>
 
-                        <!-- Fechas de Inicio y Término -->
-                        <div class="form-group">
-                            <label for="fecha_inicio">Fecha de Inicio</label>
-                            {{ form.fecha_inicio(class="form-control", 
-                                value=form.fecha_inicio.data.strftime('%Y-%m-%d') if form.fecha_inicio.data else '', 
-                                placeholder="dd-mm-yyyy") }}
+                        <!-- Tipo de Contrato -->
+                        <div class="form-group mb-4">
+                            <label for="tipo_contrato" class="form-label">Tipo de Contrato</label>
+                            {{ form.tipo_contrato(class="form-select rounded", id="tipo_contrato") }}
                         </div>
 
-                        <div class="form-group">
-                            <label for="fecha_termino">Fecha de Término</label>
-                            {{ form.fecha_termino(class="form-control", 
-                                value=form.fecha_termino.data.strftime('%Y-%m-%d') if form.fecha_termino.data else '', 
-                                placeholder="dd-mm-yyyy") }}
+                        <!-- Financiamiento -->
+                        <div class="form-group mb-4">
+                            <label for="financiamiento_id" class="form-label">Financiamiento</label>
+                            {{ form.financiamiento(class="form-select rounded", id="financiamiento_id") }}
                         </div>
 
-                        <!-- Contrato Indefinido -->
-                        <div class="form-group form-check">
-                            {{ form.es_indefinido(class="form-check-input") }}
-                            <label class="form-check-label" for="es_indefinido">Es Indefinido</label>
-                        </div>
-
-                        <!-- Observaciones -->
-                        <div class="form-group">
-                            <label for="observaciones">Observaciones</label>
-                            {{ form.observaciones(class="form-control", rows=3) }}
+                        <!-- Fechas y Contrato -->
+                        <div class="form-group mb-4">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-6">
+                                    <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                                    {{ form.fecha_inicio(class="form-control rounded", id="fecha_inicio") }}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="fecha_termino" class="form-label">Fecha de Término</label>
+                                    {{ form.fecha_termino(class="form-control rounded", id="fecha_termino") }}
+                                </div>
+                            </div>
+                            <div class="form-check d-flex align-items-center gap-2 mt-3">
+                                {{ form.es_indefinido(class="form-check-input", id="es_indefinido") }}
+                                <label for="es_indefinido" class="form-check-label mb-0">Contrato indefinido</label>
+                            </div>
                         </div>
 
                         <!-- Horas Disponibles -->
-                        <div class="form-group">
-                            <label for="horas_disponibles">Horas Disponibles</label>
-                            {{ form.horas_disponibles(class="form-control") }}
+                        <div class="form-group mb-4">
+                            <label for="horas_disponibles" class="form-label">Horas Disponibles</label>
+                            {{ form.horas_disponibles(class="form-control rounded", id="horas_disponibles") }}
+                        </div>
+
+                        <!-- Autoridades Firmantes -->
+                        <div class="form-group mb-4">
+                            <label class="form-label fw-semibold text-muted">Autoridades Firmantes</label>
+                            <div class="border rounded p-3 bg-light">
+                                <div class="mb-3">
+                                    <label for="alcalde_id" class="form-label">Alcalde o Alcaldesa</label>
+                                    {{ form.alcalde_id(class="form-select rounded", id="alcalde_id") }}
+                                </div>
+                                <div>
+                                    <label for="jefatura_daem_id" class="form-label">Jefe(a) DAEM</label>
+                                    {{ form.jefatura_daem_id(class="form-select rounded", id="jefatura_daem_id") }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Observaciones -->
+                        <div class="form-group mb-4">
+                            <label for="observaciones" class="form-label">Observaciones</label>
+                            {{ form.observaciones(class="form-control rounded", id="observaciones", rows=3) }}
                         </div>
 
                         <!-- Botón Guardar Cambios -->
                         <div class="form-group mt-4">
-                            <button type="submit" class="btn btn-primary btn-block">Guardar Cambios</button>
+                            <button type="submit" class="btn w-100 shadow text-white fw-semibold" style="background-color: #F6AE2D; border: none;">
+                                Guardar Cambios
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -75,4 +110,3 @@
     </div>
 </div>
 {% endblock %}
-

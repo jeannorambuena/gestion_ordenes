@@ -17,16 +17,34 @@ class Alcaldia(db.Model):
     __tablename__ = 'alcaldia'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    # Identificación del funcionario
     rut_cuerpo = db.Column(db.String(8), db.ForeignKey(
         'funcionarios.rut_cuerpo'), nullable=False)
     rut_dv = db.Column(db.String(1), nullable=False)
+
+    # Datos de contacto heredados del funcionario
     email = db.Column(db.String(100), nullable=True)
     telefono = db.Column(db.String(20), nullable=True)
+
+    # Fechas de vigencia
     fecha_inicio = db.Column(db.Date, nullable=False)
     fecha_termino = db.Column(db.Date, nullable=True)
 
+    # Futuro soporte para medias jornadas
+    # hora_inicio = db.Column(db.Time, nullable=True)
+    # hora_termino = db.Column(db.Time, nullable=True)
+
+    # Cargo
     id_cargo = db.Column(db.Integer, db.ForeignKey('cargos.id'), nullable=True)
 
+    # Estado activo para control de UI
+    es_activo = db.Column(db.Boolean, default=False, nullable=False)
+
+    # ✅ Nuevo: indica si es el alcalde titular de su periodo
+    es_titular = db.Column(db.Boolean, default=False, nullable=False)
+
+    # Relaciones
     funcionario = db.relationship(
         'Funcionarios',
         primaryjoin="and_(Alcaldia.rut_cuerpo==Funcionarios.rut_cuerpo, Alcaldia.rut_dv==Funcionarios.rut_dv)",
@@ -198,16 +216,29 @@ class JefaturaDAEM(db.Model):
     __tablename__ = 'jefatura_daem'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+
+    # Identificación del funcionario asociado
     rut_cuerpo = db.Column(db.String(8), nullable=False)
     rut_dv = db.Column(db.String(1), nullable=False)
+
+    # Cargo asignado
     id_cargo = db.Column(db.Integer, db.ForeignKey(
         'cargos.id'), nullable=False)
+
+    # Fechas de vigencia del mandato
     fecha_inicio = db.Column(db.Date, nullable=False)
     fecha_termino = db.Column(db.Date, nullable=True)
 
+    # Control de vigencia visual (como alcalde activo)
+    es_activo = db.Column(db.Boolean, default=False, nullable=False)
+
+    # Posible futura extensión para media jornada
+    # hora_inicio = db.Column(db.Time, nullable=True)
+    # hora_termino = db.Column(db.Time, nullable=True)
+
+    # Relaciones
     cargo = db.relationship('Cargo', backref='jefaturas_daem')
 
-    # ✅ RELACIÓN PERSONALIZADA HACIA FUNCIONARIOS
     funcionario = db.relationship(
         "Funcionarios",
         primaryjoin="and_(foreign(JefaturaDAEM.rut_cuerpo) == remote(Funcionarios.rut_cuerpo), "

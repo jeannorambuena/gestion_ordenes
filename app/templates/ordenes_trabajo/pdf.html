@@ -25,7 +25,6 @@
             width: 85px;
             vertical-align: top;
             text-align: left;
-            padding-right: 0px;
             font-weight: bold;
             text-transform: uppercase;
             font-size: 15px;
@@ -50,8 +49,9 @@
         }
         .cabecera-cargo {
             font-size: 13px;
-            font-style: italic;
-            color: #555;
+            color: #333;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         .fecha-actual {
             text-align: right;
@@ -60,6 +60,7 @@
         }
         .text-justify {
             text-align: justify;
+            line-height: 1.6;
         }
         .firmas {
             margin-top: 60px;
@@ -69,8 +70,21 @@
         .firma {
             text-align: center;
             width: 45%;
+        }
+        .firma hr {
             border-top: 1px solid #000;
-            padding-top: 5px;
+            margin-bottom: 4px;
+        }
+        .firma-nombre {
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+        .firma-cargo {
+            font-size: 13px;
+            color: #333;
+            text-transform: uppercase;
+            font-weight: bold;
         }
         .tomo-conocimiento {
             margin-top: 60px;
@@ -91,46 +105,48 @@
         ORDEN DE TRABAJO N° {{ orden.numero_orden }} – {{ orden.anio }}
     </div>
 
-    <!-- Fecha de creación alineada a la derecha -->
     <div class="fecha-actual">
-        Fecha de emisión: {{ fecha_actual.strftime('%d-%m-%Y') }}
+        Fecha de emisión: {{ fecha_larga }}
     </div>
 
-    <!-- Cabecera profesional perfectamente alineada -->
     <table class="cabecera-table">
         <tr>
             <td class="cabecera-label">DE</td>
             <td class="cabecera-sep">:</td>
             <td class="cabecera-dato">
-                <span class="cabecera-nombre">{{ orden.jefatura_daem.nombre|upper if orden.jefatura_daem else 'NOMBRE NO DISPONIBLE' }}</span><br>
-                <span class="cabecera-cargo">{{ orden.jefatura_daem.cargo_jefatura|capitalize if orden.jefatura_daem else 'Cargo no disponible' }}</span>
+                <span class="cabecera-nombre">
+                    {{ orden.jefatura_daem.funcionario.nombre|upper }} {{ orden.jefatura_daem.funcionario.apellido|upper }}
+                </span><br>
+                <span class="cabecera-cargo">{{ orden.jefatura_daem.cargo.nombre_cargo }}</span>
             </td>
         </tr>
         <tr>
             <td class="cabecera-label">A</td>
             <td class="cabecera-sep">:</td>
             <td class="cabecera-dato">
-                <span class="cabecera-nombre">{{ orden.colegio.director|upper if orden.colegio and orden.colegio.director else 'DIRECTOR NO ASIGNADO' }}</span><br>
-                <span class="cabecera-cargo">Director(a)</span>
+                <span class="cabecera-nombre">
+                    {{ orden.colegio.director|upper if orden.colegio and orden.colegio.director else 'DIRECTOR NO ASIGNADO' }}
+                </span><br>
+                <span class="cabecera-cargo">DIRECTOR(A)</span>
             </td>
         </tr>
         <tr>
-            <td class="cabecera-label">COLEGIO</td>
+            <td class="cabecera-label">ESCUELA</td>
             <td class="cabecera-sep">:</td>
             <td class="cabecera-dato">
-                <span class="cabecera-nombre">{{ orden.colegio.nombre_colegio|upper if orden.colegio else 'NO ASIGNADO' }}</span>
+                <span class="cabecera-nombre">{{ orden.colegio.nombre_colegio|upper if orden.colegio else 'NO ASIGNADA' }}</span>
             </td>
         </tr>
     </table>
 
     <p class="text-justify">
-        Por intermedio de la presente orden de trabajo informo que Don(ña):
+        Por intermedio de la presente orden de trabajo informo que Don(ña)
         <strong>{{ orden.funcionario.nombre }} {{ orden.funcionario.apellido }}</strong>,
         cédula de identidad N° <strong>{{ orden.rut_cuerpo }}-{{ orden.rut_dv }}</strong>,
-        ha sido designado(a) en su Unidad Educativa <strong>{{ orden.colegio.nombre_colegio if orden.colegio else '' }}</strong>
-        para servir en el cargo de <strong>
-            {{ orden.funcionario.cargo.nombre_cargo if orden.funcionario.cargo else 'SIN CARGO' }}</strong>
-        mediante el tipo de contratación:
+        ha sido designado(a) en su Unidad Educativa
+        para servir en el cargo de
+        <strong>{{ orden.funcionario.cargo.nombre_cargo if orden.funcionario.cargo else 'SIN CARGO' }}</strong>,
+        mediante el tipo de contratación
         <strong>{{ orden.tipo_contrato.nombre if orden.tipo_contrato else 'SIN CONTRATO' }}</strong>,
         por un total de <strong>{{ orden.horas_disponibles }}</strong> horas cronológicas en enseñanza
         <strong>
@@ -159,26 +175,36 @@
         Consecuentemente con lo anterior, ruego a usted asignar las funciones respectivas al interesado
         e informar a este departamento de educación la fecha exacta de la asunción de funciones.
     </p>
+
     <p class="text-justify">
         Sin otro particular, saluda atentamente a usted,
     </p>
 
     <div class="firmas">
         <div class="firma">
-            {{ orden.jefatura_daem.nombre|upper if orden.jefatura_daem else 'NOMBRE NO DISPONIBLE' }}<br>
-            {{ orden.jefatura_daem.cargo_jefatura|capitalize if orden.jefatura_daem else 'Cargo no disponible' }}
+            <hr>
+            <div class="firma-nombre">
+                {{ orden.jefatura_daem.funcionario.nombre|upper }} {{ orden.jefatura_daem.funcionario.apellido|upper }}
+            </div>
+            <div class="firma-cargo">
+                {{ orden.jefatura_daem.cargo.nombre_cargo }}
+            </div>
         </div>
         <div class="firma">
-            {{ orden.alcalde.nombre_alcalde|upper if orden.alcalde else 'ALCALDE NO ASIGNADO' }}<br>
-            {{ orden.alcalde.cargo|upper if orden.alcalde and orden.alcalde.cargo else 'CARGO NO DISPONIBLE' }}
+            <hr>
+            <div class="firma-nombre">
+                {{ orden.alcalde.funcionario.nombre|upper }} {{ orden.alcalde.funcionario.apellido|upper }}
+            </div>
+            <div class="firma-cargo">
+                {{ orden.alcalde.cargo.nombre_cargo }}
+            </div>
         </div>
     </div>
 
     <div class="tomo-conocimiento">
         <p><strong>TOMO CONOCIMIENTO DE LA PRESENTE ORDEN DE TRABAJO</strong></p>
         <div class="nombre">{{ orden.funcionario.nombre }} {{ orden.funcionario.apellido }}</div>
-        <div class="fecha-firma">{{ fecha_actual.strftime('%d-%m-%Y') }}</div>
+        <div class="fecha-firma">{{ fecha_larga }}</div>
     </div>
-
 </body>
 </html>

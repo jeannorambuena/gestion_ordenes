@@ -3,94 +3,103 @@
 {% block title %}Inicio - Gestión de Órdenes{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <!-- Icono destacado para Órdenes de Trabajo -->
-    <div class="row text-center mb-4">
-        <div class="col-12">
-            <a href="{{ url_for('ordenes_bp.listar_ordenes') }}" class="text-decoration-none">
-                <div class="card shadow-lg bg-white rounded">
-                    <div class="card-body">
-                        <i class="fas fa-clipboard-list fa-5x text-primary mb-3"></i>
-                        <h4 class="card-title">Órdenes de Trabajo</h4>
-                    </div>
-                </div>
-            </a>
+<div class="container mt-4">
+  <!-- Órdenes de Trabajo -->
+  <div class="row justify-content-center mb-3">
+    <div class="col-lg-8 col-md-10">
+      <a class="text-decoration-none" href="{{ url_for('ordenes_bp.listar_ordenes') }}">
+        <div class="card shadow-lg border-0 shadow-sm card-arctic" style="background-color: #F6AE2D;">
+          <div class="card-body py-4 text-center">
+            <i class="fas fa-clipboard-list fa-2x text-white mb-3"></i>
+            <h3 class="fw-bold text-white">Órdenes de Trabajo</h3>
+          </div>
         </div>
+      </a>
     </div>
+  </div>
 
-    <!-- Iconos secundarios -->
-    <div class="row text-center">
-        <!-- Sección de Funcionarios -->
-        <div class="col-lg-4 col-md-6 mb-4">
-            <a href="{{ url_for('funcionarios_bp.listar_funcionarios') }}" class="text-decoration-none">
-                <div class="card shadow-lg bg-white rounded">
-                    <div class="card-body">
-                        <i class="fas fa-user fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Funcionarios</h5>
-                    </div>
-                </div>
-            </a>
+  <!-- Recuadros inferiores -->
+  <div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+      <div class="row row-cols-1 row-cols-sm-2 g-3">
+        <!-- Funcionarios -->
+        <div class="col">
+          <a class="text-decoration-none" href="{{ url_for('funcionarios_bp.listar_funcionarios') }}">
+            <div class="card shadow-lg border-0 shadow-sm card-arctic" style="background-color: #2F4858;">
+              <div class="card-body py-3 text-center">
+                <i class="fas fa-user fa-2x text-white mb-2"></i>
+                <h5 class="fw-bold text-white">Funcionarios</h5>
+              </div>
+            </div>
+          </a>
         </div>
-
-        <!-- Sección de Cargos -->
-        <div class="col-lg-4 col-md-6 mb-4">
-            <a href="{{ url_for('cargo.listar_cargos') }}" class="text-decoration-none">
-                <div class="card shadow-lg bg-white rounded">
-                    <div class="card-body">
-                        <i class="fas fa-briefcase fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Cargos</h5>
-                    </div>
-                </div>
-            </a>
+        <!-- Cargos -->
+        <div class="col">
+          <a class="text-decoration-none" href="{{ url_for('cargo.listar_cargos') }}">
+            <div class="card shadow-lg border-0 shadow-sm card-arctic" style="background-color: #33658A;">
+              <div class="card-body py-3 text-center">
+                <i class="fas fa-briefcase fa-2x text-white mb-2"></i>
+                <h5 class="fw-bold text-white">Cargos</h5>
+              </div>
+            </div>
+          </a>
         </div>
-
-        <!-- Sección de Colegios -->
-        <div class="col-lg-4 col-md-6 mb-4">
-            <a href="{{ url_for('colegio.listar_colegios') }}" class="text-decoration-none">
-                <div class="card shadow-lg bg-white rounded">
-                    <div class="card-body">
-                        <i class="fas fa-school fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Colegios</h5>
-                    </div>
-                </div>
-            </a>
+        <!-- Colegios -->
+        <div class="col">
+          <a class="text-decoration-none" href="{{ url_for('colegio.listar_colegios') }}">
+            <div class="card shadow-lg border-0 shadow-sm card-arctic" style="background-color: #86BBD8;">
+              <div class="card-body py-3 text-center">
+                <i class="fas fa-school fa-2x text-dark mb-2"></i>
+                <h5 class="fw-bold text-dark">Colegios</h5>
+              </div>
+            </div>
+          </a>
         </div>
-
-        <!-- Sección de Tipos de Contrato -->
-        <div class="col-lg-4 col-md-6 mb-4">
-            <a href="{{ url_for('tipo_contrato_bp.listar_tipo_contrato') }}" class="text-decoration-none">
-                <div class="card shadow-lg bg-white rounded">
-                    <div class="card-body">
-                        <i class="fas fa-file-signature fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Tipos de Contrato</h5>
-                    </div>
-                </div>
-            </a>
+        <!-- Tipos de Contrato -->
+        <div class="col">
+          <a class="text-decoration-none" href="{{ url_for('tipo_contrato_bp.listar_tipo_contrato') }}">
+            <div class="card shadow-lg border-0 shadow-sm card-arctic" style="background-color: #F6AE2D;">
+              <div class="card-body py-3 text-center">
+                <i class="fas fa-file-signature fa-2x text-white mb-2"></i>
+                <h5 class="fw-bold text-white">Tipos de Contrato</h5>
+              </div>
+            </div>
+          </a>
         </div>
-
-        <!-- Sección de Alcaldía -->
-        <div class="col-lg-4 col-md-6 mb-4">
-            <a href="{{ url_for('alcaldia.listar_alcaldias') }}" class="text-decoration-none">
-                <div class="card shadow-lg bg-white rounded">
-                    <div class="card-body">
-                        <i class="fas fa-landmark fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Alcaldía</h5>
-                    </div>
-                </div>
-            </a>
+        <!-- Alcaldía -->
+        <div class="col">
+          <a class="text-decoration-none" href="{{ url_for('alcaldia.listar_alcaldias') }}">
+            <div class="card shadow-lg border-0 shadow-sm card-arctic" style="background-color: #F26419;">
+              <div class="card-body py-3 text-center">
+                <i class="fas fa-landmark fa-2x text-white mb-2"></i>
+                <h5 class="fw-bold text-white">Alcaldía</h5>
+              </div>
+            </div>
+          </a>
         </div>
-
-        <!-- Sección de Jefatura DAEM -->
-        <div class="col-lg-4 col-md-6 mb-4">
-            <a href="{{ url_for('jefatura_daem.listar_jefaturas_daem') }}" class="text-decoration-none">
-                <div class="card shadow-lg bg-white rounded">
-                    <div class="card-body">
-                        <i class="fas fa-user-cog fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title">Jefatura DAEM</h5>
-                    </div>
-                </div>
-            </a>
+        <!-- Jefatura DAEM -->
+        <div class="col">
+          <a class="text-decoration-none" href="{{ url_for('jefatura_daem.listar_jefaturas_daem') }}">
+            <div class="card shadow-lg border-0 shadow-sm card-arctic" style="background-color: #33658A;">
+              <div class="card-body py-3 text-center">
+                <i class="fas fa-user-cog fa-2x text-white mb-2"></i>
+                <h5 class="fw-bold text-white">Jefatura DAEM</h5>
+              </div>
+            </div>
+          </a>
         </div>
+      </div>
     </div>
-</div>
+  </div>
+<footer class="text-center mt-5 py-4 footer-clean">
+  <div class="d-flex justify-content-center align-items-center flex-wrap gap-2">
+    <span class="footer-text">
+      Departamento de Educación de Teno · Sistema de Órdenes de Trabajo · Realizado por
+    </span>
+    <a href="https://www.agoracreativa.cl" target="_blank" class="footer-link">
+      Ágora Creativa
+    </a>
+  </div>
+</footer>
+
 {% endblock %}
