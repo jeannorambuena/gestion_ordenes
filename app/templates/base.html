@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -13,78 +12,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/all.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-
-    <style>
-        body {
-            background-color: var(--color-fondo);
-            font-family: 'Segoe UI', sans-serif;
-        }
-        .navbar-light {
-            background-color: var(--color-fondo);
-            border-bottom: 1px solid var(--color-borde);
-        }
-        .navbar-toggler {
-            border: none;
-        }
-        .navbar-toggler:focus {
-            box-shadow: none;
-        }
-        .navbar-brand i, .navbar-brand h1 {
-            transition: color 0.3s ease;
-        }
-        .navbar-brand:hover i, .navbar-brand:hover h1 {
-            color: var(--color-principal) !important;
-        }
-        .offcanvas-title {
-            font-weight: bold;
-        }
-        .nav-link {
-            font-weight: 500;
-            color: var(--color-secundario);
-            transition: background-color 0.2s ease-in-out, border-left 0.3s ease;
-            border-left: 3px solid transparent;
-            padding-left: 1rem;
-        }
-        .nav-link:hover {
-            background-color: var(--color-acento);
-            border-radius: 0.5rem;
-            color: var(--color-principal);
-            border-left: 3px solid var(--color-principal);
-        }
-        .nav-link i {
-            font-size: 1.2rem;
-        }
-        h1, h3, h5, h6 {
-            color: var(--color-principal);
-        }
-        .container {
-            padding-top: 1rem;
-        }
-        .shadow-card {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-            border-radius: 1rem;
-            background-color: var(--color-fondo);
-        }
-        .section-title {
-            background: linear-gradient(to right, var(--color-secundario), var(--color-principal));
-            color: #ffffff;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            transition: transform 0.2s ease-in-out;
-        }
-        .section-title:hover {
-            transform: scale(1.01);
-        }
-        .table {
-            border-radius: 0.5rem;
-            overflow: hidden;
-            background-color: #ffffff;
-        }
-    </style>
 </head>
 <body>
-
     <!-- Navbar con menú off-canvas -->
     <nav class="navbar navbar-light">
         <div class="container-fluid d-flex justify-content-between">
@@ -108,22 +37,22 @@
         <!-- Menú emergente -->
         <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasNavbar">
             <div class="offcanvas-header">
-                <h5 class="offcanvas-title">Menú</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+                <h5 class="offcanvas-title">MENÚ PRINCIPAL</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
             </div>
             <div class="offcanvas-body">
                 <ul class="navbar-nav">
                     {% for item in [
-                        ('ordenes_bp.listar_ordenes', 'clipboard-list', 'Órdenes'),
-                        ('funcionarios_bp.listar_funcionarios', 'user', 'Funcionarios'),
-                        ('cargo.listar_cargos', 'briefcase', 'Cargos'),
-                        ('colegio.listar_colegios', 'school', 'Colegios'),
-                        ('tipo_contrato_bp.listar_tipo_contrato', 'file-signature', 'Tipos de Contrato'),
-                        ('alcaldia.listar_alcaldias', 'landmark', 'Alcaldía'),
-                        ('jefatura_daem.listar_jefaturas_daem', 'user-cog', 'Jefatura DAEM'),
-                        ('financiamiento.listar_financiamientos', 'hand-holding-usd', 'Financiamiento'),
-                                                ('usuarios_bp.listar_usuarios', 'users-cog', 'Gestión de Usuarios'),
-                        ('auth.logout', 'sign-out-alt', 'Cerrar Sesión')
+                        ('ordenes_bp.listar_ordenes', 'clipboard-list', 'ORDEN DE TRABAJO'),
+                        ('funcionarios_bp.listar_funcionarios', 'user', 'FUNCIONARIOS'),
+                        ('cargo.listar_cargos', 'briefcase', 'CARGOS'),
+                        ('colegio.listar_colegios', 'school', 'ESCUELAS'),
+                        ('tipo_contrato_bp.listar_tipo_contrato', 'file-signature', 'TIPOS DE CONTRATOS'),
+                        ('alcaldia.listar_alcaldias', 'landmark', 'ALCALDÍA'),
+                        ('jefatura_daem.listar_jefaturas_daem', 'user-cog', 'JEFATURA DAEM'),
+                        ('financiamiento.listar_financiamientos', 'hand-holding-usd', 'FINANCIAMIENTO'),
+                        ('usuarios_bp.listar_usuarios', 'users-cog', 'USUARIOS'),
+                        ('auth.logout', 'sign-out-alt', 'CERRAR SESIÓN')
                     ] %}
                     <li class="nav-item">
                         <a class="nav-link d-flex align-items-center" href="{{ url_for(item[0]) }}">
@@ -141,7 +70,7 @@
         {% block content %}{% endblock %}
     </div>
 
-    <!-- JS -->
+    <!-- Scripts JS -->
     <script src="{{ url_for('static', filename='js/jquery/jquery-3.7.1.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>

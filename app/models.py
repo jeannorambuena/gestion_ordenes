@@ -229,12 +229,11 @@ class JefaturaDAEM(db.Model):
     fecha_inicio = db.Column(db.Date, nullable=False)
     fecha_termino = db.Column(db.Date, nullable=True)
 
-    # Control de vigencia visual (como alcalde activo)
+    # Estado actual
     es_activo = db.Column(db.Boolean, default=False, nullable=False)
 
-    # Posible futura extensión para media jornada
-    # hora_inicio = db.Column(db.Time, nullable=True)
-    # hora_termino = db.Column(db.Time, nullable=True)
+    # ✅ Nuevo: indica si es el jefe DAEM titular
+    es_titular = db.Column(db.Boolean, default=False, nullable=False)
 
     # Relaciones
     cargo = db.relationship('Cargo', backref='jefaturas_daem')

@@ -3,79 +3,93 @@
 {% block title %}Lista de Jefaturas DAEM{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2 class="text-center mb-3">Lista de Jefaturas DAEM</h2>
+<div class="container mt-4">
+  <div class="card shadow-lg border-0 rounded" style="background-color: #33658A;">
+    <div class="card-body">
 
-  <!-- Botón para agregar nueva jefatura -->
-  <div class="d-flex justify-content-end mb-3">
-    <a href="{{ url_for('jefatura_daem.nueva_jefatura_daem') }}" class="btn btn-success">
-      <i class="fas fa-plus-circle me-1"></i> Nueva Jefatura
-    </a>
-  </div>
+      <!-- Cabecera del módulo -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-3">
+          <i class="fas fa-user-cog fa-2x text-white"></i>
+          <h2 class="text-white mb-0">Lista de Jefaturas DAEM</h2>
+        </div>
+        <a href="{{ url_for('jefatura_daem.nueva_jefatura_daem') }}" class="btn btn-light btn-sm shadow-sm">
+          <i class="fas fa-plus me-2"></i> Nueva Jefatura
+        </a>
+      </div>
 
-  {% if datos %}
-  <div class="table-responsive shadow-lg p-3 mb-5 bg-white rounded">
-    <table class="table table-bordered table-hover align-middle">
-      <thead class="bg-success text-white text-center">
-        <tr>
-          <th>Nombre</th>
-          <th>RUT</th>
-          <th>Cargo</th>
-          <th>Fecha de Inicio</th>
-          <th>Fecha de Término</th>
-          <th>Email</th>
-          <th>Activo</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in datos %}
-        <tr>
-          <td>{{ item.funcionario.nombre }} {{ item.funcionario.apellido }}</td>
-          <td>{{ item.funcionario.rut_cuerpo }}-{{ item.funcionario.rut_dv }}</td>
-          <td>{{ item.jefatura.cargo.nombre_cargo }}</td>
-          <td class="text-center">{{ item.jefatura.fecha_inicio.strftime('%d-%m-%Y') }}</td>
-          <td class="text-center">
-            {{ item.jefatura.fecha_termino.strftime('%d-%m-%Y') if item.jefatura.fecha_termino else '—' }}
-          </td>
-          <td>{{ item.funcionario.email or 'Sin correo' }}</td>
-          <td class="text-center">
-            {% if item.jefatura.es_activo %}
-              <span class="text-success fw-bold">✔️</span>
-            {% else %}
-              <span class="text-muted">—</span>
-            {% endif %}
-          </td>
-          <td class="text-center">
-            <div class="d-flex justify-content-center gap-2">
-              <a href="{{ url_for('jefatura_daem.editar_jefatura_daem', id=item.jefatura.id) }}"
-                 class="btn btn-warning btn-sm">
-                <i class="fas fa-edit"></i> Editar
-              </a>
+      {% if datos %}
+      <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-bordered table-hover align-middle mb-0">
+          <thead class="text-white text-center" style="background-color: #33658A;">
+            <tr>
+              <th>Nombre</th>
+              <th>RUT</th>
+              <th>Cargo</th>
+              <th>Inicio</th>
+              <th>Término</th>
+              <th>Email</th>
+              <th>Activo</th>
+              <th>Titular</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in datos %}
+            <tr>
+              <td>{{ item.funcionario.nombre }} {{ item.funcionario.apellido }}</td>
+              <td class="text-center">{{ item.funcionario.rut_cuerpo }}-{{ item.funcionario.rut_dv }}</td>
+              <td>{{ item.jefatura.cargo.nombre_cargo }}</td>
+              <td class="text-center">{{ item.jefatura.fecha_inicio.strftime('%d-%m-%Y') }}</td>
+              <td class="text-center">
+                {{ item.jefatura.fecha_termino.strftime('%d-%m-%Y') if item.jefatura.fecha_termino else '—' }}
+              </td>
+              <td>{{ item.funcionario.email or 'Sin correo' }}</td>
+              <td class="text-center">
+                {% if item.jefatura.es_activo %}
+                  <span class="text-success fw-bold">✔️</span>
+                {% else %}
+                  <span class="text-muted">—</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                {% if item.jefatura.es_titular %}
+                  <span class="badge bg-primary">Titular</span>
+                {% else %}
+                  <span class="badge bg-info text-dark">Suplente</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <div class="d-flex justify-content-center gap-2">
+                  <a href="{{ url_for('jefatura_daem.editar_jefatura_daem', id=item.jefatura.id) }}"
+                     class="btn btn-warning btn-sm shadow-sm" title="Editar">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  {% if item.jefatura.es_activo %}
+                  <form action="{{ url_for('jefatura_daem.desactivar_jefatura_daem', id=item.jefatura.id) }}"
+                        method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-outline-danger btn-sm shadow-sm"
+                            onclick="return confirm('¿Deseas desactivar esta jefatura?')" title="Desactivar">
+                      <i class="fas fa-user-slash"></i>
+                    </button>
+                  </form>
+                  {% else %}
+                  <span class="badge bg-secondary align-self-center">Inactiva</span>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-light text-center text-dark mt-3" role="alert">
+        No hay jefaturas DAEM registradas.
+      </div>
+      {% endif %}
 
-              {% if item.jefatura.es_activo %}
-              <form action="{{ url_for('jefatura_daem.desactivar_jefatura_daem', id=item.jefatura.id) }}"
-                    method="POST" class="d-inline">
-                <button type="submit"
-                        class="btn btn-outline-danger btn-sm"
-                        onclick="return confirm('¿Deseas desactivar esta jefatura?')">
-                  <i class="fas fa-user-slash"></i> Desactivar
-                </button>
-              </form>
-              {% else %}
-              <span class="badge bg-secondary align-self-center">Inactiva</span>
-              {% endif %}
-            </div>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    </div>
   </div>
-  {% else %}
-  <div class="alert alert-info text-center" role="alert">
-    No hay jefaturas registradas.
-  </div>
-  {% endif %}
 </div>
 {% endblock %}

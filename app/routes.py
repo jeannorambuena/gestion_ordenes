@@ -802,8 +802,8 @@ def eliminar_orden(id):
     flash('Orden de trabajo eliminada con éxito', 'success')
     return redirect(url_for('ordenes_bp.listar_ordenes'))
 
-
 # ===================== RUTAS PARA JEFATURA DAEM =====================
+
 
 @jefatura_daem_bp.route('/')
 @login_required
@@ -831,6 +831,10 @@ def listar_jefaturas_daem():
 def nueva_jefatura_daem():
     form = JefaturaDAEMForm()
 
+    # Detectar si ya existe un jefe titular
+    ya_hay_titular = JefaturaDAEM.query.filter_by(
+        es_titular=True).first() is not None
+
     if form.validate_on_submit():
         try:
             rut_completo = form.rut_funcionario.data.strip()
@@ -846,13 +850,19 @@ def nueva_jefatura_daem():
                 flash("⚠️ El funcionario no está registrado.", "warning")
                 return redirect(url_for("funcionarios_bp.nuevo_funcionario", rut=rut_completo))
 
+            if form.es_titular.data and ya_hay_titular:
+                flash(
+                    "❌ Ya existe un jefe DAEM titular registrado. No se puede asignar otro.", "danger")
+                return redirect(url_for("jefatura_daem.nueva_jefatura_daem"))
+
             nueva_jefatura = JefaturaDAEM(
                 rut_cuerpo=rut_cuerpo,
                 rut_dv=rut_dv,
                 id_cargo=form.id_cargo.data,
                 fecha_inicio=form.fecha_inicio.data,
                 fecha_termino=form.fecha_termino.data,
-                es_activo=form.es_activo.data  # ✅ Incluido
+                es_titular=form.es_titular.data,
+                es_activo=form.es_activo.data
             )
 
             db.session.add(nueva_jefatura)
@@ -864,7 +874,7 @@ def nueva_jefatura_daem():
             db.session.rollback()
             flash(f"❌ Error al guardar la jefatura: {str(e)}", "danger")
 
-    return render_template("jefatura_daem/nuevo.html", form=form)
+    return render_template("jefatura_daem/nuevo.html", form=form, ya_hay_titular=ya_hay_titular)
 
 
 @jefatura_daem_bp.route('/editar/<int:id>', methods=['GET', 'POST'])
@@ -888,7 +898,8 @@ def editar_jefatura_daem(id):
     form = JefaturaDAEMForm(
         rut_funcionario=rut_formateado,
         fecha_inicio=jefatura.fecha_inicio,
-        fecha_termino=jefatura.fecha_termino
+        fecha_termino=jefatura.fecha_termino,
+        es_titular=jefatura.es_titular
     )
 
     if request.method == 'GET':

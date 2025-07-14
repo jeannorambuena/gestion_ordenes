@@ -3,112 +3,137 @@
 {% block title %}Nueva Jefatura DAEM{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2 class="text-center mb-4">Asignar Nueva Jefatura DAEM</h2>
-
-  <form method="POST" action="{{ url_for('jefatura_daem.nueva_jefatura_daem') }}"
-        class="mx-auto p-4 shadow rounded bg-light"
-        style="max-width: 600px;">
-    {{ form.hidden_tag() }}
-
-    <!-- Funcionario seleccionado desde modal -->
-    <div class="mb-3">
-      <label for="nombre_funcionario" class="form-label">Funcionario</label>
-      <div class="input-group">
-        {{ form.rut_funcionario(type="hidden", id="rut_funcionario") }}
-        <input type="text"
-               id="nombre_funcionario"
-               class="form-control"
-               placeholder="Haz clic aquí o en la lupa para buscar un funcionario"
-               readonly required>
-        <button type="button"
-                id="buscar-funcionario-btn"
-                class="btn btn-outline-primary"
-                data-target-context="jefatura_daem"
-                title="Buscar funcionario por RUT, nombre o apellido">
-          <i class="fas fa-search"></i>
-        </button>
+<div class="container mt-4 d-flex justify-content-center">
+  <div class="card shadow-lg border-0 rounded" style="max-width: 500px; width: 100%;">
+    <!-- Cabecera institucional -->
+    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #33658A;">
+      <div class="d-flex align-items-center gap-3">
+        <i class="fas fa-user-cog text-white fa-lg"></i>
+        <h3 class="text-white mb-0">Asignar Nueva Jefatura DAEM</h3>
       </div>
-      {% for error in form.rut_funcionario.errors %}
-        <div class="text-danger small">{{ error }}</div>
-      {% endfor %}
+      <a href="{{ url_for('jefatura_daem.listar_jefaturas_daem') }}" class="btn btn-light btn-sm">
+        <i class="fas fa-arrow-left me-1"></i> Volver
+      </a>
     </div>
 
-    <!-- Cargo -->
-    <div class="mb-3">
-      <label for="id_cargo" class="form-label">Cargo a Asignar</label>
-      {{ form.id_cargo(class="form-select", id="id_cargo") }}
-      {% for error in form.id_cargo.errors %}
-        <div class="text-danger small">{{ error }}</div>
-      {% endfor %}
-    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('jefatura_daem.nueva_jefatura_daem') }}">
+        {{ form.hidden_tag() }}
 
-    <!-- Fecha de Inicio -->
-    <div class="mb-3">
-      <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
-      {{ form.fecha_inicio(class="form-control", id="fecha_inicio") }}
-      {% for error in form.fecha_inicio.errors %}
-        <div class="text-danger small">{{ error }}</div>
-      {% endfor %}
-    </div>
+        <!-- Funcionario -->
+        <div class="mb-3">
+          <label for="nombre_funcionario" class="form-label">Funcionario</label>
+          <div class="input-group">
+            <input type="text"
+                   id="nombre_funcionario"
+                   class="form-control"
+                   placeholder="Haz clic aquí o en la lupa para buscar"
+                   readonly required>
+            {{ form.rut_funcionario(type="hidden", id="rut_funcionario") }}
+            <button type="button" id="buscar-funcionario-btn"
+                    class="btn btn-outline-primary"
+                    data-target-context="jefatura_daem"
+                    title="Buscar funcionario">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+          {% for error in form.rut_funcionario.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
 
-    <!-- Fecha de Término -->
-    <div class="mb-3">
-      <label for="fecha_termino" class="form-label">Fecha de Término</label>
-      {{ form.fecha_termino(class="form-control", id="fecha_termino") }}
-      {% for error in form.fecha_termino.errors %}
-        <div class="text-danger small">{{ error }}</div>
-      {% endfor %}
-    </div>
+        <!-- Cargo -->
+        <div class="mb-3">
+          <label for="id_cargo" class="form-label">Cargo a Asignar</label>
+          {{ form.id_cargo(class="form-select", id="id_cargo") }}
+          {% for error in form.id_cargo.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
 
-    <!-- ¿Es el jefe DAEM en funciones? -->
-    <div class="form-check mb-4">
-      {{ form.es_activo(class="form-check-input", id="es_activo") }}
-      <label class="form-check-label" for="es_activo">
-        ¿Está actualmente en funciones?
-      </label>
-      {% for error in form.es_activo.errors %}
-        <div class="text-danger small">{{ error }}</div>
-      {% endfor %}
-    </div>
+        <!-- Fecha Inicio -->
+        <div class="mb-3">
+          <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+          {{ form.fecha_inicio(class="form-control", id="fecha_inicio") }}
+          {% for error in form.fecha_inicio.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
 
-    <!-- Botones -->
-    <div class="d-flex justify-content-between">
-      <button type="submit" class="btn btn-success">Guardar</button>
-      <a href="{{ url_for('jefatura_daem.listar_jefaturas_daem') }}" class="btn btn-secondary">Cancelar</a>
+        <!-- Fecha Término -->
+        <div class="mb-3">
+          <label for="fecha_termino" class="form-label">Fecha de Término</label>
+          {{ form.fecha_termino(class="form-control", id="fecha_termino") }}
+          {% for error in form.fecha_termino.errors %}
+            <div class="text-danger small">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <!-- Titularidad -->
+        <div class="form-check mb-2" style="text-align: left;">
+          {{ form.es_titular(class="form-check-input form-check-input-lg", id="es_titular", disabled=ya_hay_titular) }}
+          <label class="form-check-label fw-bold" for="es_titular">
+            ¿Es el jefe(a) DAEM titular?
+          </label>
+          <div class="text-muted small">
+            {% if ya_hay_titular %}
+              Ya existe un jefe(a) DAEM titular registrado. Este campo está deshabilitado.
+            {% else %}
+              Solo debe marcarse si el funcionario ocupará el cargo de forma oficial y permanente. Solo puede haber un titular activo a la vez.
+            {% endif %}
+          </div>
+        </div>
+
+        <hr>
+
+        <!-- ¿Activo? -->
+        <div class="form-check mb-4" style="text-align: left;">
+          {{ form.es_activo(class="form-check-input form-check-input-lg", id="es_activo") }}
+          <label class="form-check-label fw-bold" for="es_activo">
+            ¿Está actualmente en funciones?
+          </label>
+          <div class="text-muted small">
+            Indica si el funcionario está ejerciendo el cargo actualmente. Si no está activo, la jefatura quedará registrada pero no será considerada vigente.
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex justify-content-center gap-3">
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-check me-1"></i> Guardar
+          </button>
+          <a href="{{ url_for('jefatura_daem.listar_jefaturas_daem') }}" class="btn btn-danger">
+            <i class="fas fa-times me-1"></i> Cancelar
+          </a>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>
 
-<!-- Modal reutilizable -->
+<!-- Modal búsqueda -->
 {% include 'componentes/modal_busqueda_funcionario.html' %}
 
-<!-- Scripts -->
+<!-- Script búsqueda -->
 <script>
-  window.seleccionarFuncionarioParaJefaturaDaem = function (data) {
-    const campoNombre = document.getElementById("nombre_funcionario");
-    const campoRut = document.getElementById("rut_funcionario");
-    if (campoNombre) campoNombre.value = `${data.nombre} ${data.apellido}`;
-    if (campoRut) campoRut.value = data.rut;
-    console.log("✅ Funcionario traspasado al formulario Jefatura DAEM");
-  };
-
   document.addEventListener("DOMContentLoaded", function () {
     const boton = document.getElementById("buscar-funcionario-btn");
-
     if (boton) {
       boton.dataset.targetContext = "jefatura_daem";
-      boton.addEventListener("click", function () {
+      boton.addEventListener("click", () => {
         $('#modalBuscarFuncionario').modal('show');
       });
     }
 
-    const campoFuncionario = document.getElementById("nombre_funcionario");
-    if (campoFuncionario && boton) {
-      campoFuncionario.addEventListener("click", function () {
-        boton.click(); // Simula el click en el botón
-      });
+    const campo = document.getElementById("nombre_funcionario");
+    if (campo && boton) {
+      campo.addEventListener("click", () => boton.click());
     }
+
+    window.seleccionarFuncionarioParaJefaturaDaem = function (data) {
+      document.getElementById("nombre_funcionario").value = `${data.nombre} ${data.apellido}`;
+      document.getElementById("rut_funcionario").value = data.rut;
+    };
   });
 </script>
 {% endblock %}

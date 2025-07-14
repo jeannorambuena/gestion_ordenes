@@ -56,24 +56,42 @@ p {
   color: var(--color-principal) !important;
 }
 
-.offcanvas {
-  background-color: var(--color-fondo);
-  border-right: 1px solid var(--color-borde);
+/* ------------------- */
+/* 10. Corrección menú emergente desde base.html */
+/* ------------------- */
+.offcanvas-start {
+  background-color: rgba(59, 83, 122, 0.9); /* azul con opacidad */
+  color: #ffffff;
+  width: 300px !important;  /* ancho suficiente y forzado con !important */
 }
 
 .offcanvas .nav-link {
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  color: var(--color-secundario);
+  display: flex;                     
+  align-items: center;               
+  gap: 0.6rem;                       
+  color: #f0f0f0 !important;
+  font-weight: 500;
   border-left: 3px solid transparent;
-  transition: background-color 0.3s, color 0.3s, border-left 0.3s;
+  padding-left: 1rem;
+  transition: background-color 0.3s ease, transform 0.2s ease, border-left 0.3s ease;
 }
 
 .offcanvas .nav-link:hover {
-  background-color: var(--color-acento);
-  color: var(--color-principal);
-  border-left: 3px solid var(--color-principal);
+  background-color: #3b4b5f;
+  border-left: 4px solid #006C84; /* color-principal */
+  color: #ffffff;
+  transform: translateX(5px);
 }
+
+.offcanvas .nav-link i {
+  font-size: 1.2rem;
+  min-width: 20px;       /* Alineación fija para todos los íconos */
+  text-align: center;    /* Centra los íconos verticalmente respecto al texto */
+}
+.offcanvas .nav-item {
+  margin-bottom: 0.3rem;  /* Da espacio entre enlaces */
+}
+
 
 /* ------------------- */
 /* 3. Tarjetas por módulo */
@@ -320,6 +338,20 @@ a, button, .form-control {
 .footer-link:hover {
   color: #F26419;
   text-decoration: underline;
+}
+.offcanvas-header {
+  justify-content: space-between;      /* mantiene el botón de cierre a la derecha */
+  align-items: center;
+  padding: 0.75rem 1rem;
+}
+
+.offcanvas-title {
+  color: #ffffff !important;           /* blanco */
+  text-transform: uppercase;           /* mayúsculas */
+  font-weight: 600;
+  font-size: 1.2rem;
+  text-align: center;
+  flex: 1;                              /* permite que el texto ocupe todo el ancho */
 }
 
 /* === FIN === */

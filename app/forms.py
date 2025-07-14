@@ -1,3 +1,4 @@
+from app.validators import validar_rut
 from app.models import Cargo
 from wtforms.validators import DataRequired, Length, ValidationError
 from wtforms import StringField, SelectField, DateField, BooleanField, SubmitField
@@ -223,8 +224,11 @@ class JefaturaDAEMForm(FlaskForm):
     id_cargo = SelectField('Cargo Asociado', coerce=int,
                            validators=[DataRequired()])
     fecha_inicio = DateField('Fecha de Inicio', validators=[DataRequired()])
-    fecha_termino = DateField('Fecha de Término', validators=[])
+    fecha_termino = DateField('Fecha de Término')
+
+    es_titular = BooleanField('¿Es el jefe DAEM titular?', default=False)
     es_activo = BooleanField('¿Está actualmente en funciones?', default=True)
+
     submit = SubmitField('Guardar')
 
     def __init__(self, *args, **kwargs):
@@ -240,9 +244,12 @@ class JefaturaDAEMForm(FlaskForm):
         if '-' not in field.data:
             raise ValidationError(
                 'Debe ingresar el RUT con guion medio (ej: 12345678-9)')
+
         rut_cuerpo, rut_dv = field.data.strip().split('-')
-        if not validar_rut(rut_cuerpo, rut_dv):
-            raise ValidationError('El RUT ingresado no es válido.')
+        es_valido, mensaje = validar_rut(rut_cuerpo, rut_dv)
+
+        if not es_valido:
+            raise ValidationError(mensaje)
 
 
 class FinanciamientoForm(FlaskForm):
