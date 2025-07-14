@@ -9,7 +9,10 @@
 *.json text eol=lf
 *.md   text eol=lf
 *.yml  text eol=lf
-*.sql  text eol=lf   # Cambiado a LF para coherencia
+
+# Cambiado a LF para coherencia
+*.sql  text eol=lf
+
 
 # Archivos binarios (sin tocar)
 *.png binary
