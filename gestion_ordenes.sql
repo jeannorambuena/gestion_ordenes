@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 03-07-2025 a las 19:38:36
+-- Tiempo de generación: 23-07-2025 a las 17:49:12
 -- Versión del servidor: 8.3.0
 -- Versión de PHP: 8.2.18
 
@@ -41,16 +41,7 @@ CREATE TABLE IF NOT EXISTS `alcaldia` (
   `es_titular` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `idx_rut_alcaldia` (`rut_cuerpo`,`rut_dv`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `alcaldia`
---
-
-INSERT INTO `alcaldia` (`id`, `rut_cuerpo`, `rut_dv`, `fecha_inicio`, `fecha_termino`, `email`, `telefono`, `id_cargo`, `es_activo`, `es_titular`) VALUES
-(5, '7309224', '8', '2025-06-02', '2025-06-30', NULL, '999999999', 9, 0, 0),
-(6, '14326078', 'k', '2025-07-03', '2025-07-03', NULL, '997718963', 8, 1, 1),
-(7, '7309224', '8', '2025-07-04', '2025-07-04', NULL, '999999999', 8, 0, 0);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -71,7 +62,6 @@ CREATE TABLE IF NOT EXISTS `cargos` (
 --
 
 INSERT INTO `cargos` (`id`, `nombre_cargo`, `descripcion`) VALUES
-(1, 'Profesor', 'Encargado de impartir clases a los estudiante'),
 (5, 'Asistente de Aula', 'Asistente de Aula '),
 (6, 'Director', 'Director de Comalle'),
 (8, 'Alcalde', 'Máxima autoridad comunal'),
@@ -137,7 +127,7 @@ CREATE TABLE IF NOT EXISTS `financiamiento` (
   `id` int NOT NULL AUTO_INCREMENT,
   `nombre_financiamiento` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `financiamiento`
@@ -170,17 +160,14 @@ CREATE TABLE IF NOT EXISTS `funcionarios` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_rut_unico` (`rut_cuerpo`,`rut_dv`),
   KEY `id_cargo` (`id_cargo`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `funcionarios`
 --
 
 INSERT INTO `funcionarios` (`id`, `nombre`, `apellido`, `direccion`, `telefono`, `titulo`, `id_cargo`, `rut_cuerpo`, `rut_dv`, `email`) VALUES
-(1, 'Jean Paul', 'Norambuena Chávez', 'Ruta j55', '997718963', 'Ingeniero', 1, '14326078', 'k', NULL),
-(2, 'Mariela Isabel', 'Farias Leyton', 'msaldfkslk', '997744887', 'educadora', 1, '15130287', '4', NULL),
-(3, 'Luis Alfredo', 'Norambuena Cerda', 'Liquidambar 2045', '993241494', 'Profesor de Enseñanza Básica', 1, '6906337', '3', NULL),
-(4, 'Maria Elena', 'Leyton Diaz', 'Isla Victoria 1914', '999999999', 'Profesora de Educacion Básica', 1, '7309224', '8', NULL);
+(5, 'Jean', 'Norambuena Chávez', 'Ruta J55 Km 13', '997718963', 'Ingeniero Informático', 5, '14326078', 'k', NULL);
 
 -- --------------------------------------------------------
 
@@ -258,13 +245,6 @@ CREATE TABLE IF NOT EXISTS `funcionarios_colegios` (
   KEY `fk_fc_colegio` (`colegio_rbd`),
   KEY `fk_fc_orden` (`orden_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `funcionarios_colegios`
---
-
-INSERT INTO `funcionarios_colegios` (`id`, `funcionario_id`, `colegio_rbd`, `horas_disponibles`, `orden_id`) VALUES
-(8, 4, '2816-9', 15, NULL);
 
 -- --------------------------------------------------------
 
@@ -366,15 +346,7 @@ CREATE TABLE IF NOT EXISTS `jefatura_daem` (
   PRIMARY KEY (`id`),
   KEY `idx_rut_daem` (`rut_cuerpo`,`rut_dv`),
   KEY `fk_jefatura_cargo` (`id_cargo`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `jefatura_daem`
---
-
-INSERT INTO `jefatura_daem` (`id`, `rut_cuerpo`, `rut_dv`, `id_cargo`, `fecha_inicio`, `fecha_termino`, `es_activo`, `es_titular`) VALUES
-(2, '14326078', 'k', 16, '2025-06-01', '2025-06-30', 0, 0),
-(3, '15130287', '4', 18, '2025-07-03', '2025-07-03', 1, 0);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -412,14 +384,7 @@ CREATE TABLE IF NOT EXISTS `ordenes_trabajo` (
   KEY `fk_financiamiento` (`financiamiento_id`),
   KEY `fk_tipo_contrato` (`tipo_contrato_id`),
   KEY `fk_colegio` (`colegio_rbd`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Volcado de datos para la tabla `ordenes_trabajo`
---
-
-INSERT INTO `ordenes_trabajo` (`id`, `fecha_inicio`, `fecha_termino`, `es_indefinido`, `colegio_rbd`, `observaciones`, `reemplazo_a`, `motivo_reemplazo`, `rut_cuerpo`, `rut_dv`, `financiamiento_id`, `fecha_creacion`, `fecha_modificacion`, `numero_orden`, `tipo_contrato_id`, `horas_disponibles`, `anio`, `alcalde_id`, `jefatura_daem_id`, `funcionario_id`) VALUES
-(1, '2025-07-03', '2025-07-31', 0, '0504-4', 'Nada', NULL, NULL, '7309224', '8', 6, '2025-07-03 15:13:41', NULL, '1', 5, 44, 2025, 7, 3, 4);
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -508,7 +473,6 @@ CREATE TABLE IF NOT EXISTS `tipo_contrato` (
 --
 
 INSERT INTO `tipo_contrato` (`id`, `nombre`, `observacion`) VALUES
-(4, 'Código del Trabajo', 'Ley Nro XXXXXXX'),
 (5, 'Estatuto Docente', 'XX'),
 (6, 'Honorarios', ''),
 (7, 'Planta', '');

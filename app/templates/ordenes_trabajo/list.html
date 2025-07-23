@@ -66,13 +66,13 @@
                   <td>{{ orden.horas_disponibles if orden.horas_disponibles is not none else 'Sin horas' }}</td>
                   <td>
                     <div class="btn-group" role="group">
-                      <a href="{{ url_for('ordenes_bp.editar_orden', id=orden.id) }}" class="btn btn-outline-warning btn-sm" title="Editar">
+                      <a href="{{ url_for('ordenes.editar_orden', id=orden.id) }}" class="btn btn-outline-warning btn-sm" title="Editar">
                         <i class="fas fa-edit text-dark"></i>
                       </a>
-                      <a href="{{ url_for('ordenes_bp.imprimir_orden', id=orden.id) }}" class="btn btn-outline-secondary btn-sm" target="_blank" title="Vista previa">
+                      <a href="{{ url_for('ordenes.imprimir_orden', id=orden.id) }}" class="btn btn-outline-secondary btn-sm" target="_blank" title="Vista previa">
                         <i class="fas fa-eye"></i>
                       </a>
-                      <a href="{{ url_for('ordenes_bp.generar_pdf_orden', id=orden.id) }}" class="btn btn-outline-info btn-sm" target="_blank" title="PDF">
+                      <a href="{{ url_for('ordenes.generar_pdf_orden', id=orden.id) }}" class="btn btn-outline-info btn-sm" target="_blank" title="PDF">
                         <i class="fas fa-file-pdf"></i>
                       </a>
                     </div>
@@ -90,7 +90,7 @@
 
         <!-- Pie con botón para nueva orden -->
         <div class="card-footer bg-light text-center rounded-bottom-4">
-          <a href="{{ url_for('ordenes_bp.nueva_orden') }}" class="btn btn-lg rounded-pill shadow px-4 text-white" style="background-color: #F6AE2D;">
+          <a href="{{ url_for('ordenes.nueva_orden') }}" class="btn btn-lg rounded-pill shadow px-4 text-white" style="background-color: #F6AE2D;">
             <i class="fas fa-plus-circle me-2"></i>Crear Nueva Orden
           </a>
         </div>

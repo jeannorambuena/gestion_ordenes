@@ -11,11 +11,14 @@ from .alcaldia import alcaldia_bp
 from .jefatura_daem import jefatura_daem_bp
 from .usuarios import usuarios_bp
 from .roles import roles_bp
+from .main import main_bp
+
 
 # Función que registra todos los blueprints en la aplicación Flask
 
 
 def registrar_blueprints(app):
+    app.register_blueprint(main_bp)
     app.register_blueprint(ordenes_bp, url_prefix='/ordenes_trabajo')
     app.register_blueprint(
         funcionarios_bp, url_prefix='/funcionarios')  #

@@ -12,13 +12,13 @@
         <i class="fas fa-user-edit text-white fa-lg"></i>
         <h3 class="text-white mb-0">Editar Funcionario</h3>
       </div>
-      <a href="{{ url_for('funcionarios_bp.listar_funcionarios') }}" class="btn btn-light btn-sm">
+      <a href="{{ url_for('funcionarios.listar_funcionarios') }}" class="btn btn-light btn-sm">
         <i class="fas fa-arrow-left me-1"></i> Volver
       </a>
     </div>
 
     <div class="card-body">
-      <form id="funcionario-form" action="{{ url_for('funcionarios_bp.editar_funcionario', rut_cuerpo=funcionario.rut_cuerpo, rut_dv=funcionario.rut_dv) }}" method="POST">
+      <form id="funcionario-form" action="{{ url_for('funcionarios.editar_funcionario', rut_cuerpo=funcionario.rut_cuerpo, rut_dv=funcionario.rut_dv) }}" method="POST">
         {{ form.hidden_tag() }}
 
         <!-- RUT solo lectura -->
@@ -93,7 +93,7 @@
           <button type="submit" class="btn btn-primary">
             <i class="fas fa-save me-1"></i> Guardar Cambios
           </button>
-          <a href="{{ url_for('funcionarios_bp.listar_funcionarios') }}" class="btn btn-secondary">
+          <a href="{{ url_for('funcionarios.listar_funcionarios') }}" class="btn btn-secondary">
             <i class="fas fa-times me-1"></i> Cancelar
           </a>
         </div>

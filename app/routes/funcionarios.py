@@ -7,7 +7,7 @@ from app.utils.roles_required import roles_required
 # Importa también buscar_funcionarios si lo usas
 from app.utils.busqueda_funcionario import buscar_funcionarios
 
-funcionarios_bp = Blueprint('funcionarios_bp', __name__)
+funcionarios_bp = Blueprint('funcionarios', __name__)
 # ===================== RUTAS PARA FUNCIONARIOS =====================
 
 
@@ -65,7 +65,7 @@ def nuevo_funcionario():
             db.session.add(nuevo_funcionario)
             db.session.commit()
             flash('Funcionario agregado con éxito', 'success')
-            return redirect(url_for('funcionarios_bp.listar_funcionarios'))
+            return redirect(url_for('funcionarios.listar_funcionarios'))
         except Exception as e:
             db.session.rollback()
             flash(
@@ -97,7 +97,7 @@ def editar_funcionario(rut_cuerpo, rut_dv):
         try:
             db.session.commit()
             flash('Funcionario actualizado con éxito', 'success')
-            return redirect(url_for('funcionarios_bp.listar_funcionarios'))
+            return redirect(url_for('funcionarios.listar_funcionarios'))
         except Exception as e:
             db.session.rollback()
             flash(
@@ -114,7 +114,7 @@ def eliminar_funcionario(rut_cuerpo, rut_dv):
         rut_cuerpo=rut_cuerpo, rut_dv=rut_dv).first()
     if not funcionario:
         flash("Funcionario no encontrado", "danger")
-        return redirect(url_for('funcionarios_bp.listar_funcionarios'))
+        return redirect(url_for('funcionarios.listar_funcionarios'))
 
     try:
         db.session.delete(funcionario)
@@ -125,7 +125,7 @@ def eliminar_funcionario(rut_cuerpo, rut_dv):
         flash(
             f'Ocurrió un error al eliminar el funcionario: {str(e)}', 'danger')
 
-    return redirect(url_for('funcionarios_bp.listar_funcionarios'))
+    return redirect(url_for('funcionarios.listar_funcionarios'))
 
 
 @funcionarios_bp.route('/detalle/<rut>')

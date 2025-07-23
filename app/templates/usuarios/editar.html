@@ -12,7 +12,7 @@
         <i class="fas fa-user-edit text-white fa-lg"></i>
         <h3 class="text-white mb-0">Editar Usuario</h3>
       </div>
-      <a href="{{ url_for('usuarios_bp.listar_usuarios') }}" class="btn btn-light btn-sm">
+      <a href="{{ url_for('usuarios.listar_usuarios') }}" class="btn btn-light btn-sm">
         <i class="fas fa-arrow-left me-1"></i> Volver
       </a>
     </div>
@@ -59,7 +59,7 @@
           <button type="submit" class="btn btn-success">
             <i class="fas fa-save me-1"></i> Guardar Cambios
           </button>
-          <a href="{{ url_for('usuarios_bp.listar_usuarios') }}" class="btn btn-danger">
+          <a href="{{ url_for('usuarios.listar_usuarios') }}" class="btn btn-danger">
             <i class="fas fa-times me-1"></i> Cancelar
           </a>
         </div>

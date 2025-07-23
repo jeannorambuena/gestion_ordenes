@@ -7,7 +7,7 @@
   <!-- Órdenes de Trabajo -->
   <div class="row justify-content-center mb-3">
     <div class="col-lg-8 col-md-10">
-      <a class="text-decoration-none" href="{{ url_for('ordenes_bp.listar_ordenes') }}">
+      <a class="text-decoration-none" href="{{ url_for('ordenes.listar_ordenes') }}">
         <div class="card shadow-lg border-0 shadow-sm card-arctic" style="background-color: #F6AE2D;">
           <div class="card-body py-4 text-center">
             <i class="fas fa-clipboard-list fa-2x text-white mb-3"></i>
@@ -24,7 +24,7 @@
       <div class="row row-cols-1 row-cols-sm-2 g-3">
         <!-- Funcionarios -->
         <div class="col">
-          <a class="text-decoration-none" href="{{ url_for('funcionarios_bp.listar_funcionarios') }}">
+          <a class="text-decoration-none" href="{{ url_for('funcionarios.listar_funcionarios') }}">
             <div class="card shadow-lg border-0 shadow-sm card-arctic" style="background-color: #2F4858;">
               <div class="card-body py-3 text-center">
                 <i class="fas fa-user fa-2x text-white mb-2"></i>
@@ -57,7 +57,7 @@
         </div>
         <!-- Tipos de Contrato -->
         <div class="col">
-          <a class="text-decoration-none" href="{{ url_for('tipo_contrato_bp.listar_tipo_contrato') }}">
+          <a class="text-decoration-none" href="{{ url_for('tipo_contrato.listar_tipo_contrato') }}">
             <div class="card shadow-lg border-0 shadow-sm card-arctic" style="background-color: #F6AE2D;">
               <div class="card-body py-3 text-center">
                 <i class="fas fa-file-signature fa-2x text-white mb-2"></i>

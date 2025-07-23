@@ -5,7 +5,7 @@ from app.models.models import Colegios
 from app.extensions.extensions import db
 from app.utils.roles_required import roles_required
 
-colegio_bp = Blueprint('colegio_bp', __name__)
+colegio_bp = Blueprint('colegio', __name__)
 # ===================== RUTAS PARA COLEGIOS =====================
 
 

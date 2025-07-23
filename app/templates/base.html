@@ -43,15 +43,15 @@
             <div class="offcanvas-body">
                 <ul class="navbar-nav">
                     {% for item in [
-                        ('ordenes_bp.listar_ordenes', 'clipboard-list', 'ORDEN DE TRABAJO'),
-                        ('funcionarios_bp.listar_funcionarios', 'user', 'FUNCIONARIOS'),
+                        ('ordenes.listar_ordenes', 'clipboard-list', 'ORDEN DE TRABAJO'),
+                        ('funcionarios.listar_funcionarios', 'user', 'FUNCIONARIOS'),
                         ('cargo.listar_cargos', 'briefcase', 'CARGOS'),
                         ('colegio.listar_colegios', 'school', 'ESCUELAS'),
-                        ('tipo_contrato_bp.listar_tipo_contrato', 'file-signature', 'TIPOS DE CONTRATOS'),
+                        ('tipo_contrato.listar_tipo_contrato', 'file-signature', 'TIPOS DE CONTRATOS'),
                         ('alcaldia.listar_alcaldias', 'landmark', 'ALCALDÍA'),
                         ('jefatura_daem.listar_jefaturas_daem', 'user-cog', 'JEFATURA DAEM'),
                         ('financiamiento.listar_financiamientos', 'hand-holding-usd', 'FINANCIAMIENTO'),
-                        ('usuarios_bp.listar_usuarios', 'users-cog', 'USUARIOS'),
+                        ('usuarios.listar_usuarios', 'users-cog', 'USUARIOS'),
                         ('roles.listar_roles', 'users-cog', 'ROLES'),
                         ('auth.logout', 'sign-out-alt', 'CERRAR SESIÓN')
                     ] %}

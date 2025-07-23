@@ -3,35 +3,69 @@
 {% block title %}Permisos de {{ usuario.nombre_usuario }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5 d-flex justify-content-center">
-  <div class="card shadow-lg p-4 mb-5 bg-white rounded" style="width: 100%; max-width: 800px;">
-    <h2 class="text-center mb-4">Permisos para {{ usuario.nombre_usuario }}</h2>
-    <form method="POST" novalidate>
+<div class="container mt-5 d-flex justify-content-center align-items-center" style="min-height:70vh;">
+  <div class="card shadow-lg p-4 mb-5 bg-white rounded-4 border-0" style="width: 100%; max-width: 700px;">
+    <div class="mb-4 text-center">
+      <h2 class="fw-bold mb-1" style="color: #2A3547;">Permisos para {{ usuario.nombre_usuario }}</h2>
+      <p class="text-muted mb-0">Marca o desmarca los permisos y haz clic en <b>Guardar Permisos</b>.</p>
+    </div>
+    <form method="POST" novalidate autocomplete="off">
+      <div class="mb-3">
+        <div class="form-check form-switch d-flex align-items-center gap-2 justify-content-end">
+          <input class="form-check-input" type="checkbox" id="checkAll">
+          <label class="form-check-label small" for="checkAll"><b>Seleccionar/Desmarcar todos</b></label>
+        </div>
+      </div>
       <div class="row g-3">
         {% for permiso in todos_los_permisos %}
-          <div class="col-md-6">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" name="permisos" value="{{ permiso.id }}"
-                     id="permiso{{ permiso.id }}"
-                     {% if permiso.id in permisos_usuario %}checked{% endif %}>
-              <label class="form-check-label" for="permiso{{ permiso.id }}">
-                <strong>{{ permiso.nombre }}</strong><br>
-                <small class="text-muted">{{ permiso.descripcion }}</small>
+          <div class="col-sm-6">
+            <div class="form-check form-switch px-3 py-2 bg-light rounded-3 shadow-sm mb-2 d-flex align-items-start gap-2" style="min-height: 70px;">
+              <input
+                class="form-check-input permiso-checkbox"
+                type="checkbox"
+                name="permisos"
+                value="{{ permiso.id }}"
+                id="permiso{{ permiso.id }}"
+                {% if permiso.id in permisos_usuario %}checked{% endif %}
+                style="transform: scale(1.2);"
+                aria-label="Permiso {{ permiso.nombre }}"
+              >
+              <label class="form-check-label w-100" for="permiso{{ permiso.id }}">
+                <span class="fw-semibold">{{ permiso.nombre }}</span><br>
+                <span class="text-muted small">{{ permiso.descripcion }}</span>
               </label>
             </div>
           </div>
         {% endfor %}
       </div>
-
       <div class="mt-4 d-flex justify-content-between">
-        <a href="{{ url_for('usuarios_bp.listar_usuarios') }}" class="btn btn-secondary shadow-sm">
-          Cancelar
+        <a href="{{ url_for('usuarios.listar_usuarios') }}" class="btn btn-outline-secondary rounded-pill px-4 shadow-sm">
+          <i class="fas fa-arrow-left me-2"></i>Cancelar
         </a>
-        <button type="submit" class="btn btn-primary shadow-sm">
-          Guardar Permisos
+        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
+          <i class="fas fa-save me-2"></i>Guardar Permisos
         </button>
       </div>
     </form>
   </div>
 </div>
+
+<script>
+  // Seleccionar/desmarcar todos los permisos
+  document.addEventListener('DOMContentLoaded', function () {
+    const checkAll = document.getElementById('checkAll');
+    const checks = document.querySelectorAll('.permiso-checkbox');
+    if (checkAll) {
+      checkAll.addEventListener('change', function () {
+        checks.forEach(cb => cb.checked = checkAll.checked);
+      });
+      // Si todos están marcados, marca el checkAll
+      function updateCheckAll() {
+        checkAll.checked = Array.from(checks).every(cb => cb.checked);
+      }
+      checks.forEach(cb => cb.addEventListener('change', updateCheckAll));
+      updateCheckAll();
+    }
+  });
+</script>
 {% endblock %}

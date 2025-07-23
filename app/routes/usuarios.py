@@ -5,7 +5,7 @@ from app.models.models import Usuario, Permiso
 from app.extensions.extensions import db
 from app.utils.roles_required import roles_required
 
-usuarios_bp = Blueprint('usuarios_bp', __name__)
+usuarios_bp = Blueprint('usuarios', __name__)
 
 
 # ===================== RUTAS PARA USUARIOS =====================
@@ -17,25 +17,6 @@ usuarios_bp = Blueprint('usuarios_bp', __name__)
 def listar_usuarios():
     usuarios = Usuario.query.all()
     return render_template('usuarios/list.html', usuarios=usuarios)
-
-
-@usuarios_bp.route('/permisos/<int:id>', methods=['GET', 'POST'])
-@login_required
-@roles_required('administrador')
-def gestionar_permisos(id):
-    usuario = Usuario.query.get_or_404(id)
-    todos_los_permisos = Permiso.query.all()
-    permisos_usuario = {p.id for p in usuario.permisos}
-
-    if request.method == 'POST':
-        permisos_seleccionados = request.form.getlist('permisos')
-        usuario.permisos = Permiso.query.filter(
-            Permiso.id.in_(permisos_seleccionados)).all()
-        db.session.commit()
-        flash('Permisos actualizados correctamente.', 'success')
-        return redirect(url_for('usuarios_bp.listar_usuarios'))
-
-    return render_template('usuarios/permisos.html', usuario=usuario, todos_los_permisos=todos_los_permisos, permisos_usuario=permisos_usuario)
 
 
 @usuarios_bp.route('/usuarios/permisos/<int:id>', methods=['GET', 'POST'])
@@ -58,9 +39,9 @@ def asignar_permisos(id):
 
         db.session.commit()
         flash('Permisos actualizados correctamente.', 'success')
-        return redirect(url_for('usuarios_bp.listar_usuarios'))
+        return redirect(url_for('usuarios.listar_usuarios'))
 
-    return render_template('usuarios/asignar_permisos.html', usuario=usuario, todos_permisos=todos_permisos)
+    return render_template('usuarios/permisos.html', usuario=usuario, todos_permisos=todos_permisos)
 
 
 @usuarios_bp.route('/nuevo', methods=['GET', 'POST'])
@@ -73,7 +54,7 @@ def nuevo_usuario():
             nombre_usuario=form.nombre_usuario.data).first()
         if usuario_existente:
             flash('El nombre de usuario ya existe.', 'warning')
-            return redirect(url_for('usuarios_bp.nuevo_usuario'))
+            return redirect(url_for('usuarios.nuevo_usuario'))
         nuevo_usuario = Usuario(nombre_usuario=form.nombre_usuario.data)
         nuevo_usuario.set_password(form.contraseña.data)
         # Asignación de rol directamente desde el formulario
@@ -81,7 +62,7 @@ def nuevo_usuario():
         db.session.add(nuevo_usuario)
         db.session.commit()
         flash('Usuario creado exitosamente.', 'success')
-        return redirect(url_for('usuarios_bp.listar_usuarios'))
+        return redirect(url_for('usuarios.listar_usuarios'))
     return render_template('usuarios/nuevo.html', form=form)
 
 
@@ -98,7 +79,7 @@ def editar_usuario(id):
             usuario.set_password(form.contrasena.data)
         db.session.commit()
         flash('Usuario actualizado exitosamente.', 'success')
-        return redirect(url_for('usuarios_bp.listar_usuarios'))
+        return redirect(url_for('usuarios.listar_usuarios'))
     return render_template('usuarios/editar.html', form=form, usuario=usuario)
 
 
@@ -110,4 +91,4 @@ def eliminar_usuario(id):
     db.session.delete(usuario)
     db.session.commit()
     flash('Usuario eliminado exitosamente.', 'success')
-    return redirect(url_for('usuarios_bp.listar_usuarios'))
+    return redirect(url_for('usuarios.listar_usuarios'))

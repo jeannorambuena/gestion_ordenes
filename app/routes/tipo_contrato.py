@@ -5,7 +5,7 @@ from app.models.models import TipoContrato
 from app.extensions.extensions import db
 from app.utils.roles_required import roles_required
 
-tipo_contrato_bp = Blueprint('tipo_contrato_bp', __name__)
+tipo_contrato_bp = Blueprint('tipo_contrato', __name__)
 
 # ===================== RUTAS PARA TIPO DE CONTRATO =====================
 
@@ -32,7 +32,7 @@ def nuevo_tipo_contrato():
         db.session.add(nuevo_tipo)
         db.session.commit()
         flash('Tipo de contrato creado con éxito', 'success')
-        return redirect(url_for('tipo_contrato_bp.listar_tipo_contrato'))
+        return redirect(url_for('tipo_contrato.listar_tipo_contrato'))
     return render_template('tipo_contrato/nuevo.html', form=form)
 
 
@@ -47,7 +47,7 @@ def editar_tipo_contrato(id):
         tipo.observacion = form.observacion.data
         db.session.commit()
         flash('Tipo de contrato actualizado con éxito', 'success')
-        return redirect(url_for('tipo_contrato_bp.listar_tipo_contrato'))
+        return redirect(url_for('tipo_contrato.listar_tipo_contrato'))
     return render_template('tipo_contrato/editar.html', form=form, tipo=tipo)
 
 
@@ -59,4 +59,4 @@ def eliminar_tipo_contrato(id):
     db.session.delete(tipo)
     db.session.commit()
     flash('Tipo de contrato eliminado con éxito', 'success')
-    return redirect(url_for('tipo_contrato_bp.listar_tipo_contrato'))
+    return redirect(url_for('tipo_contrato.listar_tipo_contrato'))

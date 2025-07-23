@@ -13,7 +13,7 @@ from app.extensions.extensions import db
 from flask_login import login_required
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, make_response
 
-ordenes_bp = Blueprint('ordenes_bp', __name__)
+ordenes_bp = Blueprint('ordenes', __name__)
 
 # ===================== RUTAS PARA ORDENES DE TRABAJO =====================
 
@@ -113,7 +113,7 @@ def nueva_orden():
         db.session.commit()
 
         flash('Orden de trabajo creada con éxito', 'success')
-        return redirect(url_for('ordenes_bp.listar_ordenes'))
+        return redirect(url_for('ordenes.listar_ordenes'))
 
     return render_template('ordenes_trabajo/nueva.html',
                            form=form,
@@ -208,7 +208,7 @@ def editar_orden(id):
 
         db.session.commit()
         flash('Orden de trabajo actualizada con éxito', 'success')
-        return redirect(url_for('ordenes_bp.listar_ordenes'))
+        return redirect(url_for('ordenes.listar_ordenes'))
 
     return render_template('ordenes_trabajo/editar.html', form=form, orden=orden)
 
@@ -221,4 +221,4 @@ def eliminar_orden(id):
     db.session.delete(orden)
     db.session.commit()
     flash('Orden de trabajo eliminada con éxito', 'success')
-    return redirect(url_for('ordenes_bp.listar_ordenes'))
+    return redirect(url_for('ordenes.listar_ordenes'))
