@@ -3,25 +3,50 @@
 {% block title %}Editar Rol{% endblock %}
 
 {% block content %}
-<div class="container mt-5 d-flex justify-content-center">
-    <div class="card shadow-lg p-4 mb-5 bg-white rounded" style="max-width: 600px;">
-        <h2 class="text-center mb-4">Editar Rol</h2>
-        
-        <form action="" method="POST">
-            {{ form.hidden_tag() }}
-            <div class="mb-3">
-                <label for="nombre_rol" class="form-label">Nombre del Rol</label>
-                {{ form.nombre_rol(class="form-control") }}
-            </div>
-            <div class="mb-3">
-                <label for="descripcion" class="form-label">Descripción</label>
-                {{ form.descripcion(class="form-control") }}
-            </div>
-            <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary me-2">Actualizar</button>
-                <a href="{{ url_for('roles.listar_roles') }}" class="btn btn-secondary">Cancelar</a>
-            </div>
-        </form>
+<div class="container mt-4 d-flex justify-content-center">
+  <div class="card shadow-lg border-0 rounded" style="max-width: 600px; width: 100%;">
+
+    <!-- Cabecera -->
+    <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #2F4858;">
+      <div class="d-flex align-items-center gap-3">
+        <i class="fas fa-edit text-white fa-lg"></i>
+        <h3 class="text-white mb-0">Editar Rol</h3>
+      </div>
+      <a href="{{ url_for('roles.listar_roles') }}" class="btn btn-light btn-sm">
+        <i class="fas fa-arrow-left me-1"></i> Volver
+      </a>
     </div>
+
+    <div class="card-body">
+      <form action="" method="POST" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          <label for="nombre_rol" class="form-label">Nombre del Rol</label>
+          {{ form.nombre_rol(class="form-control") }}
+          {% if form.nombre_rol.errors %}
+            <div class="text-danger small mt-1">{{ form.nombre_rol.errors[0] }}</div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label for="descripcion" class="form-label">Descripción</label>
+          {{ form.descripcion(class="form-control", rows="3") }}
+          {% if form.descripcion.errors %}
+            <div class="text-danger small mt-1">{{ form.descripcion.errors[0] }}</div>
+          {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-center gap-3">
+          <button type="submit" class="btn btn-success shadow-sm">
+            Guardar Cambios
+          </button>
+          <a href="{{ url_for('roles.listar_roles') }}" class="btn btn-danger shadow-sm">
+            Cancelar
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}

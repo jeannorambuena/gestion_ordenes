@@ -1,6 +1,7 @@
 from app.auth import auth_bp
 from flask import Flask, jsonify
-from app.extensions import db, migrate, login_manager
+from app.extensions.extensions import db, migrate, login_manager
+from app.models.models import Usuario
 from config import Config
 
 
@@ -12,12 +13,15 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
-    # login_manager.login_view = 'login'
     login_manager.login_view = 'auth.login'
     login_manager.login_message_category = 'info'
 
+    @login_manager.user_loader
+    def load_user(user_id):
+        return Usuario.query.get(int(user_id))
+
     # Registrar Blueprints
-    from app.routes import (
+    from app.routes.routes import (
         main_bp, cargo_bp, colegio_bp, alcaldia_bp,
         jefatura_daem_bp, financiamiento_bp, roles_bp, historial_bp,
         ordenes_bp, funcionarios_bp, tipo_contrato_bp, usuarios_bp

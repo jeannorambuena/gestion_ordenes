@@ -1,40 +1,67 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ usuario is defined and 'Editar Usuario' or 'Nuevo Usuario' }}{% endblock %}
+{% block title %}
+  {{ usuario is defined and 'Editar Usuario' or 'Nuevo Usuario' }}
+{% endblock %}
 
 {% block content %}
 <div class="container mt-5 d-flex justify-content-center">
-    <!-- Card para el formulario de nuevo usuario -->
-    <div class="card shadow-lg p-4 mb-5 bg-white rounded" style="width: 100%; max-width: 600px;">
-        <h2 class="text-center mb-4">{{ usuario is defined and 'Editar Usuario' or 'Crear Nuevo Usuario' }}</h2>
-        <form action="" method="POST">
-            {{ form.hidden_tag() }}
-            
-            <div class="mb-3">
-                <label for="nombre_usuario" class="form-label">Nombre de Usuario</label>
-                {{ form.nombre_usuario(class="form-control") }}
-            </div>
-            
-            <div class="mb-3">
-                <label for="contraseña" class="form-label">Contraseña</label>
-                {{ form.contraseña(class="form-control") }}
-            </div>
-            
-            <div class="mb-3">
-                <label for="confirmar_contraseña" class="form-label">Confirmar Contraseña</label>
-                {{ form.confirmar_contraseña(class="form-control") }}
-            </div>
-            
-            <div class="mb-3">
-                <label for="rol" class="form-label">Rol</label>
-                {{ form.rol(class="form-select") }}
-            </div>
-
-            <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-primary me-2">{{ usuario is defined and 'Actualizar' or 'Crear' }}</button>
-                <a href="{{ url_for('usuarios_bp.listar_usuarios') }}" class="btn btn-secondary">Cancelar</a>
-            </div>
-        </form>
+  <div class="card shadow-lg border-0 rounded" style="max-width: 600px; width: 100%;">
+    <!-- Cabecera -->
+    <div class="card-header d-flex align-items-center gap-3" style="background-color: #2F4858;">
+      <i class="fas fa-user{{ usuario is defined and '-edit' or '' }} text-white fa-lg"></i>
+      <h3 class="text-white mb-0">
+        {{ usuario is defined and 'Editar Usuario' or 'Crear Nuevo Usuario' }}
+      </h3>
     </div>
+
+    <div class="card-body">
+      <form action="" method="POST" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          <label for="nombre_usuario" class="form-label">Nombre de Usuario</label>
+          {{ form.nombre_usuario(class="form-control") }}
+          {% if form.nombre_usuario.errors %}
+            <div class="text-danger mt-1">{{ form.nombre_usuario.errors[0] }}</div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label for="contraseña" class="form-label">Contraseña</label>
+          {{ form.contraseña(class="form-control") }}
+          {% if form.contraseña.errors %}
+            <div class="text-danger mt-1">{{ form.contraseña.errors[0] }}</div>
+          {% endif %}
+          <small class="text-muted">Deja vacío para mantener la contraseña actual.</small>
+        </div>
+
+        <div class="mb-3">
+          <label for="confirmar_contraseña" class="form-label">Confirmar Contraseña</label>
+          {{ form.confirmar_contraseña(class="form-control") }}
+          {% if form.confirmar_contraseña.errors %}
+            <div class="text-danger mt-1">{{ form.confirmar_contraseña.errors[0] }}</div>
+          {% endif %}
+        </div>
+
+        <div class="mb-3">
+          <label for="rol" class="form-label">Rol</label>
+          {{ form.rol(class="form-select") }}
+          {% if form.rol.errors %}
+            <div class="text-danger mt-1">{{ form.rol.errors[0] }}</div>
+          {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-center gap-3">
+          <button type="submit" class="btn btn-success shadow-sm">
+            {{ usuario is defined and 'Actualizar' or 'Crear' }}
+          </button>
+          <a href="{{ url_for('usuarios_bp.listar_usuarios') }}" class="btn btn-danger shadow-sm">
+            Cancelar
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}
