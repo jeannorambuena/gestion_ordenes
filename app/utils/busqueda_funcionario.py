@@ -1,4 +1,4 @@
-from app.models.models import Funcionarios
+from app.models import Funcionarios, Cargo
 from sqlalchemy import or_
 
 

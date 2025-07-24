@@ -4,14 +4,23 @@ from sqlalchemy import and_, or_
 from sqlalchemy.orm import joinedload
 from datetime import datetime, date
 from app.forms.forms import OrdenTrabajoForm
-from app.models.models import (
-    OrdenesTrabajo, Funcionarios, Colegios, TipoContrato,
-    Financiamiento, Alcaldia, JefaturaDAEM
+from app.models import (
+    OrdenesTrabajo,
+    Funcionarios,
+    Colegios,
+    TipoContrato,
+    Financiamiento,
+    Alcaldia,
+    JefaturaDAEM
 )
 from app.utils.roles_required import roles_required
 from app.extensions.extensions import db
 from flask_login import login_required
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, make_response
+from flask import (
+    Blueprint, render_template, request, redirect,
+    url_for, flash, jsonify, make_response
+)
+
 
 ordenes_bp = Blueprint('ordenes', __name__)
 

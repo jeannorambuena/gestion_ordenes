@@ -16,7 +16,7 @@ from wtforms.validators import (
 from app.utils.validators import validar_rut
 
 # 📌 Modelos del sistema
-from app.models.models import (
+from app.models import (
     Funcionarios, TipoContrato, Colegios,
     Financiamiento, Alcaldia, JefaturaDAEM, Cargo
 )

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from app.forms.forms import RolForm
-from app.models.models import Rol
+from app.models import Rol
 from app.extensions.extensions import db
 from app.utils.roles_required import roles_required
 

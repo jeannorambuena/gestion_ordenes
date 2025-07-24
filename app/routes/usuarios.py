@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from app.forms.forms import UsuarioForm
-from app.models.models import Usuario, Permiso
+from app.models import Usuario, Permiso
 from app.extensions.extensions import db
 from app.utils.roles_required import roles_required
 

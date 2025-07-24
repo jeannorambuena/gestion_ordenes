@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required
-from app.models.models import Funcionarios
+from app.models import Funcionarios, Cargo
 from app.utils.validators import validar_rut
 
 main_bp = Blueprint('main', __name__)

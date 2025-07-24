@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from app.forms.forms import FinanciamientoForm
-from app.models.models import Financiamiento
+from app.models import Financiamiento
 from app.extensions.extensions import db
 from app.utils.roles_required import roles_required
 

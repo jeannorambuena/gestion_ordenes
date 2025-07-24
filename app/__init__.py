@@ -1,6 +1,12 @@
 """
 Inicialización principal de la aplicación Flask.
-Aquí se configuran extensiones, carga de usuario, registro de Blueprints y manejo global de errores.
+
+Aquí se configuran extensiones globales (DB, migraciones, login manager), 
+la carga de usuario para Flask-Login, el registro de Blueprints y el manejo global de errores.
+Este archivo es el punto de entrada de la arquitectura y asegura la cohesión del proyecto.
+
+Autor: Jean Paul Norambuena
+Fecha: 2025-07-23
 """
 
 from flask import Flask, jsonify
@@ -9,8 +15,8 @@ from config import Config
 # Importa extensiones (db, migrate, login_manager)
 from app.extensions.extensions import db, migrate, login_manager
 
-# Importa modelo de usuario para login
-from app.models.models import Usuario
+# Importa modelo de usuario para login (usando estructura modular)
+from app.models import Usuario
 
 # Importa blueprint de autenticación
 from app.auth import auth_bp
@@ -37,11 +43,13 @@ def create_app(config_class=Config):
     # === Carga de usuario para Flask-Login ===
     @login_manager.user_loader
     def load_user(user_id):
-        """Devuelve el usuario para la sesión dada su id."""
+        """
+        Devuelve el usuario para la sesión dada su id.
+        Flask-Login requiere esta función para cargar usuarios autenticados.
+        """
         return Usuario.query.get(int(user_id))
 
     # === Registro de Blueprints ===
-    # Centraliza el registro usando la función del paquete routes
     registrar_blueprints(app)
     app.register_blueprint(auth_bp, url_prefix='/auth')
 

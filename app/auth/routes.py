@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from app.auth import auth_bp
 from app.auth.forms import LoginForm, RegisterForm
 # from app.models import Usuario, db
-from app.models.models import Usuario
+from app.models import Usuario
 from app.extensions.extensions import db
 
 

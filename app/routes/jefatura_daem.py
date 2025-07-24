@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from app.forms.forms import JefaturaDAEMForm
-from app.models.models import JefaturaDAEM, Funcionarios
+from app.models import JefaturaDAEM, Funcionarios
 from app.extensions.extensions import db
 from app.utils.roles_required import roles_required
 from datetime import datetime

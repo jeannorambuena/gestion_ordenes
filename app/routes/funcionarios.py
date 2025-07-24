@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from flask_login import login_required
 from app.forms.forms import FuncionarioForm
-from app.models.models import Funcionarios, Cargo
+from app.models import Funcionarios, Cargo
 from app.extensions.extensions import db
 from app.utils.roles_required import roles_required
 # Importa también buscar_funcionarios si lo usas
